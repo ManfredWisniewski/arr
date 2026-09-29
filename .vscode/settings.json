@@ -1,5 +1,13 @@
 {
   "files.watcherExclude": {
     "**/+wit-*/**": true
+  },
+  "npm.packageManager": "pnpm",
+  "js/ts.tsdk.path": "node_modules/typescript/lib",
+  "js/ts.tsdk.promptToUseWorkspaceVersion": true,
+  "[javascript][typescript][typescriptreact]": {
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": "explicit"
+    }
   }
 }

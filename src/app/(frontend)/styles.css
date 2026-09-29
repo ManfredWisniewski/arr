@@ -1,0 +1,103 @@
+/* Base frontend styles. Design values come from the `theme` global
+   (compiled wit-tokens CSS injected into <head>); var() fallbacks keep the
+   site readable before the first theme push. */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-family-sans, system-ui, sans-serif);
+  font-size: var(--font-size-base, 1rem);
+  line-height: var(--line-height-normal, 1.6);
+  color: var(--fg, #111);
+  background: var(--bg, #fff);
+}
+
+.page {
+  max-width: var(--content-width, 70ch);
+  margin: 0 auto;
+  padding: var(--space-lg, 2rem) var(--space-md, 1rem);
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-weight: var(--font-weight-bold, 700);
+  line-height: var(--line-height-tight, 1.25);
+}
+
+a {
+  color: var(--brand, inherit);
+
+  &:hover {
+    color: var(--brand-hover, currentColor);
+  }
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+figure {
+  margin: var(--space-md, 1rem) 0;
+}
+
+figcaption {
+  margin-top: var(--space-xs, 0.25rem);
+  color: var(--fg-muted, #666);
+  font-size: var(--font-size-sm, 0.875rem);
+}
+
+blockquote {
+  margin: var(--space-md, 1rem) 0;
+  padding-left: var(--space-md, 1rem);
+  border-left: 3px solid var(--brand, #888);
+  color: var(--fg-muted, #555);
+}
+
+code {
+  font-family: var(--font-family-mono, monospace);
+  font-size: var(--font-size-sm, 0.875em);
+  background: var(--bg-muted, #f0f0f0);
+  padding: 0.1em 0.3em;
+  border-radius: var(--radius-sm, 3px);
+}
+
+pre {
+  padding: var(--space-md, 1rem);
+  background: var(--bg-muted, #f0f0f0);
+  border-radius: var(--radius-md, 6px);
+  overflow-x: auto;
+
+  code {
+    background: none;
+    padding: 0;
+  }
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th,
+td {
+  border: 1px solid var(--border, #ddd);
+  padding: var(--space-xs, 0.4rem) var(--space-sm, 0.75rem);
+  text-align: left;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid var(--border, #ddd);
+  margin: var(--space-lg, 2rem) 0;
+}

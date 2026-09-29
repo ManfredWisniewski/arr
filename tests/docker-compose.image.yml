@@ -1,0 +1,25 @@
+services:
+  payload:
+    build:
+      context: ..
+    image: ${PAYLOAD_IMAGE_UNDER_TEST:-docker-payload:image-test}
+    ports:
+      - '127.0.0.1:${PAYLOAD_TEST_PORT:-3011}:3000'
+    environment:
+      DATABASE_URL: postgresql://payload_test:payload_test@postgres:5432/payload_test
+      PAYLOAD_SECRET: image-test-secret-not-for-production
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: payload_test
+      POSTGRES_USER: payload_test
+      POSTGRES_PASSWORD: payload_test
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U payload_test -d payload_test"]
+      interval: 2s
+      timeout: 5s
+      retries: 15

@@ -1,17 +1,21 @@
 # Instructions for AI agents
 
-This repository is `<project>`. Read `+wit-dev/README.md`, `+wit-dev/AGENTS.md` and `+intent/` before making changes.
+This repository is `arr-witconsult`, the Payload CMS application for witconsult.de. Read `+wit-dev/README.md`, `+wit-dev/AGENTS.md` and `+intent/` before making changes.
 
 ## Rules
 
 The shared rules in `+wit-common/conventions/agent-rules.md` apply. Additionally:
 
-- `<project-specific rule, or remove this line>`
+- The Payload database is a derived read model — never treat it as a source of truth; content and theme are pushed via the REST API.
+- Do not store credentials, customer data, conversation logs or runtime state.
 
 ## Commands
 
 ```text
-build:  <build command>
-test:   <test command>
-lint:   npx markdownlint-cli2 "**/*.md"
+build:  npm run build          (Next.js standalone; Dockerfile builds the image)
+test:   npm run test:int       (vitest, needs PostgreSQL via docker compose up)
+        npm run test:e2e       (playwright)
+        ./scripts/test-image.sh (production image smoke test)
+lint:   npm run lint && npx markdownlint-cli2 "**/*.md"
+types:  npx payload generate:types
 ```

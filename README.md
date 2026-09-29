@@ -1,0 +1,147 @@
+# arr-witconsult
+
+The Payload CMS application for witconsult.de — a site-agnostic image deployed
+through the `wit.docker_apps` Ansible role. Supersedes
+`github.com/ManfredWisniewski/docker-payload` as the app-code repository.
+
+Design: `+wit-wiki/plans/payload/2026-09-29_plan-payload-website.md` —
+intent and boundaries: `+intent/intent.md`.
+
+Before making changes, read the shared WIT development guidance in `+wit-dev/`
+in this repository. Start with `+wit-dev/README.md` and `+wit-dev/AGENTS.md`,
+then read the relevant convention or best-practice files. These shared
+definitions apply independently of which skill or AI agent is performing the
+work.
+
+## AI folders
+
+- `/+intent` — intent, decision records, test strategy
+- `/+wit-dev` — shared development conventions
+- `/+wit-common` — shared conventions and repo scripts
+- `/+wit-wiki` — shared research, plans and templates
+
+## What the app provides
+
+- `pages` collection: `title`, `slug`, `path` (unique route), `markdownRaw`,
+  `content` (Lexical richText), `sourcePath` (idempotency key), `sourceRepo`,
+  `meta { title, description }`; drafts enabled.
+- `media` collection: upload with `alt`, `caption`, `sourceHash` (sha256
+  dedup), `sourcePath`.
+- `users` collection: API-key auth (`useAPIKey`) plus a `role` field
+  (`editor` / `content-bot`).
+- `theme` global: `cssLight`, `cssDark`, `meta { siteName, fontFamily }` —
+  per-site styling as data, pushed via `PATCH /api/globals/theme`.
+- markdown → Lexical: the `pages` `beforeValidate` hook converts `markdownRaw`
+  server-side; clients send plain markdown and `![media:<id>]()` placeholders.
+- D04 review gate: only `editor` may set `_status: 'published'`; the
+  `content-bot` can create/update drafts but cannot publish or delete.
+- Frontend: `app/(frontend)/[[...path]]` renders published pages by route and
+  injects the `theme` CSS into `<head>`.
+
+## Requirements
+
+- Docker Engine with Compose
+- Node.js 20.9+ for local development, or Docker for the provided development
+  workflow
+- PostgreSQL for local development or deployment
+
+## Local development
+
+Create a local environment file and set a long random `PAYLOAD_SECRET`:
+
+```sh
+cp .env.example .env
+```
+
+Start Payload and PostgreSQL:
+
+```sh
+docker compose up
+```
+
+The local application is available at `http://127.0.0.1:3000`. The health
+endpoint is `http://127.0.0.1:3000/api/health`.
+
+## Production image
+
+The Dockerfile builds a standalone Next.js image from
+`node:22.17.0-bookworm-slim`. Debian slim is used instead of Alpine because the
+target Docker host cannot load the Alpine Sharp native dependency. The image
+runs as UID/GID `1000:1000`, runs Payload migrations through the image
+entrypoint before startup, exposes port `3000`, and includes the Payload
+configuration and seed script required by the Ansible integration.
+
+Build locally:
+
+```sh
+docker build -t docker-payload:test .
+```
+
+The deployment image must be published to GHCR with an immutable tag and
+digest. Configure the resulting repository, tag, and digest as
+`payload_image_repository`, `payload_image_tag`, and `payload_image_digest` in
+the Ansible host variables.
+
+## Image tests
+
+Run the Docker image smoke tests before publishing or deploying:
+
+```sh
+./scripts/test-image.sh
+```
+
+The test builds the production image from the Dockerfile, starts it with
+PostgreSQL, verifies that the runtime uses UID/GID 1000, runs the bundled
+migrations, checks `/api/health`, and runs the bundled admin seed command
+twice to verify idempotence. The temporary Compose stack and PostgreSQL volume
+are removed automatically when the test exits.
+
+Use a different local port if port `3011` is already in use:
+
+```sh
+PAYLOAD_TEST_PORT=3012 ./scripts/test-image.sh
+```
+
+## Publish to GHCR
+
+GitHub Actions (`.github/workflows/build.yml`) builds and pushes the image to
+`ghcr.io/manfredwisniewski/docker-payload` (image name kept so existing
+Ansible pins stay valid) on pushes to `main` (`sha-<commit>` tag) and `v*`
+tags. To publish manually, `scripts/publish-ghcr.sh` builds the image, runs
+`scripts/test-image.sh` first, reads the GitHub token without echoing it,
+publishes only after the tests pass, and records Ansible-ready values in
+`image-digest.yml`:
+
+```sh
+./scripts/publish-ghcr.sh test-20260928-1400
+```
+
+Use the recorded `sha256:` digest in the Ansible host variables. Do not use
+`latest`:
+
+```yaml
+payload_image_repository: "ghcr.io/manfredwisniewski/docker-payload"
+payload_image_tag: "sha-<commit>"
+payload_image_digest: "sha256:<64-hex-character-digest>"
+```
+
+## Application contract
+
+The Ansible integration expects:
+
+- `GET /api/health` to return HTTP 200 JSON;
+- PostgreSQL through `DATABASE_URI` (`DATABASE_URL` still accepted as a
+  fallback);
+- media storage at `/app/media`;
+- image uploads without Sharp-based resizing on the current test host;
+- `seed-admin.js` to create the first admin idempotently;
+- `PAYLOAD_SEED_ADMIN_EMAIL` and `PAYLOAD_SEED_ADMIN_PASSWORD` for the seed
+  command; and
+- `PAYLOAD_SECRET` to be supplied through the Ansible vault.
+
+The content sync contract (fields, endpoints, draft-only writes) is documented
+in `wit_pytools/payloadtools/+intent/INTENT.md`; the content repository holds
+`.witcontent.yml` with the mapping rules.
+
+Do not commit `.env`, generated secrets, image credentials, or production
+database credentials.

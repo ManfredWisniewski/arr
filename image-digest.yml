@@ -1,0 +1,3 @@
+payload_image_repository: "ghcr.io/manfredwisniewski/docker-payload"
+payload_image_tag: "test-20260928-161657"
+payload_image_digest: "sha256:598dd3011024e3b14cdbf88654c7274a02037c0bd2d91249d478a3ac96b48531"

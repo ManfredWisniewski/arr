@@ -276,3 +276,13 @@ packages/tokens/build/
 
 # The generic *.jar rule above must not swallow the Gradle wrapper
 !**/gradle/wrapper/gradle-wrapper.jar
+
+# Payload app (Next.js)
+/.next/
+/out/
+next-env.d.ts
+/media
+/test-results/
+/playwright-report/
+/blob-report/
+.env*.local

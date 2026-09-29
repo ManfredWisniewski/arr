@@ -2,3 +2,11 @@
 	path = +wit-common
 	url = https://github.com/ManfredWisniewski/wit-common.git
 	branch = main
+[submodule "+wit-wiki"]
+	path = +wit-wiki
+	url = https://github.com/ManfredWisniewski/wit-wiki.git
+	branch = main
+[submodule "+wit-dev"]
+	path = +wit-dev
+	url = https://github.com/ManfredWisniewski/wit-dev.git
+	branch = main

@@ -2,7 +2,7 @@ services:
   payload:
     build:
       context: ..
-    image: ${PAYLOAD_IMAGE_UNDER_TEST:-docker-payload:image-test}
+    image: ${PAYLOAD_IMAGE_UNDER_TEST:-arr-witconsult:image-test}
     ports:
       - '127.0.0.1:${PAYLOAD_TEST_PORT:-3011}:3000'
     environment:

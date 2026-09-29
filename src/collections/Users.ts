@@ -6,7 +6,10 @@ export const Users: CollectionConfig = {
     useAsTitle: 'email',
   },
   auth: {
-    useAPIKey: true,
+    useAPIKey: {
+      // lets an admin reveal the stored key instead of regenerating
+      reveal: true,
+    },
   },
   fields: [
     // Email added by default

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-IMAGE_REPOSITORY="${IMAGE_REPOSITORY:-ghcr.io/manfredwisniewski/docker-payload}"
+IMAGE_REPOSITORY="${IMAGE_REPOSITORY:-ghcr.io/manfredwisniewski/arr}"
 PLATFORM="${PLATFORM:-linux/amd64}"
 DIGEST_FILE="${DIGEST_FILE:-image-digest.yml}"
 CLEAN_DOCKER="${CLEAN_DOCKER:-0}"
@@ -13,7 +13,7 @@ fi
 
 TAG="${1:-test-$(date -u +%Y%m%d-%H%M%S)}"
 IMAGE="${IMAGE_REPOSITORY}:${TAG}"
-LOCAL_IMAGE="docker-payload:publish-test"
+LOCAL_IMAGE="arr-witconsult:publish-test"
 
 if ! command -v docker >/dev/null 2>&1; then
   echo "docker is required" >&2

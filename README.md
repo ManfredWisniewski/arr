@@ -74,7 +74,7 @@ configuration and seed script required by the Ansible integration.
 Build locally:
 
 ```sh
-docker build -t docker-payload:test .
+docker build -t arr-witconsult:test .
 ```
 
 The deployment image must be published to GHCR with an immutable tag and
@@ -105,9 +105,9 @@ PAYLOAD_TEST_PORT=3012 ./scripts/test-image.sh
 ## Publish to GHCR
 
 GitHub Actions (`.github/workflows/build.yml`) builds and pushes the image to
-`ghcr.io/manfredwisniewski/docker-payload` (image name kept so existing
-Ansible pins stay valid) on pushes to `main` (`sha-<commit>` tag) and `v*`
-tags. To publish manually, `scripts/publish-ghcr.sh` builds the image, runs
+`ghcr.io/manfredwisniewski/arr` on pushes to `main` (`sha-<commit>` tag) and
+`v*` tags. Update `payload_image_repository` in the Ansible host vars
+accordingly. To publish manually, `scripts/publish-ghcr.sh` builds the image, runs
 `scripts/test-image.sh` first, reads the GitHub token without echoing it,
 publishes only after the tests pass, and records Ansible-ready values in
 `image-digest.yml`:
@@ -120,7 +120,7 @@ Use the recorded `sha256:` digest in the Ansible host variables. Do not use
 `latest`:
 
 ```yaml
-payload_image_repository: "ghcr.io/manfredwisniewski/docker-payload"
+payload_image_repository: "ghcr.io/manfredwisniewski/arr"
 payload_image_tag: "sha-<commit>"
 payload_image_digest: "sha256:<64-hex-character-digest>"
 ```

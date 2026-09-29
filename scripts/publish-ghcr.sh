@@ -2,7 +2,7 @@
 set -euo pipefail
 
 IMAGE_REPOSITORY="${IMAGE_REPOSITORY:-ghcr.io/manfredwisniewski/arr}"
-PLATFORM="${PLATFORM:-linux/amd64}"
+PLATFORM="${PLATFORM:-linux/amd64,linux/arm64}"
 DIGEST_FILE="${DIGEST_FILE:-image-digest.yml}"
 CLEAN_DOCKER="${CLEAN_DOCKER:-0}"
 

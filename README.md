@@ -125,6 +125,11 @@ payload_image_tag: "sha-<commit>"
 payload_image_digest: "sha256:<64-hex-character-digest>"
 ```
 
+The `arr` package is public, so the Docker host pulls anonymously and
+`payload_instance_secrets` needs no `registry_username`/`registry_token`. If
+the package is ever made private, add those two vault values (a GitHub
+username plus a `read:packages` token) and the role logs in before pulling.
+
 ## Application contract
 
 The Ansible integration expects:

@@ -85,7 +85,7 @@ COPY --from=builder --chown=node:node /app/.next/static ./.next/static
 COPY --from=builder --chown=node:node /app/migrations ./migrations
 COPY --from=builder --chown=node:node /app/migrate.js ./migrate.js
 COPY --from=builder --chown=node:node /app/seed-admin.js ./seed-admin.js
-COPY --from=builder --chown=node:node /app/scripts/entrypoint.sh ./entrypoint.sh
+COPY --from=builder --chown=node:node --chmod=755 /app/scripts/entrypoint.sh ./entrypoint.sh
 
 USER node
 

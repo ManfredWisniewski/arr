@@ -10,3 +10,7 @@
 	path = +wit-dev
 	url = https://github.com/ManfredWisniewski/wit-dev.git
 	branch = main
+[submodule "wit_pytools"]
+	path = wit_pytools
+	url = https://github.com/ManfredWisniewski/wit_pytools.git
+	branch = main

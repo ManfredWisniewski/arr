@@ -80,8 +80,26 @@ switch ($Command) {
                 "OK    $($sm.Name) (nothing to push)"
             }
         }
+        # record changed submodule pointers in the superproject
+        $gm = Join-Path $root '.gitmodules'
+        $top = git -C $root config -f $gm --get-regexp 'submodule\..*\.path' 2>$null |
+            ForEach-Object { ($_ -split '\s+', 2)[1].Trim() }
+        if ($top) {
+            git -C $root add -- $top
+            git -C $root diff --cached --quiet
+            if ($LASTEXITCODE -ne 0) {
+                git -C $root commit -m 'chore: bump submodule pointers'
+                "COMMIT superproject (pointer bumps)"
+            }
+        }
+        if (Test-Ahead $root) {
+            'PUSH  superproject'
+            git -C $root push
+        } else {
+            'OK    superproject (nothing to push)'
+        }
         if (git -C $root status --porcelain) {
-            'NOTE  superproject has uncommitted changes (submodule pointers?)'
+            'NOTE  superproject still has uncommitted non-submodule changes'
         }
     }
 }

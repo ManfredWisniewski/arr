@@ -51,8 +51,24 @@ do_push() {
             echo "OK    $name (nothing to push)"
         fi
     done
-    if git status --porcelain | grep -q '^[MARD ]*[MARD]'; then
-        echo "NOTE  superproject has uncommitted changes (submodule pointers?)"
+    # record changed submodule pointers in the superproject
+    top=$(git config -f .gitmodules --get-regexp 'submodule\..*\.path' \
+        2>/dev/null | awk '{print $2}')
+    if test -n "$top"; then
+        git add -- $top
+        if ! git diff --cached --quiet; then
+            git commit -m 'chore: bump submodule pointers'
+            echo "COMMIT superproject (pointer bumps)"
+        fi
+    fi
+    if ahead .; then
+        echo "PUSH  superproject"
+        git push || echo "FAIL  superproject"
+    else
+        echo "OK    superproject (nothing to push)"
+    fi
+    if git status --porcelain | grep -q '[MARD]'; then
+        echo "NOTE  superproject still has uncommitted non-submodule changes"
     fi
 }
 

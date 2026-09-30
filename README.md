@@ -142,7 +142,8 @@ The Ansible integration expects:
 - `seed-admin.js` to create the first admin idempotently;
 - `PAYLOAD_SEED_ADMIN_EMAIL` and `PAYLOAD_SEED_ADMIN_PASSWORD` for the seed
   command; and
-- `PAYLOAD_SECRET` to be supplied through the Ansible vault.
+- `PAYLOAD_SECRET` to be supplied through the Ansible vault; and
+- `PREVIEW_SECRET` for the admin draft-preview link, also through the vault.
 
 The content sync contract (fields, endpoints, draft-only writes) is documented
 in `wit_pytools/payloadtools/+intent/INTENT.md`; the content repository holds

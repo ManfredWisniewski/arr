@@ -1,3 +1,4 @@
+import { draftMode } from 'next/headers'
 import { notFound } from 'next/navigation.js'
 import { RichText } from '@payloadcms/richtext-lexical/react'
 import { getPayload } from 'payload'
@@ -12,14 +13,14 @@ type Props = {
   params: Promise<{ path?: string[] }>
 }
 
-async function findPage(route: string) {
+async function findPage(route: string, draft: boolean) {
   const payload = await getPayload({ config: await config })
   const { docs } = await payload.find({
     collection: 'pages',
-    draft: false,
+    draft,
     limit: 1,
     where: {
-      _status: { equals: 'published' },
+      ...(draft ? {} : { _status: { equals: 'published' } }),
       path: { equals: route },
     },
   })
@@ -28,7 +29,8 @@ async function findPage(route: string) {
 
 export async function generateMetadata({ params }: Props) {
   const { path = [] } = await params
-  const page = await findPage(`/${path.join('/')}`)
+  const { isEnabled } = await draftMode()
+  const page = await findPage(`/${path.join('/')}`, isEnabled)
   if (!page) {
     return {}
   }
@@ -40,7 +42,8 @@ export async function generateMetadata({ params }: Props) {
 
 export default async function SitePage({ params }: Props) {
   const { path = [] } = await params
-  const page = await findPage(`/${path.join('/')}`)
+  const { isEnabled } = await draftMode()
+  const page = await findPage(`/${path.join('/')}`, isEnabled)
 
   if (!page) {
     notFound()

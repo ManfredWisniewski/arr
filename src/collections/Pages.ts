@@ -9,6 +9,9 @@ export const Pages: CollectionConfig = {
   slug: 'pages',
   admin: {
     useAsTitle: 'title',
+    // opens the frontend draft preview (Draft Mode via /preview route handler)
+    preview: (doc, { req }) =>
+      `${req.origin}/preview?secret=${process.env.PREVIEW_SECRET}&path=${encodeURIComponent(String(doc.path ?? ''))}`,
   },
   versions: {
     drafts: true,

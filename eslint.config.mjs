@@ -24,7 +24,17 @@ const eslintConfig = [
     },
   },
   {
-    ignores: ['.next/', 'src/payload-types.ts', 'src/payload-generated-schema.ts'],
+    ignores: [
+      '.next/',
+      'src/payload-types.ts',
+      'src/payload-generated-schema.ts',
+      // submodules are separate repos with their own linting
+      '+wit-common/',
+      '+wit-dev/',
+      '+wit-wiki/',
+      'obs-seo-witconsult/',
+      'wit_pytools/',
+    ],
   },
 ]
 

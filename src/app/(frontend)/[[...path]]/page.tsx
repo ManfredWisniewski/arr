@@ -49,8 +49,12 @@ export default async function SitePage({ params }: Props) {
     notFound()
   }
 
+  // template names resolve to renderer variants — the registry grows once
+  // biti-ui publishes shared components; unknown names fall back to default
+  const template = page.template || 'default'
+
   return (
-    <article className="page">
+    <article className="page" data-template={template}>
       {page.content ? (
         <RichText converters={jsxConverters} data={page.content} />
       ) : null}

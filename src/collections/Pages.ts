@@ -66,6 +66,11 @@ export const Pages: CollectionConfig = {
       type: 'text',
     },
     {
+      // render template name resolved by the frontend registry; empty = default
+      name: 'template',
+      type: 'text',
+    },
+    {
       name: 'meta',
       type: 'group',
       fields: [

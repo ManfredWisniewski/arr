@@ -6,6 +6,7 @@ import { fileURLToPath } from 'url'
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
 import { Pages } from './collections/Pages'
+import { Structures } from './collections/Structures'
 import { Theme } from './globals/Theme'
 
 const filename = fileURLToPath(import.meta.url)
@@ -18,7 +19,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Media, Pages],
+  collections: [Users, Media, Pages, Structures],
   globals: [Theme],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',

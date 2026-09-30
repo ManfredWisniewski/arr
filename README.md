@@ -24,19 +24,25 @@ work.
 
 - `pages` collection: `title`, `slug`, `path` (unique route), `markdownRaw`,
   `content` (Lexical richText), `sourcePath` (idempotency key), `sourceRepo`,
-  `meta { title, description }`; drafts enabled.
+  `meta { title, description }`, `template` (renderer name, empty =
+  default); drafts enabled.
 - `media` collection: upload with `alt`, `caption`, `sourceHash` (sha256
   dedup), `sourcePath`.
 - `users` collection: API-key auth (`useAPIKey`) plus a `role` field
   (`editor` / `content-bot`).
+- `structures` collection: generic site-layout documents (`name`, `data`
+  JSON, `sourcePath`, `sourceRepo`), synced from `<site>/structure/*.yml` in
+  the content repository; drafts enabled. The `navigation` doc drives the
+  header menu (`data.items[*].{label, path}`).
 - `theme` global: `cssLight`, `cssDark`, `meta { siteName, fontFamily }` —
   per-site styling as data, pushed via `PATCH /api/globals/theme`.
 - markdown → Lexical: the `pages` `beforeValidate` hook converts `markdownRaw`
   server-side; clients send plain markdown and `![media:<id>]()` placeholders.
 - D04 review gate: only `editor` may set `_status: 'published'`; the
   `content-bot` can create/update drafts but cannot publish or delete.
-- Frontend: `app/(frontend)/[[...path]]` renders published pages by route and
-  injects the `theme` CSS into `<head>`.
+- Frontend: a site shell (header with `theme.meta.siteName` + `navigation`
+  menu, `main`, footer) wraps `app/(frontend)/[[...path]]`, which renders
+  published pages by route; `theme` CSS is injected into `<head>`.
 
 ## Requirements
 

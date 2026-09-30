@@ -70,6 +70,7 @@ export interface Config {
     users: User;
     media: Media;
     pages: Page;
+    structures: Structure;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -80,6 +81,7 @@ export interface Config {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
+    structures: StructuresSelect<false> | StructuresSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -203,10 +205,33 @@ export interface Page {
   } | null;
   sourcePath?: string | null;
   sourceRepo?: string | null;
+  template?: string | null;
   meta?: {
     title?: string | null;
     description?: string | null;
   };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "structures".
+ */
+export interface Structure {
+  id: number;
+  name: string;
+  data:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  sourcePath?: string | null;
+  sourceRepo?: string | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -246,6 +271,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'pages';
         value: number | Page;
+      } | null)
+    | ({
+        relationTo: 'structures';
+        value: number | Structure;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -350,12 +379,26 @@ export interface PagesSelect<T extends boolean = true> {
   content?: T;
   sourcePath?: T;
   sourceRepo?: T;
+  template?: T;
   meta?:
     | T
     | {
         title?: T;
         description?: T;
       };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "structures_select".
+ */
+export interface StructuresSelect<T extends boolean = true> {
+  name?: T;
+  data?: T;
+  sourcePath?: T;
+  sourceRepo?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;

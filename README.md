@@ -35,7 +35,7 @@ work.
   the content repository; drafts enabled. The `navigation` doc drives the
   header menu (`data.items[*].{label, path}`).
 - `theme` global: `cssLight`, `cssDark`, `meta { siteName, fontFamily }` —
-  per-site styling as data, pushed via `PATCH /api/globals/theme`.
+  per-site styling as data, pushed via `POST /api/globals/theme`.
 - markdown → Lexical: the `pages` `beforeValidate` hook converts `markdownRaw`
   server-side; clients send plain markdown and `![media:<id>]()` placeholders.
 - D04 review gate: only `editor` may set `_status: 'published'`; the

@@ -12,7 +12,11 @@
 
 ## Content sync
 
-- **D05 The content-repository mapping file is named `.arrcontent.yml`** (alternatives: `.witcontent.yml`; a configurable filename or `--config` flag). One fixed, app-specific name means every content repository targeting this app carries the same expected file — no per-repo filename configuration. The name ties the mapping contract to the `arr` app rather than the generic `witcontent`/`payloadtools` tool.
+- **D03 The content-repository mapping file is named `.arrcontent.yml`** (alternatives: `.witcontent.yml`; a configurable filename or `--config` flag). One fixed, app-specific name means every content repository targeting this app carries the same expected file — no per-repo filename configuration. The name ties the mapping contract to the `arr` app rather than the generic `witcontent`/`payloadtools` tool.
+
+## Review gate
+
+- **D04 External communication passes a human review gate** (WIT convention: external sends need approval — `+wit-common/taxonomies/communication-channels.md`; alternatives: the bot publishes directly; a later `--publish` batch). All synced content arrives as draft via `?draft=true`; only `editor` users may set `_status: 'published'`, enforced server-side, not by convention. Publish state is the only data the content repo does not own.
 
 ## Backlog (not decided, parked)
 

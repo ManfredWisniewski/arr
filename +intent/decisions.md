@@ -10,6 +10,10 @@
 
 - **D02 `main` stays generic — site-specific implementation lives in dedicated branches** (alternatives: single-branch development with witconsult.de code on `main`; one repository per site). `main` must only contain site-agnostic application code. Implementation-specific content for a site (e.g. witconsult.de) is developed on a dedicated branch; only general code is merged to `main`. This keeps the image and codebase reusable for future Payload instances without site forks polluting the generic baseline.
 
+## Content sync
+
+- **D05 The content-repository mapping file is named `.arrcontent.yml`** (alternatives: `.witcontent.yml`; a configurable filename or `--config` flag). One fixed, app-specific name means every content repository targeting this app carries the same expected file — no per-repo filename configuration. The name ties the mapping contract to the `arr` app rather than the generic `witcontent`/`payloadtools` tool.
+
 ## Backlog (not decided, parked)
 
 - `<idea discussed but deliberately not decided>`.

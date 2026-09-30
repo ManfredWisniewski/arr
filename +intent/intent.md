@@ -21,7 +21,7 @@ State:
 - the content sync tool is already implemented: `wit_pytools/payloadtools`
   (`witcontent` CLI, submodule) — it pushes markdown, media and theme CSS via
   the REST API;
-- content lives in `obs-seo-witconsult` (content SSOT incl. `.witcontent.yml`),
+- content lives in `obs-seo-witconsult` (content SSOT incl. `.arrcontent.yml`),
   design tokens in `wit-tokens` (style SSOT, to be created), deployment in
   `wit.docker_apps`.
 
@@ -60,7 +60,7 @@ never a source of truth.
   `app/(frontend)/[...path]` rendering Lexical + theme vars, the block library
   styled exclusively with `var(--…)`, `/api/health`, `seed-admin`, Dockerfile,
   GitHub Actions → GHCR.
-- Out of scope: content and `.witcontent.yml` (`obs-seo-witconsult`), token
+- Out of scope: content and `.arrcontent.yml` (`obs-seo-witconsult`), token
   authoring (`wit-tokens`), Ansible deployment (`wit.docker_apps`), the sync
   CLI (`wit_pytools/payloadtools`).
 

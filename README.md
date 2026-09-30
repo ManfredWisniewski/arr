@@ -147,7 +147,7 @@ The Ansible integration expects:
 
 The content sync contract (fields, endpoints, draft-only writes) is documented
 in `wit_pytools/payloadtools/+intent/INTENT.md`; the content repository holds
-`.witcontent.yml` with the mapping rules.
+`.arrcontent.yml` with the mapping rules.
 
 Do not commit `.env`, generated secrets, image credentials, or production
 database credentials.

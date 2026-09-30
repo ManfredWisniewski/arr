@@ -1,7 +1,7 @@
 # Per-submodule pull/push/status — avoids submodule.recurse rebase failures.
 # Usage: scripts/submodules.ps1 [-Command status|pull|push]
 param(
-    [ValidateSet('status', 'pull', 'push')]
+    [ValidateSet('status', 'pull', 'push', 'sync')]
     [string]$Command = 'status'
 )
 
@@ -34,6 +34,13 @@ function Test-Ahead([string]$Dir) {
 
 function Test-Initialized([string]$Dir) {
     return Test-Path (Join-Path $Dir '.git')
+}
+
+if ($Command -eq 'sync') {
+    & $PSCommandPath pull
+    $pullExit = $LASTEXITCODE
+    & $PSCommandPath push
+    exit ($LASTEXITCODE -or $pullExit)
 }
 
 switch ($Command) {

@@ -76,5 +76,6 @@ case "${1:-status}" in
     status) do_status ;;
     pull) do_pull ;;
     push) do_push ;;
-    *) echo "usage: $0 [status|pull|push]" >&2; exit 2 ;;
+    sync) do_pull; do_push ;;
+    *) echo "usage: $0 [status|pull|push|sync]" >&2; exit 2 ;;
 esac

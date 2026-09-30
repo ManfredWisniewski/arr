@@ -1,4 +1,4 @@
-# arr-witconsult
+# arr
 
 The Payload CMS application for witconsult.de — a site-agnostic image deployed
 through the `wit.docker_apps` Ansible role. Supersedes
@@ -74,7 +74,7 @@ configuration and seed script required by the Ansible integration.
 Build locally:
 
 ```sh
-docker build -t arr-witconsult:test .
+docker build -t arr:test .
 ```
 
 The deployment image must be published to GHCR with an immutable tag and

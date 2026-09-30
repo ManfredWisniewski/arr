@@ -1,8 +1,8 @@
-# Intent: `arr-witconsult`
+# Intent: `arr`
 
 ## Purpose
 
-`arr-witconsult` is the application repository for the witconsult.de website: a
+`arr` is the application repository for the witconsult.de website: a
 Payload CMS 3.x app on Next.js, built into a site-agnostic Docker image,
 published to GHCR, and deployed per instance by `wit.docker_apps`. It
 supersedes `github.com/ManfredWisniewski/docker-payload` as the app-code

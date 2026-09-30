@@ -13,7 +13,7 @@ fi
 
 TAG="${1:-test-$(date -u +%Y%m%d-%H%M%S)}"
 IMAGE="${IMAGE_REPOSITORY}:${TAG}"
-LOCAL_IMAGE="arr-witconsult:publish-test"
+LOCAL_IMAGE="arr:publish-test"
 
 if ! command -v docker >/dev/null 2>&1; then
   echo "docker is required" >&2

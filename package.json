@@ -1,5 +1,5 @@
 {
-  "name": "arr-witconsult",
+  "name": "arr",
   "version": "1.0.0",
   "description": "Payload CMS application image for witconsult.de, deployed via wit.docker_apps",
   "license": "MIT",

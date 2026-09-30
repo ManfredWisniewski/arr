@@ -1,4 +1,4 @@
-# Tests and acceptance criteria — `arr-witconsult`
+# Tests and acceptance criteria — `arr`
 
 *Format per `+wit-common/conventions/tests.md`. Criteria are numbered `A01`, `A02`, ... and never renumbered.*
 

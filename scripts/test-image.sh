@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-PROJECT_NAME="${COMPOSE_PROJECT_NAME:-arr-witconsult-image-test}"
+PROJECT_NAME="${COMPOSE_PROJECT_NAME:-arr-image-test}"
 COMPOSE_FILE="tests/docker-compose.image.yml"
 IMAGE_UNDER_TEST="${PAYLOAD_IMAGE_UNDER_TEST:-}"
 PORT="${PAYLOAD_TEST_PORT:-3011}"

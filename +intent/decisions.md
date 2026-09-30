@@ -1,4 +1,4 @@
-# Decision records — `arr-witconsult`
+# Decision records — `arr`
 
 *Session date: `2026-09-30`. Format per `+wit-common/conventions/decisions.md`; requirement levels per `+wit-common/conventions/requirement-levels.md`.*
 

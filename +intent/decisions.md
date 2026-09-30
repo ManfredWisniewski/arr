@@ -12,7 +12,8 @@
 
 ## Content sync
 
-- **D03 The content-repository mapping file is named `.arrcontent.yml`** (alternatives: `.witcontent.yml`; a configurable filename or `--config` flag). One fixed, app-specific name means every content repository targeting this app carries the same expected file — no per-repo filename configuration. The name ties the mapping contract to the `arr` app rather than the generic `witcontent`/`payloadtools` tool.
+- **D03 The content mapping file is named `.arrcontent.yml`, one per site directory inside a content repository** (alternatives: `.witcontent.yml`; a configurable filename or `--config` flag; one config at repository root). A fixed, app-specific name at the site root (`<repo>/<domain>/`) means every site targeting this app is recognised without per-repo filename configuration, and a multi-site vault carries one config per domain. The name ties the mapping contract to the `arr` app rather than the generic `witcontent`/`payloadtools` tool.
+  - *2026-09-30 amendment*: routes derive literally from the directory path — no stripping and no override table; the filename is always `webtext*.md` and carries no status. Filename statuses (`locked`/`entwurf`) are unused for this site: every `webtext*.md` syncs as draft and the Payload draft review (D04) is the only gate.
 
 ## Review gate
 

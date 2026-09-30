@@ -7,8 +7,9 @@ through the `wit.docker_apps` Ansible role. Supersedes
 Design: `+wit-wiki/plans/payload/2026-09-29_plan-payload-website.md` —
 intent and boundaries: `+intent/intent.md`.
 
-Before making changes, read the shared WIT development guidance in `+wit-dev/`
-in this repository. Start with `+wit-dev/README.md` and `+wit-dev/AGENTS.md`,
+Before making changes, read the shared WIT development guidance in
+`+wit-wiki/development/` in this repository. Start with
+`+wit-wiki/development/README.md` and `+wit-wiki/development/AGENTS.md`,
 then read the relevant convention or best-practice files. These shared
 definitions apply independently of which skill or AI agent is performing the
 work.
@@ -16,9 +17,9 @@ work.
 ## AI folders
 
 - `/+intent` — intent, decision records, test strategy
-- `/+wit-dev` — shared development conventions
 - `/+wit-common` — shared conventions and repo scripts
-- `/+wit-wiki` — shared research, plans and templates
+- `/+wit-wiki` — shared research, plans and templates; development
+  conventions live in `+wit-wiki/development/` (formerly `+wit-dev`)
 
 ## What the app provides
 

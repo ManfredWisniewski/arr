@@ -1,6 +1,6 @@
 # Instructions for AI agents
 
-This repository is `arr`, the Payload CMS application for witconsult.de. Read `+wit-dev/README.md`, `+wit-dev/AGENTS.md` and `+intent/` before making changes.
+This repository is `arr`, the Payload CMS application for witconsult.de. Read `+wit-wiki/development/README.md`, `+wit-wiki/development/AGENTS.md` and `+intent/` before making changes.
 
 ## Rules
 

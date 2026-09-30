@@ -14,3 +14,7 @@
 	path = wit_pytools
 	url = https://github.com/ManfredWisniewski/wit_pytools.git
 	branch = main
+[submodule "obs-seo-witconsult"]
+	path = obs-seo-witconsult
+	url = https://github.com/ManfredWisniewski/obs-seo-witconsult.git
+	branch = main

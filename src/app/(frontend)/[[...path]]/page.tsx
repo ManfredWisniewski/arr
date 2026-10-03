@@ -51,10 +51,7 @@ export default async function SitePage({ params }: Props) {
     notFound()
   }
 
-  return renderTemplate(
-    page,
-    page.content ? (
-      <RichText converters={jsxConverters} data={page.content} />
-    ) : null,
+  return renderTemplate(page, (data) =>
+    data ? <RichText converters={jsxConverters} data={data} /> : null,
   )
 }

@@ -1,6 +1,8 @@
 import { createElement } from 'react'
 import type React from 'react'
 
+import type { Page } from '@/payload-types'
+
 import { DefaultTemplate, type TemplateProps } from './default'
 import { LandingTemplate } from './landing'
 
@@ -18,6 +20,6 @@ export const resolveTemplate = (name?: null | string) =>
 // Render-time resolution lives here so call sites never assign a component
 // type inside render (react-hooks/static-components).
 export const renderTemplate = (
-  page: TemplateProps['page'],
-  children: React.ReactNode,
-) => createElement(resolveTemplate(page.template), { page }, children)
+  page: Page,
+  renderBody: TemplateProps['renderBody'],
+) => createElement(resolveTemplate(page.template), { page, renderBody })

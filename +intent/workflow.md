@@ -135,6 +135,12 @@ Naming contract (single source of mapping, keep in this doc):
   biti owns token ids/format (ids remain the published API — add or
   deprecate, never rename in place).
 
+## Resources
+
+- Webfonts (WOFF2 downloads, Google Fonts mirror):
+  https://gwfh.mranftl.com/fonts/ — download font files, place them under
+  `biti/public/fonts/`, then `make push` picks them up via `--font` args.
+
 ## Research appendix
 
 Raw notes that informed this plan (generic Figma→Payload workflow):

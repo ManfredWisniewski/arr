@@ -17,10 +17,27 @@ async function getTheme(): Promise<null | Theme> {
   }
 }
 
-type NavItem = { label: string; path: string }
+type NavItem = { label: string; path?: string; children: NavItem[] }
 
-// `structures` doc "navigation" — { items: [{ label, path }] } from
-// <site>/structure/navigation.yml. Draft-aware like the page renderer.
+// `structures` doc "navigation" — { items: [{ label, path, children? }] }
+// from <site>/structure/navigation.yml. Draft-aware like the page renderer.
+function mapNavItems(items: unknown): NavItem[] {
+  if (!Array.isArray(items)) {
+    return []
+  }
+  return items
+    .filter(
+      (item): item is Record<string, unknown> =>
+        typeof item === 'object' && item !== null,
+    )
+    .map((item) => ({
+      label: typeof item.label === 'string' ? item.label : '',
+      path: typeof item.path === 'string' ? item.path : undefined,
+      children: mapNavItems(item.children),
+    }))
+    .filter((item) => item.label && (item.path || item.children.length > 0))
+}
+
 async function getNavigation(draft: boolean): Promise<NavItem[]> {
   try {
     const payload = await getPayload({ config: await config })
@@ -33,15 +50,27 @@ async function getNavigation(draft: boolean): Promise<NavItem[]> {
         ...(draft ? {} : { _status: { equals: 'published' } }),
       },
     })
-    const items = (
-      docs[0]?.data as { items?: { label?: string; path?: string }[] } | undefined
-    )?.items
-    return (items ?? []).filter(
-      (item): item is NavItem => Boolean(item.label && item.path),
+    return mapNavItems(
+      (docs[0]?.data as { items?: unknown } | undefined)?.items,
     )
   } catch {
     return []
   }
+}
+
+function NavEntry({ item }: { item: NavItem }) {
+  return (
+    <li>
+      {item.path ? <Link href={item.path}>{item.label}</Link> : item.label}
+      {item.children.length > 0 ? (
+        <ul>
+          {item.children.map((child) => (
+            <NavEntry key={child.label} item={child} />
+          ))}
+        </ul>
+      ) : null}
+    </li>
+  )
 }
 
 export async function generateMetadata() {
@@ -91,9 +120,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
             <nav className="site-nav">
               <ul>
                 {navItems.map((item) => (
-                  <li key={item.path}>
-                    <Link href={item.path}>{item.label}</Link>
-                  </li>
+                  <NavEntry key={item.label} item={item} />
                 ))}
               </ul>
             </nav>

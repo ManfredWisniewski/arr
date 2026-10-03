@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { getPayload } from 'payload'
 import React from 'react'
 
-import type { Theme } from '@/payload-types'
+import type { Media, Theme } from '@/payload-types'
 import config from '@/payload.config'
 import './styles.css'
 
@@ -73,7 +73,16 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
       <body>
         <header className="site-header">
           <Link className="site-name" href="/">
-            {siteName}
+            {theme?.logo && typeof theme.logo === 'object' && theme.logo.url ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                alt={(theme.logo as Media).alt || siteName}
+                className="site-logo"
+                src={(theme.logo as Media).url ?? ''}
+              />
+            ) : (
+              siteName
+            )}
           </Link>
           {navItems.length ? (
             <nav className="site-nav">

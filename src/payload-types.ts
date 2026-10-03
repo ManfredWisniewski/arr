@@ -449,6 +449,7 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
  */
 export interface Theme {
   id: number;
+  logo?: (number | null) | Media;
   cssLight?: string | null;
   cssDark?: string | null;
   meta?: {
@@ -463,6 +464,7 @@ export interface Theme {
  * via the `definition` "theme_select".
  */
 export interface ThemeSelect<T extends boolean = true> {
+  logo?: T;
   cssLight?: T;
   cssDark?: T;
   meta?:

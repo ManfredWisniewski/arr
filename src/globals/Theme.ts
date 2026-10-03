@@ -13,6 +13,12 @@ export const Theme: GlobalConfig = {
   },
   fields: [
     {
+      // brand mark rendered in the site header; falls back to meta.siteName
+      name: 'logo',
+      type: 'upload',
+      relationTo: 'media',
+    },
+    {
       name: 'cssLight',
       type: 'code',
       admin: {

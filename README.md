@@ -18,8 +18,8 @@ work.
 
 - `/+intent` — intent, decision records, test strategy
 - `/+wit-common` — shared conventions and repo scripts
-- `/+wit-wiki` — shared research, plans and templates; development
-  conventions live in `+wit-wiki/development/` (formerly `+wit-dev`)
+- `/+wit` — shared knowledge, plans and templates; development
+  conventions live in `+wit/development/`
 
 ## What the app provides
 

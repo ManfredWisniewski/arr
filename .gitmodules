@@ -1,5 +1,5 @@
-[submodule "+wit-common"]
-	path = +wit-common
+[submodule "+wit"]
+	path = +wit
 	url = https://github.com/ManfredWisniewski/wit-common.git
 	branch = main
 [submodule "wit_pytools"]

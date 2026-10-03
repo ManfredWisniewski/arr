@@ -1,6 +1,6 @@
 # Tests and acceptance criteria — `arr`
 
-*Format per `+wit-common/conventions/tests.md`. Criteria are numbered `A01`, `A02`, ... and never renumbered.*
+*Format per `+wit/development/tests.md`. Criteria are numbered `A01`, `A02`, ... and never renumbered.*
 
 ## Commands
 
@@ -16,7 +16,7 @@ types:  npx payload generate:types && npx tsc
 ### A01 Repository structure
 
 - `README.md`, `AGENTS.md`, `TASKS.md`, `+intent/{intent,decisions,tests}.md`, `.gitignore` and `.markdownlint-cli2.jsonc` exist at the root.
-- The branches and submodules required by `+wit-common/conventions/repo-setup.md` exist.
+- The branches and submodules required by `+wit/common/conventions/repo-setup.md` exist.
 
 ### A02 Content sync contract
 

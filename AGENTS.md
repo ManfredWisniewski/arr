@@ -1,10 +1,10 @@
 # Instructions for AI agents
 
-This repository is `arr`, the Payload CMS application for witconsult.de. Read `+wit-wiki/development/README.md`, `+wit-wiki/development/AGENTS.md` and `+intent/` before making changes.
+This repository is `arr`, the Payload CMS application for witconsult.de. Read `+wit/development/README.md`, `+wit/development/AGENTS.md` and `+intent/` before making changes.
 
 ## Rules
 
-The shared rules in `+wit-common/conventions/agent-rules.md` apply. Additionally:
+The shared rules in `+wit/AGENTS.md` apply. Additionally:
 
 - The Payload database is a derived read model — never treat it as a source of truth; content and theme are pushed via the REST API.
 - Do not store credentials, customer data, conversation logs or runtime state.

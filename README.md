@@ -4,12 +4,12 @@ The Payload CMS application for witconsult.de — a site-agnostic image deployed
 through the `wit.docker_apps` Ansible role. Supersedes
 `github.com/ManfredWisniewski/docker-payload` as the app-code repository.
 
-Design: `+wit-wiki/plans/payload/2026-09-29_plan-payload-website.md` —
+Design: `+wit/plans/payload/2026-09-29_plan-payload-website.md` —
 intent and boundaries: `+intent/intent.md`.
 
 Before making changes, read the shared WIT development guidance in
-`+wit-wiki/development/` in this repository. Start with
-`+wit-wiki/development/README.md` and `+wit-wiki/development/AGENTS.md`,
+`+wit/development/` in this repository. Start with
+`+wit/development/README.md` and `+wit/development/AGENTS.md`,
 then read the relevant convention or best-practice files. These shared
 definitions apply independently of which skill or AI agent is performing the
 work.
@@ -17,9 +17,8 @@ work.
 ## AI folders
 
 - `/+intent` — intent, decision records, test strategy
-- `/+wit-common` — shared conventions and repo scripts
-- `/+wit` — shared knowledge, plans and templates; development
-  conventions live in `+wit/development/`
+- `/+wit` — shared WIT knowledge base (conventions, templates, repo
+  scripts); development guidance lives in `+wit/development/`
 
 ## What the app provides
 

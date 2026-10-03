@@ -7,6 +7,8 @@ import React from 'react'
 import type { Page } from '@/payload-types'
 import config from '@/payload.config'
 
+import { renderTemplate } from '@/templates/registry'
+
 import { jsxConverters } from './converters'
 
 type Props = {
@@ -49,15 +51,10 @@ export default async function SitePage({ params }: Props) {
     notFound()
   }
 
-  // template names resolve to renderer variants — the registry grows once
-  // biti-ui publishes shared components; unknown names fall back to default
-  const template = page.template || 'default'
-
-  return (
-    <article className="page" data-template={template}>
-      {page.content ? (
-        <RichText converters={jsxConverters} data={page.content} />
-      ) : null}
-    </article>
+  return renderTemplate(
+    page,
+    page.content ? (
+      <RichText converters={jsxConverters} data={page.content} />
+    ) : null,
   )
 }

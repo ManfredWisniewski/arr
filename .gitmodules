@@ -2,10 +2,6 @@
 	path = +wit-common
 	url = https://github.com/ManfredWisniewski/wit-common.git
 	branch = main
-[submodule "+wit-wiki"]
-	path = +wit-wiki
-	url = https://github.com/ManfredWisniewski/wit-wiki.git
-	branch = main
 [submodule "wit_pytools"]
 	path = wit_pytools
 	url = https://github.com/ManfredWisniewski/wit_pytools.git

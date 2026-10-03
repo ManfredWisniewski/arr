@@ -63,6 +63,9 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
   return (
     <html lang="de">
       <head>
+        {theme?.favicon && typeof theme.favicon === 'object'
+          ? <link href={(theme.favicon as Media).url ?? ''} rel="icon" />
+          : null}
         {theme?.cssLight ? (
           <style dangerouslySetInnerHTML={{ __html: theme.cssLight }} />
         ) : null}

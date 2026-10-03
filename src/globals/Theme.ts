@@ -19,6 +19,12 @@ export const Theme: GlobalConfig = {
       relationTo: 'media',
     },
     {
+      // browser tab icon; rendered as <link rel="icon"> when set
+      name: 'favicon',
+      type: 'upload',
+      relationTo: 'media',
+    },
+    {
       name: 'cssLight',
       type: 'code',
       admin: {

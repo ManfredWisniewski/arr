@@ -6,9 +6,10 @@ export type ThemeVariant = { name: string; css: string }
 // Dev only: expose every compiled biti theme (arr/trurl/wit × light/dark)
 // as a selectable variant for design testing. Light builds carry a
 // `:root, [data-theme="x-light"]` selector pair, dark builds use
-// `[data-theme="dark"]` — both are re-scoped to the file stem so a
-// `data-theme` attribute on <html> picks the variant. The `theme` global's
-// pushed CSS stays the default (`:root` + `[data-theme="dark"]`).
+// `[data-theme="dark"]` — every data-theme selector is re-scoped to a
+// `data-variant` attribute on <html> keyed by the file stem. `data-variant`
+// is independent from `data-theme` (the pushed theme's light/dark channel),
+// and variant styles are injected last so they always win while set.
 export function getThemeVariants(): ThemeVariant[] {
   if (process.env.NODE_ENV === 'production') {
     return []
@@ -24,7 +25,7 @@ export function getThemeVariants(): ThemeVariant[] {
         const name = file.replace(/\.css$/, '')
         const css = readFileSync(path.join(dir, file), 'utf8')
           .replace(/:root\s*,\s*/g, '')
-          .replaceAll('[data-theme="dark"]', `[data-theme="${name}"]`)
+          .replace(/\[data-theme="[^"]*"\]/g, `[data-variant="${name}"]`)
         return { name, css }
       })
   } catch {

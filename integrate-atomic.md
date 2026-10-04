@@ -191,9 +191,11 @@ fixture props.
       amendment point at extracting shared components into a `biti-ui`
       repo/package eventually; the vendored `components/` tree is the
       interim home.
-- [ ] **ThemeSwitcher vs ThemeToggle overlap in dev.** Both write
-      `data-theme`; last write wins. Consider hiding the production
-      toggle in dev or merging widgets.
+- [x] ~~ThemeSwitcher vs ThemeToggle overlap in dev.~~ Resolved:
+      variants are re-scoped to a separate `data-variant` attribute
+      (injected last, wins while set); `data-theme` remains the
+      pushed-theme light/dark channel; choosing a mode clears the
+      variant.
 - [ ] **Demo site coverage.** `/komponenten` (showcase template) covers
       all components; markdown pages still can't emit `.btn`/`.badge`
       until the marker issue above is solved.

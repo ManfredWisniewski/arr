@@ -51,6 +51,11 @@ export function ThemeToggle() {
         } else {
           localStorage.setItem(THEME_KEY, pref)
         }
+        // a mode choice wins over a dev variant — clear it so the
+        // pushed theme applies, and reset the dev switcher's select
+        localStorage.removeItem('theme-variant')
+        delete document.documentElement.dataset.variant
+        window.dispatchEvent(new Event('arr:theme-mode'))
         applyTheme(pref)
       }}
       ref={selectRef}

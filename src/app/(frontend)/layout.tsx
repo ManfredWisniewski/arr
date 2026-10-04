@@ -52,7 +52,7 @@ export async function generateMetadata() {
 
 // Applies the stored theme preference before first paint (no flash) —
 // counterpart to the ThemeToggle atom; key per design-tokens spec.
-const THEME_INIT = `(function(){try{var t=localStorage.getItem('arr.theme')||'system';var d=t==='dark'||(t!=='light'&&window.matchMedia('(prefers-color-scheme: dark)').matches);if(d){document.documentElement.dataset.theme='dark'}}catch(e){}})()`
+const THEME_INIT = `(function(){try{var v=localStorage.getItem('theme-variant');if(v){document.documentElement.dataset.variant=v}var t=localStorage.getItem('arr.theme')||'system';var d=t==='dark'||(t!=='light'&&window.matchMedia('(prefers-color-scheme: dark)').matches);if(d){document.documentElement.dataset.theme='dark'}}catch(e){}})()`
 
 export default async function RootLayout(props: { children: React.ReactNode }) {
   const { children } = props

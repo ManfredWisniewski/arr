@@ -116,6 +116,14 @@ release.
 
 ### Fixed
 
+- Dev theme picker conflict: the variant switcher and `ThemeToggle`
+  both wrote `data-theme` — the toggle's mount effect clobbered the
+  picked variant. Variants are now re-scoped to a separate
+  `data-variant` attribute (styles injected last, so a set variant
+  always wins), `data-theme` stays the pushed-theme light/dark channel,
+  the pre-paint init script restores both attributes, and choosing a
+  mode in `ThemeToggle` clears the variant and resets the switcher
+  (`arr:theme-mode` event)
 - Code blocks render on the frontend: JSX converter for the `Code` block
   (`pre`/`code` + `data-language`) was missing
   (`src/app/(frontend)/[[...path]]/converters.tsx`)

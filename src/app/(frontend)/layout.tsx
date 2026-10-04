@@ -6,6 +6,8 @@ import React from 'react'
 import type { Media, Theme } from '@/payload-types'
 import config from '@/payload.config'
 import './styles.css'
+import { ThemeSwitcher } from './theme-switcher'
+import { getThemeVariants } from './theme-variants'
 
 async function getTheme(): Promise<null | Theme> {
   try {
@@ -88,6 +90,8 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
     getNavigation(isEnabled),
   ])
   const siteName = theme?.meta?.siteName ?? 'witconsult'
+  // dev-only theme variants (empty in production / without biti build)
+  const variants = getThemeVariants()
 
   return (
     <html lang="de">
@@ -101,6 +105,12 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
         {theme?.cssDark ? (
           <style dangerouslySetInnerHTML={{ __html: theme.cssDark }} />
         ) : null}
+        {variants.map((variant) => (
+          <style
+            dangerouslySetInnerHTML={{ __html: variant.css }}
+            key={variant.name}
+          />
+        ))}
       </head>
       <body>
         <header className="site-header">
@@ -128,6 +138,9 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
         </header>
         <main>{children}</main>
         <footer className="site-footer">{siteName}</footer>
+        {variants.length ? (
+          <ThemeSwitcher variants={variants.map((v) => v.name)} />
+        ) : null}
       </body>
     </html>
   )

@@ -101,3 +101,20 @@ hr {
   border-top: 1px solid var(--border, #ddd);
   margin: var(--space-lg, 2rem) 0;
 }
+
+/* dev-only theme switcher widget */
+.theme-switcher {
+  position: fixed;
+  right: var(--space-md, 1rem);
+  bottom: var(--space-md, 1rem);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs, 0.4rem);
+  padding: var(--space-xs, 0.4rem) var(--space-sm, 0.75rem);
+  background: var(--bg, #fff);
+  color: var(--fg, #111);
+  border: 1px solid var(--border, #ddd);
+  border-radius: var(--radius-md, 6px);
+  font-size: var(--font-size-sm, 0.875rem);
+}

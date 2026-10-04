@@ -1,5 +1,6 @@
 import type {
   DefaultNodeTypes,
+  SerializedBlockNode,
   SerializedUploadNode,
 } from '@payloadcms/richtext-lexical'
 import type { JSXConvertersFunction } from '@payloadcms/richtext-lexical/react'
@@ -22,9 +23,24 @@ const upload = ({ node }: { node: SerializedUploadNode }) => {
   )
 }
 
+// CodeBlock() from the pages editor serializes as a block node
+// (blockType "Code").
+const Code = ({
+  node,
+}: {
+  node: SerializedBlockNode<{ code?: string; language?: string }>
+}) => (
+  <pre>
+    <code data-language={node.fields?.language ?? undefined}>
+      {node.fields?.code ?? ''}
+    </code>
+  </pre>
+)
+
 export const jsxConverters: JSXConvertersFunction<DefaultNodeTypes> = ({
   defaultConverters,
 }) => ({
   ...defaultConverters,
   upload,
+  blocks: { Code },
 })

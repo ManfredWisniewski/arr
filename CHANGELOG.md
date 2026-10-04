@@ -10,6 +10,20 @@ release.
 
 ## Unreleased
 
+### Added
+
+- Dev-only theme switcher: in `next dev`, all compiled biti theme variants
+  (`arr`/`trurl`/`wit` × light/dark) are injected scoped to
+  `[data-theme="<name>"]` and selectable via a fixed widget; the pushed
+  `theme` global stays the default (`src/app/(frontend)/theme-variants.ts`,
+  `theme-switcher.tsx`, `layout.tsx`)
+
+### Fixed
+
+- Code blocks render on the frontend: JSX converter for the `Code` block
+  (`pre`/`code` + `data-language`) was missing
+  (`src/app/(frontend)/[[...path]]/converters.tsx`)
+
 ### Changed
 
 - `seed-admin` accepts `PAYLOAD_SEED_ADMIN_API_KEY` to provision an API

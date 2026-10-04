@@ -3,49 +3,87 @@
 # PostgreSQL (installed via scoop on first run) and `npm run dev`.
 $ErrorActionPreference = 'Stop'
 
-# open the site once the dev server answers (up to ~2 min)
+$useDocker = [bool](Get-Command docker -ErrorAction SilentlyContinue)
+
+# dev-only seed credentials (local@test.com / notapassword + a fixed local
+# API key). Override via PAYLOAD_SEED_ADMIN_* env vars.
+if (-not $env:PAYLOAD_SEED_ADMIN_EMAIL) {
+    $env:PAYLOAD_SEED_ADMIN_EMAIL = 'local@test.com'
+    $env:PAYLOAD_SEED_ADMIN_PASSWORD = 'notapassword'
+    $env:PAYLOAD_SEED_ADMIN_API_KEY = '6927128c-70b0-4e85-a455-835e4d184afa'
+}
+
+# background: wait for the server, force a db query so dev mode pushes the
+# schema, seed the dev user, then open the site (up to ~2 min)
 Start-Job -ScriptBlock {
+    param($root, $docker)
+    Set-Location $root
+    $up = $false
     foreach ($i in 1..120) {
         try {
             $r = Invoke-WebRequest -Uri 'http://127.0.0.1:3000/api/health' `
                 -UseBasicParsing -TimeoutSec 2
-            if ($r.StatusCode -eq 200) {
-                Start-Process 'http://localhost:3000'
-                return
-            }
+            if ($r.StatusCode -eq 200) { $up = $true; break }
         } catch {}
         Start-Sleep -Seconds 1
     }
-} | Out-Null
+    if (-not $up) { return }
+    foreach ($i in 1..30) {
+        try {
+            Invoke-RestMethod 'http://127.0.0.1:3000/api/pages?limit=1' `
+                -TimeoutSec 5 | Out-Null
+            break
+        } catch { Start-Sleep -Seconds 2 }
+    }
+    foreach ($i in 1..3) {
+        if ($docker) {
+            docker compose exec -T `
+                -e PAYLOAD_SEED_ADMIN_EMAIL -e PAYLOAD_SEED_ADMIN_PASSWORD `
+                -e PAYLOAD_SEED_ADMIN_API_KEY `
+                payload npx tsx scripts/seed-admin.ts
+        } else {
+            npx tsx scripts/seed-admin.ts
+        }
+        if ($LASTEXITCODE -eq 0) { break }
+        Start-Sleep -Seconds 3
+    }
+    Start-Process 'http://localhost:3000'
+} -ArgumentList (Get-Location).Path, $useDocker | Out-Null
 
-if (Get-Command docker -ErrorAction SilentlyContinue) {
+if ($useDocker) {
     docker compose up
     exit $LASTEXITCODE
 }
 
 # --- native path: PostgreSQL + next dev ---
+$pgBin = "$env:USERPROFILE\scoop\apps\postgresql\current\bin"
 if (-not (Get-Command psql -ErrorAction SilentlyContinue)) {
-    if (-not (Get-Command scoop -ErrorAction SilentlyContinue)) {
-        throw 'PostgreSQL not found. Install it first: scoop install postgresql'
-    }
-    scoop install postgresql
-    # scoop adds <app>/bin to the user PATH — refresh this process
-    $env:PATH = [Environment]::GetEnvironmentVariable('PATH', 'User') + ';' +
-                [Environment]::GetEnvironmentVariable('PATH', 'Machine')
-    if (-not (Get-Command psql -ErrorAction SilentlyContinue)) {
-        throw 'PostgreSQL install failed. Retry: scoop install postgresql'
+    if (Test-Path "$pgBin\psql.exe") {
+        # installed via scoop already, just not on this process's PATH
+        $env:PATH = "$pgBin;$env:PATH"
+    } else {
+        if (-not (Get-Command scoop -ErrorAction SilentlyContinue)) {
+            throw 'PostgreSQL not found. Install it first: scoop install postgresql'
+        }
+        scoop install postgresql
+        $env:PATH = "$pgBin;$env:PATH"
+        if (-not (Test-Path "$pgBin\psql.exe")) {
+            throw 'PostgreSQL install failed. Retry: scoop install postgresql'
+        }
     }
 }
 
 $dataDir = "$env:USERPROFILE\scoop\persist\postgresql\data"
 if (-not (Test-Path "$dataDir\PG_VERSION")) {
     # scoop's post_install normally does this; fallback for other installs
-    initdb -D $dataDir -U postgres -E UTF8 --auth=trust | Out-Null
+    & "$pgBin\initdb.exe" -D $dataDir -U postgres -E UTF8 --auth=trust | Out-Null
 }
 
-pg_ctl -D $dataDir status *>$null
+& "$pgBin\pg_ctl.exe" -D $dataDir status *>$null
 if ($LASTEXITCODE -ne 0) {
-    pg_ctl -D $dataDir -l "$dataDir\server.log" start
+    # detached so the postmaster outlives this shell
+    Start-Process -FilePath "$pgBin\pg_ctl.exe" -Wait -ArgumentList `
+        '-D', $dataDir, '-l', "$dataDir\server.log", 'start'
 }
 
 # same credentials as docker-compose.yml
@@ -58,14 +96,5 @@ $db = psql @psql -tAc "SELECT 1 FROM pg_database WHERE datname='payload_test'"
 if ($db -ne '1') {
     psql @psql -c "CREATE DATABASE payload_test OWNER payload_test" | Out-Null
 }
-
-# apply schema + seed a local admin/API-key user (env-overridable)
-npx payload migrate
-if (-not $env:PAYLOAD_SEED_ADMIN_EMAIL) {
-    $env:PAYLOAD_SEED_ADMIN_EMAIL = 'local@test.com'
-    $env:PAYLOAD_SEED_ADMIN_PASSWORD = 'notapassword'
-    $env:PAYLOAD_SEED_ADMIN_API_KEY = '6927128c-70b0-4e85-a455-835e4d184afa'
-}
-npx tsx scripts/seed-admin.ts
 
 npm run dev

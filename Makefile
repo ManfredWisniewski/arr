@@ -71,3 +71,7 @@ push-local: export PAYLOAD_BASE_URL := http://127.0.0.1:3000
 push-local: export PAYLOAD_API_KEY ?= 6927128c-70b0-4e85-a455-835e4d184afa
 push-local: theme site sync
 	$(info pushed to http://127.0.0.1:3000)
+
+# Push the mockup demo site (all templates/elements) to the local stack.
+demo: CONTENT_REPO := ../obs-seo-witconsult/demo
+demo: push-local

@@ -79,6 +79,11 @@ pre-provisioned API key. `make push-local` pushes theme, site config and
 content to the local instance and defaults to that seeded key; set
 `$env:PAYLOAD_API_KEY` to override.
 
+For design testing, `make demo` pushes the mockup site in
+`../obs-seo-witconsult/demo` (all templates + element showcase) instead.
+In dev mode a theme switcher (bottom right) toggles between all compiled
+biti theme variants — arr/trurl/wit × light/dark — without repushing.
+
 ## Production image
 
 The Dockerfile builds a standalone Next.js image from

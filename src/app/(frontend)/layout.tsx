@@ -20,7 +20,7 @@ async function getTheme(): Promise<null | Theme> {
 type NavItem = { label: string; path?: string; children: NavItem[] }
 
 // `structures` doc "navigation" — { items: [{ label, path, children? }] }
-// from <site>/structure/navigation.yml. Draft-aware like the page renderer.
+// from <site>/+structure/navigation.yml. Draft-aware like the page renderer.
 function mapNavItems(items: unknown): NavItem[] {
   if (!Array.isArray(items)) {
     return []

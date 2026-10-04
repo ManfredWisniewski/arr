@@ -21,7 +21,7 @@
 
 ## Site structure
 
-- **D05 Site layout data lives in YAML files under `<site>/structure/`, synced into a generic `structures` collection** (alternatives: a `navigation` global; hardcoded menu markup in the image; one collection per structure type). The filename stem becomes the document `name`; the parsed YAML lands verbatim in a `data` JSON field; upserts key on `sourcePath` and obey the same draft-only rules as pages (D04). New document kinds (`menu`, `navigation`, `footer`, `header`, …) need no schema or code changes — consumers interpret `data` per `name`. The frontend renders the header menu from `structures` doc `navigation` as `data.items[*].{label, path}`.
+- **D05 Site layout data lives in YAML files under `<site>/+structure/`, synced into a generic `structures` collection** (alternatives: a `navigation` global; hardcoded menu markup in the image; one collection per structure type). The filename stem becomes the document `name`; the parsed YAML lands verbatim in a `data` JSON field; upserts key on `sourcePath` and obey the same draft-only rules as pages (D04). New document kinds (`menu`, `navigation`, `footer`, `header`, …) need no schema or code changes — consumers interpret `data` per `name`. The frontend renders the header menu from `structures` doc `navigation` as `data.items[*].{label, path}`.
 
 ## Templates
 

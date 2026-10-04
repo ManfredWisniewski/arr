@@ -31,7 +31,7 @@ work.
 - `users` collection: API-key auth (`useAPIKey`) plus a `role` field
   (`editor` / `content-bot`).
 - `structures` collection: generic site-layout documents (`name`, `data`
-  JSON, `sourcePath`, `sourceRepo`), synced from `<site>/structure/*.yml` in
+  JSON, `sourcePath`, `sourceRepo`), synced from `<site>/+structure/*.yml` in
   the content repository; drafts enabled. The `navigation` doc drives the
   header menu (`data.items[*].{label, path}`).
 - `theme` global: `cssLight`, `cssDark`, `meta { siteName, fontFamily }` —

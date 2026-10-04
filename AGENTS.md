@@ -8,6 +8,7 @@ The shared rules in `+wit/AGENTS.md` apply. Additionally:
 
 - The Payload database is a derived read model — never treat it as a source of truth; content and theme are pushed via the REST API.
 - Do not store credentials, customer data, conversation logs or runtime state.
+- `CHANGELOG.md` tracks changes that ship in the image (`src/`, config, schema). If a change requires an image rebuild + redeploy to go live, add an entry under `## Unreleased`.
 
 ## Commands
 

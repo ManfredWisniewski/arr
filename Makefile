@@ -44,7 +44,7 @@ FONT_ARGS := $(FONT_ARGS_$(THEME)) $(FONT_VARS_$(THEME))
 push: tokens theme site sync
 	@echo NOTE: pages and structures are pushed as drafts - publish them in the Payload admin to go live.
 ifneq ($(IMAGE_DIRTY),)
-	@echo NOTE: image files changed ($(IMAGE_PATHS)) - rebuild and redeploy the image; push does not ship code changes.
+	@echo NOTE: image files changed ($(IMAGE_PATHS)) - rebuild and redeploy the image; push does not ship code changes. See CHANGELOG.md.
 endif
 
 tokens:

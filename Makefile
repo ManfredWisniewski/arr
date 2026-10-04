@@ -10,6 +10,11 @@ FONT_DIR ?= $(BITI_DIR)/public/fonts
 
 PT := python -m wit_pytools.payloadtools
 
+# Paths baked into the image — changes here need a rebuild + redeploy,
+# they do not go live via `push`.
+IMAGE_PATHS := src next.config.ts package.json package-lock.json Dockerfile
+IMAGE_DIRTY := $(shell git status --porcelain $(IMAGE_PATHS))
+
 # $(call font_arg,Family,glob) -> --font arg when the glob matches.
 # All matched files of the family are uploaded; weight/style are
 # inferred from filenames (google-webfonts-helper naming).
@@ -37,6 +42,10 @@ FONT_ARGS := $(FONT_ARGS_$(THEME)) $(FONT_VARS_$(THEME))
 .PHONY: push tokens theme site sync
 
 push: tokens theme site sync
+	@echo NOTE: pages and structures are pushed as drafts - publish them in the Payload admin to go live.
+ifneq ($(IMAGE_DIRTY),)
+	@echo NOTE: image files changed ($(IMAGE_PATHS)) - rebuild and redeploy the image; push does not ship code changes.
+endif
 
 tokens:
 	npm --prefix $(BITI_DIR)/tokens run build

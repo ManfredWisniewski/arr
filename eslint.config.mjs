@@ -30,6 +30,7 @@ const eslintConfig = [
       'src/payload-generated-schema.ts',
       // submodules are separate repos with their own linting
       '+wit/',
+      'biti/',
       'obs-seo-witconsult/',
       'wit_pytools/',
     ],

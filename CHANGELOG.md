@@ -12,11 +12,35 @@ release.
 
 ### Added
 
+- Components reorganised by atomic design (`+wit/design` spec):
+  `src/components/{atoms,molecules,organisms,templates}` — header/footer/
+  hero/nav/figure extracted from `layout.tsx` + `src/templates/` (moved to
+  `components/templates`)
+- `ThemeToggle` atom: production light/dark select (system/light/dark,
+  `arr.theme` storage key, pre-paint init script) per
+  `+wit/design/design-tokens.md`
+- Mobile navigation in `SiteHeader`: `.site-nav` collapses into a
+  `<details>` menu (`.site-nav-toggle`) below the 48rem breakpoint;
+  styles are new shell.css contract classes
 - Dev-only theme switcher: in `next dev`, all compiled biti theme variants
   (`arr`/`trurl`/`wit` × light/dark) are injected scoped to
   `[data-theme="<name>"]` and selectable via a fixed widget; the pushed
   `theme` global stays the default (`src/app/(frontend)/theme-variants.ts`,
   `theme-switcher.tsx`, `layout.tsx`)
+- New atoms (semantic-class wrappers, concepts from
+  Senofy/next-atomic-design re-implemented in the arr contract):
+  `Button` (.btn/.btn-primary/.btn-secondary, link variant), `Link`
+  (internal next/link vs external anchor), `Img`, `Heading`/`Paragraph`/
+  `Lead`/`Badge` (.badge), `Icon` (inline SVG registry: menu/close/
+  external/check), `Input` (.input)
+- New organism: `Modal` — `<dialog>`-based (focus trap, Esc, backdrop
+  click), `.modal`/`.modal-close` contract classes
+- Per-layer barrel exports (`components/*/index.ts`); organisms now
+  compose atoms (`SiteHeader` menu icon, `PageHero`/`SiteLogo`/`Figure`
+  via `Heading`/`Lead`/`Img`/`Link`)
+- Dev-only `/components` showcase route — renders all components with
+  fixture props under the pushed theme; `notFound()` in production
+  (shadows a hypothetical content page at that path)
 
 ### Fixed
 

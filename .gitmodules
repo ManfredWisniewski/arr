@@ -6,3 +6,7 @@
 	path = wit_pytools
 	url = https://github.com/ManfredWisniewski/wit_pytools.git
 	branch = main
+[submodule "biti"]
+	path = biti
+	url = https://github.com/ManfredWisniewski/biti.git
+	branch = main

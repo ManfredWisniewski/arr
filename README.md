@@ -51,6 +51,14 @@ work.
   workflow
 - PostgreSQL for local development or deployment
 
+Submodules (`+wit`, `wit_pytools`, `biti`) are needed for theme/content
+pushes — `biti` supplies the token CSS, fonts and design assets:
+
+```sh
+git submodule update --init --recursive
+# or per-submodule: scripts/submodules.ps1 -Command pull
+```
+
 ## Local development
 
 Create a local environment file and set a long random `PAYLOAD_SECRET`:

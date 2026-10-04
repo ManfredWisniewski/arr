@@ -15,7 +15,7 @@ export function getThemeVariants(): ThemeVariant[] {
   }
   const dir =
     process.env.THEME_VARIANTS_DIR ??
-    path.resolve(process.cwd(), '../biti/tokens/build/css')
+    path.resolve(process.cwd(), 'biti/tokens/build/css')
   try {
     return readdirSync(dir)
       .filter((file) => /-(light|dark)\.css$/.test(file))

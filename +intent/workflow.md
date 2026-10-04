@@ -18,7 +18,7 @@ Naming contract (single source of mapping, keep in this doc):
 | Variable `theme.bg`       | token id `theme.bg`             | `--theme-bg` CSS var   |
 | Variable mode `arr`       | resolver context `arr`          | `arr.css`              |
 | Variable mode `arr-dark`  | resolver context `arr-dark`     | `arr-dark.css`         |
-| Component `Template/X`    | `src/templates/x.tsx`           | `template: x`          |
+| Component `Template/X`    | `src/components/templates/x.tsx`           | `template: x`          |
 | Component `Section/Y`     | `.y-*` classes in `shell.css`   | styled markup          |
 
 ## Step by step
@@ -61,8 +61,8 @@ Naming contract (single source of mapping, keep in this doc):
 
    ```bat
    python -m wit_pytools.payloadtools theme ^
-     --css-light ..\biti\tokens\build\css\arr.css ^
-     --css-dark  ..\biti\tokens\build\css\arr-dark.css
+     --css-light biti\tokens\build\css\arr.css ^
+     --css-dark  biti\tokens\build\css\arr-dark.css
    ```
 
    Token changes go live with no image rebuild.
@@ -76,7 +76,7 @@ Naming contract (single source of mapping, keep in this doc):
    PNG 1x/2x) into `biti/design/figma/`. I port from the images plus
    the variable values. Dev Mode inspect / MCP are optional upgrades
    once a paid seat exists.
-3. Port to `arr/src/templates/` (or `@biti/ui` once extracted):
+3. Port to `arr/src/components/templates/` (or `@biti/ui` once extracted):
    semantic classes + `var(--token-id)` only — no hard-coded values.
    Add structural rules to `tokens/shell.css` under the section's
    class prefix; push styles via `payloadtools theme`.
@@ -92,7 +92,7 @@ Naming contract (single source of mapping, keep in this doc):
 2. Markdown maps into the template's slots by documented convention
    (today: first `![]()` = landing hero media; `meta_description` =
    hero lead). Each template's convention goes in `biti/BITI-DOC.md`.
-3. New template = new entry in `src/templates/registry.tsx` → rebuild.
+3. New template = new entry in `src/components/templates/registry.tsx` → rebuild.
 
 ### Phase 4 — Change loop (steady state)
 
@@ -108,7 +108,7 @@ Naming contract (single source of mapping, keep in this doc):
   `tokens/build/css/arr*.css` (+ `shell.css` append, `preview.html`).
 - `payloadtools theme` / `site` push commands; hash-deduped media
   upload; `theme` global (cssLight/cssDark/logo/favicon/siteName).
-- Template seam: `src/templates/registry.tsx` with `default` and
+- Template seam: `src/components/templates/registry.tsx` with `default` and
   `landing` (hero convention proven end-to-end).
 - Styling contract: semantic classes + token variables, no Tailwind,
   no hard-coded values.

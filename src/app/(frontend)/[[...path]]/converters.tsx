@@ -7,20 +7,15 @@ import type { JSXConvertersFunction } from '@payloadcms/richtext-lexical/react'
 import React from 'react'
 
 import type { Media } from '@/payload-types'
+import { Figure } from '@/components/molecules/figure'
 
 // Upload nodes hold the populated media document when depth > 0 (default).
 const upload = ({ node }: { node: SerializedUploadNode }) => {
   const media = node.value as Media | number | undefined
-  if (!media || typeof media !== 'object' || !media.url) {
+  if (!media || typeof media !== 'object') {
     return null
   }
-  return (
-    <figure>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img alt={media.alt} src={media.url} />
-      {media.caption ? <figcaption>{media.caption}</figcaption> : null}
-    </figure>
-  )
+  return <Figure media={media} />
 }
 
 // CodeBlock() from the pages editor serializes as a block node

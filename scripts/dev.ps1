@@ -79,11 +79,26 @@ if (-not (Test-Path "$dataDir\PG_VERSION")) {
     & "$pgBin\initdb.exe" -D $dataDir -U postgres -E UTF8 --auth=trust | Out-Null
 }
 
-& "$pgBin\pg_ctl.exe" -D $dataDir status *>$null
-if ($LASTEXITCODE -ne 0) {
-    # detached so the postmaster outlives this shell
-    Start-Process -FilePath "$pgBin\pg_ctl.exe" -Wait -ArgumentList `
-        '-D', $dataDir, '-l', "$dataDir\server.log", 'start'
+$pgService = Get-Service -Name 'PostgreSQL' -ErrorAction SilentlyContinue
+if ($pgService) {
+    if ($pgService.Status -ne 'Running') { Start-Service PostgreSQL }
+} else {
+    & "$pgBin\pg_ctl.exe" -D $dataDir status *>$null
+    if ($LASTEXITCODE -ne 0) {
+        # console-detached so the postmaster outlives this shell; for a
+        # durable setup run once elevated:
+        #   pg_ctl register -N PostgreSQL -D <dataDir>
+        Invoke-CimMethod -ClassName Win32_Process -MethodName Create `
+            -Arguments @{ CommandLine = "`"$pgBin\pg_ctl.exe`" -D `"$dataDir`" -l `"$dataDir\server.log`" start" } |
+            Out-Null
+        # wait for the server to accept connections
+        foreach ($i in 1..30) {
+            & "$pgBin\psql.exe" -U postgres -d postgres -w -tAc 'select 1' `
+                *>$null
+            if ($LASTEXITCODE -eq 0) { break }
+            Start-Sleep -Seconds 1
+        }
+    }
 }
 
 # same credentials as docker-compose.yml

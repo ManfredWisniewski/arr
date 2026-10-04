@@ -7,7 +7,7 @@ import React from 'react'
 import type { Page } from '@/payload-types'
 import config from '@/payload.config'
 
-import { renderTemplate } from '@/templates/registry'
+import { renderTemplate } from '@/components/templates/registry'
 
 import { jsxConverters } from './converters'
 

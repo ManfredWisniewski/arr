@@ -2,6 +2,7 @@ import React from 'react'
 
 import type { Media } from '@/payload-types'
 
+import { PageHero } from '../organisms/page-hero'
 import type { TemplateProps } from './default'
 
 // Vendored from biti (src/heros/MediumImpact) — hero header adapted to the
@@ -22,18 +23,7 @@ export const LandingTemplate = ({ page, renderBody }: TemplateProps) => {
 
   return (
     <article className="page page--landing" data-template="landing">
-      <header className="page-hero">
-        <h1 className="page-hero-title">{page.title}</h1>
-        {page.meta?.description ? (
-          <p className="page-hero-lead">{page.meta.description}</p>
-        ) : null}
-      </header>
-      {hero?.url ? (
-        <div className="page-hero-media">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img alt={hero.alt} src={hero.url} />
-        </div>
-      ) : null}
+      <PageHero media={hero} page={page} />
       <div className="page-body">{renderBody(body)}</div>
     </article>
   )

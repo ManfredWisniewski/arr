@@ -7,5 +7,5 @@
     "MD034": false,
     "MD060": false
   },
-  "ignores": ["node_modules/**", "+wit-*/**", "__*/**"]
+  "ignores": ["node_modules/**", "+wit-*/**", "biti/**", "__*/**"]
 }

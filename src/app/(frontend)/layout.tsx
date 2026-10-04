@@ -1,10 +1,14 @@
 import { draftMode } from 'next/headers'
-import Link from 'next/link'
 import { getPayload } from 'payload'
 import React from 'react'
 
 import type { Media, Theme } from '@/payload-types'
 import config from '@/payload.config'
+
+import { mapNavItems, type NavItem } from '@/components/molecules/nav-item'
+import { SiteFooter } from '@/components/organisms/site-footer'
+import { SiteHeader } from '@/components/organisms/site-header'
+
 import './styles.css'
 import { ThemeSwitcher } from './theme-switcher'
 import { getThemeVariants } from './theme-variants'
@@ -17,27 +21,6 @@ async function getTheme(): Promise<null | Theme> {
     // render unstyled rather than fail (e.g. before migrations ran)
     return null
   }
-}
-
-type NavItem = { label: string; path?: string; children: NavItem[] }
-
-// `structures` doc "navigation" — { items: [{ label, path, children? }] }
-// from <site>/+structure/navigation.yml. Draft-aware like the page renderer.
-function mapNavItems(items: unknown): NavItem[] {
-  if (!Array.isArray(items)) {
-    return []
-  }
-  return items
-    .filter(
-      (item): item is Record<string, unknown> =>
-        typeof item === 'object' && item !== null,
-    )
-    .map((item) => ({
-      label: typeof item.label === 'string' ? item.label : '',
-      path: typeof item.path === 'string' ? item.path : undefined,
-      children: mapNavItems(item.children),
-    }))
-    .filter((item) => item.label && (item.path || item.children.length > 0))
 }
 
 async function getNavigation(draft: boolean): Promise<NavItem[]> {
@@ -60,27 +43,16 @@ async function getNavigation(draft: boolean): Promise<NavItem[]> {
   }
 }
 
-function NavEntry({ item }: { item: NavItem }) {
-  return (
-    <li>
-      {item.path ? <Link href={item.path}>{item.label}</Link> : item.label}
-      {item.children.length > 0 ? (
-        <ul>
-          {item.children.map((child) => (
-            <NavEntry key={child.label} item={child} />
-          ))}
-        </ul>
-      ) : null}
-    </li>
-  )
-}
-
 export async function generateMetadata() {
   const theme = await getTheme()
   return {
     title: theme?.meta?.siteName ?? 'witconsult',
   }
 }
+
+// Applies the stored theme preference before first paint (no flash) —
+// counterpart to the ThemeToggle atom; key per design-tokens spec.
+const THEME_INIT = `(function(){try{var t=localStorage.getItem('arr.theme')||'system';var d=t==='dark'||(t!=='light'&&window.matchMedia('(prefers-color-scheme: dark)').matches);if(d){document.documentElement.dataset.theme='dark'}}catch(e){}})()`
 
 export default async function RootLayout(props: { children: React.ReactNode }) {
   const { children } = props
@@ -96,6 +68,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
   return (
     <html lang="de">
       <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT }} />
         {theme?.favicon && typeof theme.favicon === 'object'
           ? <link href={(theme.favicon as Media).url ?? ''} rel="icon" />
           : null}
@@ -113,31 +86,13 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
         ))}
       </head>
       <body>
-        <header className="site-header">
-          <Link className="site-name" href="/">
-            {theme?.logo && typeof theme.logo === 'object' && theme.logo.url ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                alt={(theme.logo as Media).alt || siteName}
-                className="site-logo"
-                src={(theme.logo as Media).url ?? ''}
-              />
-            ) : (
-              siteName
-            )}
-          </Link>
-          {navItems.length ? (
-            <nav className="site-nav">
-              <ul>
-                {navItems.map((item) => (
-                  <NavEntry key={item.label} item={item} />
-                ))}
-              </ul>
-            </nav>
-          ) : null}
-        </header>
+        <SiteHeader
+          logo={theme?.logo as Media | null | undefined}
+          navItems={navItems}
+          siteName={siteName}
+        />
         <main>{children}</main>
-        <footer className="site-footer">{siteName}</footer>
+        <SiteFooter siteName={siteName} />
         {variants.length ? (
           <ThemeSwitcher variants={variants.map((v) => v.name)} />
         ) : null}

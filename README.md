@@ -62,11 +62,22 @@ cp .env.example .env
 Start Payload and PostgreSQL:
 
 ```sh
-docker compose up
+make dev            # or: docker compose up
 ```
+
+`make dev` uses docker compose when Docker is installed; otherwise
+`scripts/dev.ps1` sets up a local PostgreSQL via scoop (first run only)
+and runs `npm run dev` natively — same `payload_test` credentials and
+`DATABASE_URI` as the compose stack.
 
 The local application is available at `http://127.0.0.1:3000`. The health
 endpoint is `http://127.0.0.1:3000/api/health`.
+
+On the native path, `make dev` also migrates the schema and seeds a
+dev-only user — admin login `local@test.com` / `notapassword` with a
+pre-provisioned API key. `make push-local` pushes theme, site config and
+content to the local instance and defaults to that seeded key; set
+`$env:PAYLOAD_API_KEY` to override.
 
 ## Production image
 
@@ -147,7 +158,7 @@ The Ansible integration expects:
 - image uploads without Sharp-based resizing on the current test host;
 - `seed-admin.js` to create the first admin idempotently;
 - `PAYLOAD_SEED_ADMIN_EMAIL` and `PAYLOAD_SEED_ADMIN_PASSWORD` for the seed
-  command; and
+  command (`PAYLOAD_SEED_ADMIN_API_KEY` optionally sets an API key); and
 - `PAYLOAD_SECRET` to be supplied through the Ansible vault; and
 - `PREVIEW_SECRET` for the admin draft-preview link, also through the vault.
 

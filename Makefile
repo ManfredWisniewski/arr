@@ -39,12 +39,12 @@ FONT_VARS_wit := \
 
 FONT_ARGS := $(FONT_ARGS_$(THEME)) $(FONT_VARS_$(THEME))
 
-.PHONY: push tokens theme site sync
+.PHONY: push push-local dev tokens theme site sync
 
 push: tokens theme site sync
-	@echo NOTE: pages and structures are pushed as drafts - publish them in the Payload admin to go live.
+	$(info NOTE: pages and structures are pushed as drafts - publish them in the Payload admin to go live.)
 ifneq ($(IMAGE_DIRTY),)
-	@echo NOTE: image files changed ($(IMAGE_PATHS)) - rebuild and redeploy the image; push does not ship code changes. See CHANGELOG.md.
+	$(info NOTE: image files changed ($(IMAGE_PATHS)) - rebuild and redeploy the image; push does not ship code changes. See CHANGELOG.md.)
 endif
 
 tokens:
@@ -58,3 +58,16 @@ site:
 
 sync:
 	$(PT) sync --repo $(CONTENT_REPO)
+
+# Local dev server (hot reload) on :3000 — docker compose when Docker is
+# installed, else a local PostgreSQL (auto-installed/started by the script,
+# matching DATABASE_URI in .env) + next dev.
+dev:
+	powershell -NoProfile -ExecutionPolicy Bypass -File scripts/dev.ps1
+
+# Same push pipeline against the local stack. Defaults to the dev-only
+# key seeded by `make dev`; set $env:PAYLOAD_API_KEY to override.
+push-local: export PAYLOAD_BASE_URL := http://127.0.0.1:3000
+push-local: export PAYLOAD_API_KEY ?= 6927128c-70b0-4e85-a455-835e4d184afa
+push-local: theme site sync
+	$(info pushed to http://127.0.0.1:3000)

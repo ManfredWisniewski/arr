@@ -12,6 +12,9 @@ release.
 
 ### Changed
 
+- `seed-admin` accepts `PAYLOAD_SEED_ADMIN_API_KEY` to provision an API
+  key on the seeded user (used by local dev; optional for deployments)
+  (`scripts/seed-admin.ts`)
 - Header navigation supports `children` sub-items in the `navigation`
   structure doc; entries without `path` render as group labels
   (`src/app/(frontend)/layout.tsx`)

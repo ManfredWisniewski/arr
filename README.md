@@ -83,7 +83,7 @@ endpoint is `http://127.0.0.1:3000/api/health`.
 
 On the native path, `make dev` also migrates the schema and seeds a
 dev-only user — admin login `local@test.com` / `notapassword` with a
-pre-provisioned API key. `make push-local` pushes theme, site config and
+pre-provisioned API key. `make publish-local` pushes theme, site config and
 content to the local instance and defaults to that seeded key; set
 `$env:PAYLOAD_API_KEY` to override.
 

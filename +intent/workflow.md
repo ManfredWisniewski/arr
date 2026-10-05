@@ -139,7 +139,7 @@ Naming contract (single source of mapping, keep in this doc):
 
 - Webfonts (WOFF2 downloads, Google Fonts mirror):
   https://gwfh.mranftl.com/fonts/ — download font files, place them under
-  `biti/public/fonts/`, then `make push` picks them up via `--font` args.
+  `biti/public/fonts/`, then `make publish` picks them up via `--font` args.
 
 ## Research appendix
 

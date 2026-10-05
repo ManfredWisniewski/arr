@@ -1,6 +1,6 @@
-# Push all site content to the Payload instance (theme CSS, fonts,
+# Publish all site content to the Payload instance (theme CSS, fonts,
 # site.yml, pages/media/structure). Requires .env with PAYLOAD_BASE_URL
-# and PAYLOAD_API_KEY. Usage: make push [THEME=arr|wit]
+# and PAYLOAD_API_KEY. Usage: make publish [THEME=arr|wit]
 
 CONTENT_REPO ?= ../obs-seo-witconsult/witconsult.de
 THEME ?= wit
@@ -11,7 +11,7 @@ FONT_DIR ?= $(BITI_DIR)/public/fonts
 PT := python -m wit_pytools.payloadtools
 
 # Paths baked into the image — changes here need a rebuild + redeploy,
-# they do not go live via `push`.
+# they do not go live via `publish`.
 IMAGE_PATHS := src next.config.ts package.json package-lock.json Dockerfile
 IMAGE_DIRTY := $(shell git status --porcelain $(IMAGE_PATHS))
 
@@ -39,9 +39,9 @@ FONT_VARS_wit := \
 
 FONT_ARGS := $(FONT_ARGS_$(THEME)) $(FONT_VARS_$(THEME))
 
-.PHONY: push push-local dev tokens theme site sync
+.PHONY: publish publish-local dev tokens theme site sync
 
-push: tokens theme site sync
+publish: tokens theme site sync
 	$(info NOTE: pages and structures are pushed as drafts - publish them in the Payload admin to go live.)
 ifneq ($(IMAGE_DIRTY),)
 	$(info NOTE: image files changed ($(IMAGE_PATHS)) - rebuild and redeploy the image; push does not ship code changes. See CHANGELOG.md.)
@@ -67,11 +67,11 @@ dev:
 
 # Same push pipeline against the local stack. Defaults to the dev-only
 # key seeded by `make dev`; set $env:PAYLOAD_API_KEY to override.
-push-local: export PAYLOAD_BASE_URL := http://127.0.0.1:3000
-push-local: export PAYLOAD_API_KEY ?= 6927128c-70b0-4e85-a455-835e4d184afa
-push-local: theme site sync
-	$(info pushed to http://127.0.0.1:3000)
+publish-local: export PAYLOAD_BASE_URL := http://127.0.0.1:3000
+publish-local: export PAYLOAD_API_KEY ?= 6927128c-70b0-4e85-a455-835e4d184afa
+publish-local: theme site sync
+	$(info published to http://127.0.0.1:3000)
 
 # Push the mockup demo site (all templates/elements) to the local stack.
 demo: CONTENT_REPO := ../obs-seo-witconsult/demo
-demo: push-local
+demo: publish-local

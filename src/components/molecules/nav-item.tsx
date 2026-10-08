@@ -1,6 +1,7 @@
 import React from 'react'
 
 import { Link } from '../atoms/link'
+import { NavCaret } from './nav-caret'
 
 export type NavItem = { label: string; path?: string; children: NavItem[] }
 
@@ -23,12 +24,30 @@ export function mapNavItems(items: unknown): NavItem[] {
     .filter((item) => item.label && (item.path || item.children.length > 0))
 }
 
-function NavItemEntry({ item }: { item: NavItem }) {
+// shell.css navbar contract (biti +intent/components/navbar_prompt.md):
+// li > .nav-item cell; a nested ul opens as the full-width submenu band
+// anchored to .navbar. First band child is a .nav-brand--spacer aligning
+// the band items under .site-nav.
+function NavItemEntry({
+  brand,
+  item,
+}: {
+  brand?: React.ReactNode
+  item: NavItem
+}) {
   return (
     <li>
-      {item.path ? <Link href={item.path}>{item.label}</Link> : item.label}
+      <div className="nav-item">
+        {item.path ? <Link href={item.path}>{item.label}</Link> : item.label}
+        {item.children.length > 0 ? <NavCaret label={item.label} /> : null}
+      </div>
       {item.children.length > 0 ? (
         <ul>
+          {brand ? (
+            <li aria-hidden="true" className="nav-brand nav-brand--spacer">
+              {brand}
+            </li>
+          ) : null}
           {item.children.map((child) => (
             <NavItemEntry key={child.label} item={child} />
           ))}
@@ -38,11 +57,44 @@ function NavItemEntry({ item }: { item: NavItem }) {
   )
 }
 
-export function NavList({ items }: { items: NavItem[] }) {
+// Mobile variant — plain nested list; .site-nav-toggle styles it.
+function NavItemEntryPlain({ item }: { item: NavItem }) {
   return (
-    <ul>
+    <li>
+      {item.path ? <Link href={item.path}>{item.label}</Link> : item.label}
+      {item.children.length > 0 ? (
+        <ul>
+          {item.children.map((child) => (
+            <NavItemEntryPlain key={child.label} item={child} />
+          ))}
+        </ul>
+      ) : null}
+    </li>
+  )
+}
+
+export function NavList({
+  brand,
+  items,
+  primary,
+}: {
+  brand?: React.ReactNode
+  items: NavItem[]
+  primary?: boolean
+}) {
+  if (!primary) {
+    return (
+      <ul>
+        {items.map((item) => (
+          <NavItemEntryPlain key={item.label} item={item} />
+        ))}
+      </ul>
+    )
+  }
+  return (
+    <ul className="primary-nav">
       {items.map((item) => (
-        <NavItemEntry key={item.label} item={item} />
+        <NavItemEntry brand={brand} item={item} key={item.label} />
       ))}
     </ul>
   )

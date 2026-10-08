@@ -116,6 +116,14 @@ release.
 
 ### Fixed
 
+- Site header rebuilt to the current shell.css navbar contract: the
+  styled bar is now `.navbar` inside the unstyled `.site-header`
+  wrapper, nav items render `.nav-item` cells under `ul.primary-nav`
+  with a `.nav-caret` submenu trigger (`.is-open` toggle for
+  non-hover), and submenu bands start with a `.nav-brand--spacer`
+  aligning them under `.site-nav`; `.site-nav-toggle` and the theme
+  select sit in flush-right `.nav-actions`. The previous markup
+  matched a retired contract and rendered unstyled
 - Dev theme picker conflict: the variant switcher and `ThemeToggle`
   both wrote `data-theme` — the toggle's mount effect clobbered the
   picked variant. Variants are now re-scoped to a separate

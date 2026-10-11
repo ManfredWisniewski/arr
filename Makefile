@@ -6,7 +6,7 @@ CONTENT_REPO ?= ../obs-seo-witconsult/witconsult.de
 THEME ?= wit
 BITI_DIR ?= biti
 CSS_DIR ?= $(BITI_DIR)/tokens/build/css
-FONT_DIR ?= $(BITI_DIR)/public/fonts
+FONT_DIR ?= $(BITI_DIR)/assets/$(THEME)/fonts
 
 PT := python -m wit_pytools.payloadtools
 

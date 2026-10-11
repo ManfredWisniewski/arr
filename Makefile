@@ -1,8 +1,13 @@
 # Publish all site content to the Payload instance (theme CSS, fonts,
-# site.yml, pages/media/structure). Requires .env with PAYLOAD_BASE_URL
-# and PAYLOAD_API_KEY. Usage: make publish [THEME=arr|wit]
+# site.yml, pages/media/structure). Per-site credentials live in
+# sites/<site>/.env (PAYLOAD_BASE_URL, PAYLOAD_API_KEY) — never commit
+# real .env files. Usage: make publish [SITE=w1t.org] [THEME=arr|wit]
 
-CONTENT_REPO ?= ../obs-seo-witconsult/witconsult.de
+SITE ?= witconsult.de
+-include sites/$(SITE)/.env
+export PAYLOAD_BASE_URL PAYLOAD_API_KEY
+
+CONTENT_REPO ?= ../obs-seo-witconsult/$(SITE)
 THEME ?= wit
 BITI_DIR ?= biti
 CSS_DIR ?= $(BITI_DIR)/tokens/build/css

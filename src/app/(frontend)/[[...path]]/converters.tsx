@@ -8,6 +8,7 @@ import React from 'react'
 
 import type { Media } from '@/payload-types'
 import { Figure } from '@/components/molecules/figure'
+import { WitSpace } from '@/components/organisms/wit-space'
 
 // Upload nodes hold the populated media document when depth > 0 (default).
 const upload = ({ node }: { node: SerializedUploadNode }) => {
@@ -32,10 +33,24 @@ const Code = ({
   </pre>
 )
 
+// witSpace block serializes its fields directly on the node
+// (blockType "witSpace"); nulls fall back to the component defaults.
+const WitSpaceScene = ({
+  node,
+}: {
+  node: SerializedBlockNode<{ depth?: number; maxTilt?: number; size?: number }>
+}) => (
+  <WitSpace
+    depth={node.fields?.depth ?? undefined}
+    maxTilt={node.fields?.maxTilt ?? undefined}
+    size={node.fields?.size ?? undefined}
+  />
+)
+
 export const jsxConverters: JSXConvertersFunction<DefaultNodeTypes> = ({
   defaultConverters,
 }) => ({
   ...defaultConverters,
   upload,
-  blocks: { Code },
+  blocks: { Code, witSpace: WitSpaceScene },
 })

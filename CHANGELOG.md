@@ -12,6 +12,13 @@ release.
 
 ### Added
 
+- `witSpace` rich-text block on the pages editor
+  (`src/blocks/wit-space.ts`): markdown tag syntax
+  `<witSpace size="600" maxTilt="15" depth="90" />` via `jsx`
+  import/export, rendered by the new `WitSpace` organism
+  (`src/components/organisms/wit-space.tsx` — the wit logo extruded
+  into a pointer-tilting 3D vector space, ported from biti) through a
+  `blocks` entry in `jsxConverters`.
 - Components reorganised by atomic design (`+wit/design` spec):
   `src/components/{atoms,molecules,organisms,templates}` — header/footer/
   hero/nav/figure extracted from `layout.tsx` + `src/templates/` (moved to

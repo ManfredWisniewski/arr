@@ -12,6 +12,22 @@ release.
 
 ### Added
 
+- `posts` collection (`src/collections/Posts.ts`): blog posts synced from
+  `<site>/blog/<agent>/*_webtext*.md` via a new `collections` glob map in
+  `.arrcontent.yml` (`wit_pytools/payloadtools`). Front matter adds
+  `author` (defaults to the `blog/<agent>/` segment), `date`
+  (`publishedAt`), `categories`, `tags`, `excerpt` and `cover`
+  (sha256-deduped media doc). Same draft review gate, markdown hook and
+  access rules as `pages`; `markdownToContent` now resolves the content
+  field from the request collection.
+- `/blog` frontend routes: index (`blog/page.tsx`, optional intro from a
+  `pages` doc at `/blog`), author view `blog/[author]` (profile from the
+  `structures` doc `agents`), single post `blog/[author]/[post]`, and
+  taxonomy archives `blog/kategorie/[category]` + `blog/tag/[tag]`
+  (labels from the optional `structures` doc `taxonomies`). Pagination
+  via `?page=N`; `jsxConverters` moved to `src/lib/jsx-converters.tsx`
+  for reuse. New `AuthorLine` molecule, `PostList`/`postToCardItem`
+  organism built on `CardGrid`.
 - `witSpace` rich-text block on the pages editor
   (`src/blocks/wit-space.ts`): markdown tag syntax
   `<witSpace size="600" maxTilt="15" depth="90" />` via `jsx`

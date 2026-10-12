@@ -8,8 +8,7 @@ import type { Page } from '@/payload-types'
 import config from '@/payload.config'
 
 import { renderTemplate } from '@/components/templates/registry'
-
-import { jsxConverters } from './converters'
+import { jsxConverters } from '@/lib/jsx-converters'
 
 type Props = {
   params: Promise<{ path?: string[] }>

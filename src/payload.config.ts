@@ -6,6 +6,7 @@ import { fileURLToPath } from 'url'
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
 import { Pages } from './collections/Pages'
+import { Posts } from './collections/Posts'
 import { Structures } from './collections/Structures'
 import { Theme } from './globals/Theme'
 
@@ -19,7 +20,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Media, Pages, Structures],
+  collections: [Users, Media, Pages, Posts, Structures],
   globals: [Theme],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',

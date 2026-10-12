@@ -10,11 +10,12 @@ import {
 // Regenerates `content` (Lexical) from `markdownRaw` whenever markdown is sent
 // and differs from the stored value. Updates without `markdownRaw` (or with an
 // unchanged one) leave `content` untouched, so manual admin edits are kept.
+// Applies to every collection exposing markdownRaw + content (pages, posts).
 export const markdownToContent: CollectionBeforeValidateHook = ({
+  collection,
   data,
   operation,
   originalDoc,
-  req,
 }) => {
   const markdown = (data as { markdownRaw?: unknown } | undefined)?.markdownRaw
 
@@ -29,7 +30,7 @@ export const markdownToContent: CollectionBeforeValidateHook = ({
     return data
   }
 
-  const contentField = req.payload.collections.pages.config.fields.find(
+  const contentField = collection?.fields.find(
     (f): f is RichTextField =>
       'name' in f && f.name === 'content' && f.type === 'richText',
   )

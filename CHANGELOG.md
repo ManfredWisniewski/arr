@@ -178,3 +178,19 @@ release.
 - Header navigation supports `children` sub-items in the `navigation`
   structure doc; entries without `path` render as group labels
   (`src/app/(frontend)/layout.tsx`)
+- Rich-text `link`/`autolink` nodes render through the `Link` atom:
+  external URLs open in a new tab (`target="_blank" rel="noopener
+  noreferrer"`) by default, internal doc links resolve to the document
+  `path` via `next/link` (`src/lib/jsx-converters.tsx`)
+- `SiteFooter` renders the full `navigation` structure as an expanded
+  list (group labels as text, no hover); copyright line and `links`/
+  `siteName`/`text` props removed
+  (`src/components/organisms/site-footer.tsx`)
+- Frontend UI strings switched to English (site default language):
+  `Weiterlesen`→`Continue`, `Keine Beiträge gefunden.`→`No posts
+  found.`, `Kategorie:`→`Category:`, 404 text, and `formatDate` now
+  uses `en-GB` (`11 October 2026`)
+- Post cards show an author byline (`AuthorLine`, linked to
+  `/blog/<author>`) via a new `meta` slot on `Card`/`CardItem`;
+  `getAgentMap` resolves names + avatar URLs for the listed authors
+  (`src/components/organisms/{card,post-list}.tsx`, `src/lib/blog.ts`)

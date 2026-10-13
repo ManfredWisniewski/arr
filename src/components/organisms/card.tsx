@@ -15,6 +15,7 @@ export type CardItem = {
   linkLabel?: string
   mediaAlt?: string
   mediaSrc?: string
+  meta?: React.ReactNode
   title: string
 }
 
@@ -29,6 +30,7 @@ export const Card = ({
   linkLabel,
   mediaAlt,
   mediaSrc,
+  meta,
   title,
 }: CardItem) => (
   <div className="card">
@@ -40,11 +42,14 @@ export const Card = ({
         <p className="card-text">{description}</p>
       </CardBody>
     ) : null}
-    {href ? (
+    {href || meta ? (
       <CardFooter>
-        <Link className="card-link" href={href}>
-          {linkLabel ?? 'Mehr erfahren'}
-        </Link>
+        {meta}
+        {href ? (
+          <Link className="card-link" href={href}>
+            {linkLabel ?? 'Continue'}
+          </Link>
+        ) : null}
       </CardFooter>
     ) : null}
   </div>

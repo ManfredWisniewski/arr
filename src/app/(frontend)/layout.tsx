@@ -92,7 +92,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
           siteName={siteName}
         />
         <main>{children}</main>
-        <SiteFooter siteName={siteName} />
+        <SiteFooter navItems={navItems} />
         {variants.length ? (
           <ThemeSwitcher variants={variants.map((v) => v.name)} />
         ) : null}

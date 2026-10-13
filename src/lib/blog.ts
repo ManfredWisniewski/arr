@@ -120,6 +120,37 @@ export async function getAgent(slug: string, draft: boolean) {
   return (await getAgents(draft)).find((agent) => agent.slug === slug)
 }
 
+export type AgentRef = { avatarUrl?: string; name: string; slug: string }
+
+// Display data for post-card bylines — one agents-doc lookup plus one
+// media lookup per author actually present in the list.
+export async function getAgentMap(
+  slugs: (null | string | undefined)[],
+  draft: boolean,
+): Promise<Record<string, AgentRef>> {
+  const wanted = new Set(slugs.filter((slug): slug is string => !!slug))
+  if (!wanted.size) {
+    return {}
+  }
+  const agents = await getAgents(draft)
+  const entries = await Promise.all(
+    agents
+      .filter((agent) => wanted.has(agent.slug))
+      .map(
+        async (agent) =>
+          [
+            agent.slug,
+            {
+              avatarUrl: await getMediaUrl(agent.avatar, draft),
+              name: agent.name,
+              slug: agent.slug,
+            },
+          ] as const,
+      ),
+  )
+  return Object.fromEntries(entries)
+}
+
 export async function getTaxonomyTerm(
   kind: 'categories' | 'tags',
   slug: string,
@@ -176,9 +207,9 @@ export function formatDate(value?: null | string) {
   if (Number.isNaN(date.getTime())) {
     return ''
   }
-  return date.toLocaleDateString('de-DE', {
-    day: '2-digit',
-    month: '2-digit',
+  return date.toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'long',
     year: 'numeric',
   })
 }

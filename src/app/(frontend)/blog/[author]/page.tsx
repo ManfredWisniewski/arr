@@ -51,9 +51,18 @@ export default async function AuthorBlog({ params, searchParams }: Props) {
         </div>
       </header>
       {result.docs.length ? (
-        <PostList posts={result.docs} />
+        <PostList
+          agents={{
+            [agent.slug]: {
+              avatarUrl,
+              name: agent.name,
+              slug: agent.slug,
+            },
+          }}
+          posts={result.docs}
+        />
       ) : (
-        <p className="empty">Keine Beiträge gefunden.</p>
+        <p className="empty">No posts found.</p>
       )}
       <Pagination
         current={result.page ?? current}

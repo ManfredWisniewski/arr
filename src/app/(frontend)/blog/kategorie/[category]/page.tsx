@@ -2,7 +2,7 @@ import { draftMode } from 'next/headers'
 import { notFound } from 'next/navigation.js'
 import React from 'react'
 
-import { getPostsPage, getTaxonomyTerm } from '@/lib/blog'
+import { getAgentMap, getPostsPage, getTaxonomyTerm } from '@/lib/blog'
 
 import { TaxonomyArchive } from '../../taxonomy-archive'
 
@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: Props) {
   const term = await getTaxonomyTerm('categories', category, isEnabled)
   return {
     description: term?.description,
-    title: term?.label ?? `Kategorie: ${category}`,
+    title: term?.label ?? `Category: ${category}`,
   }
 }
 
@@ -30,16 +30,21 @@ export default async function CategoryArchive({ params, searchParams }: Props) {
     getTaxonomyTerm('categories', category, isEnabled),
     getPostsPage({ category, draft: isEnabled, page: current }),
   ])
+  const agents = await getAgentMap(
+    result.docs.map((post) => post.author),
+    isEnabled,
+  )
   if (!result.docs.length && !term && !isEnabled) {
     notFound()
   }
 
   return (
     <TaxonomyArchive
+      agents={agents}
       basePath={`/blog/kategorie/${category}`}
       current={result.page ?? current}
       description={term?.description}
-      heading={term?.label ?? `Kategorie: ${category}`}
+      heading={term?.label ?? `Category: ${category}`}
       posts={result.docs}
       totalPages={result.totalPages}
     />

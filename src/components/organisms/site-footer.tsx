@@ -1,28 +1,15 @@
 import React from 'react'
 
-import { Link } from '../atoms/link'
+import type { NavItem } from '../molecules/nav-item'
+import { NavList } from '../molecules/nav-item'
 
-// Site footer — copyright line + optional link list (legal/sitemap).
-export const SiteFooter = ({
-  links,
-  siteName,
-  text,
-}: {
-  links?: { href: string; label: string }[]
-  siteName: string
-  text?: string
-}) => (
+// Site footer — the full navigation tree as a plain expanded list
+// (group labels render as text, no hover needed).
+export const SiteFooter = ({ navItems }: { navItems: NavItem[] }) => (
   <footer className="site-footer">
-    <p className="site-footer-copy">
-      {text ?? `© ${new Date().getFullYear()} ${siteName}`}
-    </p>
-    {links?.length ? (
-      <nav aria-label="Fußzeile" className="site-footer-nav">
-        {links.map((link) => (
-          <Link href={link.href} key={link.href}>
-            {link.label}
-          </Link>
-        ))}
+    {navItems.length ? (
+      <nav aria-label="Footer" className="site-footer-nav">
+        <NavList items={navItems} />
       </nav>
     ) : null}
   </footer>

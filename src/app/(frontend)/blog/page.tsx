@@ -8,7 +8,7 @@ import config from '@/payload.config'
 
 import { Pagination } from '@/components/molecules/pagination'
 import { PostList } from '@/components/organisms/post-list'
-import { getPostsPage } from '@/lib/blog'
+import { getAgentMap, getPostsPage } from '@/lib/blog'
 import { jsxConverters } from '@/lib/jsx-converters'
 
 type Props = {
@@ -48,6 +48,10 @@ export default async function BlogIndex({ searchParams }: Props) {
     findIntro(isEnabled),
     getPostsPage({ draft: isEnabled, page: current }),
   ])
+  const agents = await getAgentMap(
+    result.docs.map((post) => post.author),
+    isEnabled,
+  )
 
   return (
     <article className="page blog-index">
@@ -55,9 +59,9 @@ export default async function BlogIndex({ searchParams }: Props) {
         <RichText converters={jsxConverters} data={intro.content} />
       ) : null}
       {result.docs.length ? (
-        <PostList posts={result.docs} />
+        <PostList agents={agents} posts={result.docs} />
       ) : (
-        <p className="empty">Keine Beiträge gefunden.</p>
+        <p className="empty">No posts found.</p>
       )}
       <Pagination
         current={result.page ?? current}

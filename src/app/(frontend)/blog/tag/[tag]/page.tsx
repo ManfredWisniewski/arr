@@ -2,7 +2,7 @@ import { draftMode } from 'next/headers'
 import { notFound } from 'next/navigation.js'
 import React from 'react'
 
-import { getPostsPage, getTaxonomyTerm } from '@/lib/blog'
+import { getAgentMap, getPostsPage, getTaxonomyTerm } from '@/lib/blog'
 
 import { TaxonomyArchive } from '../../taxonomy-archive'
 
@@ -30,12 +30,17 @@ export default async function TagArchive({ params, searchParams }: Props) {
     getTaxonomyTerm('tags', tag, isEnabled),
     getPostsPage({ draft: isEnabled, page: current, tag }),
   ])
+  const agents = await getAgentMap(
+    result.docs.map((post) => post.author),
+    isEnabled,
+  )
   if (!result.docs.length && !term && !isEnabled) {
     notFound()
   }
 
   return (
     <TaxonomyArchive
+      agents={agents}
       basePath={`/blog/tag/${tag}`}
       current={result.page ?? current}
       description={term?.description}

@@ -45,6 +45,15 @@ types:  npx payload generate:types && npx tsc
 - `GET /api/health` returns 200; image runs as UID/GID 1000; the entrypoint
   runs `payload migrate`; `seed-admin.js` is idempotent (`test-image.sh`).
 
+### A06 Media image sizes
+
+- `Media.upload.imageSizes` defines a named variant for every display
+  context (`logo`, `avatar`, `card`, `content`, `hero`); no render path
+  serves `doc.url` directly — components resolve via `mediaUrl()` /
+  `getMediaUrl()` with `/_next/image` then original as fallback.
+- Adding a display context means adding an `imageSizes` entry plus a
+  migration, not serving the original.
+
 ## Not tested
 
 - REST-level publish denial by the bot key — covered by the `beforeChange`

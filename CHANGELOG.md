@@ -190,7 +190,10 @@ release.
   `Weiterlesen`→`Continue`, `Keine Beiträge gefunden.`→`No posts
   found.`, `Kategorie:`→`Category:`, 404 text, and `formatDate` now
   uses `en-GB` (`11 October 2026`)
-- Post cards show an author byline (`AuthorLine`, linked to
-  `/blog/<author>`) via a new `meta` slot on `Card`/`CardItem`;
+- Post cards show an author byline in the header — avatar (`lg`) left
+  of the title with the author name as a linked subtitle targeting
+  `/blog/<author>` — via new `lead`/`subtitle` slots on `Card`/
+  `CardHeader` (`meta` slot remains for footer content);
   `getAgentMap` resolves names + avatar URLs for the listed authors
-  (`src/components/organisms/{card,post-list}.tsx`, `src/lib/blog.ts`)
+  (`src/components/{organisms,molecules}/{card,post-list,card-section}.tsx`,
+  `src/lib/blog.ts`)

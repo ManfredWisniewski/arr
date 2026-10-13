@@ -4,11 +4,13 @@ import type { Post } from '@/payload-types'
 import type { AgentRef } from '@/lib/blog'
 import { formatDate } from '@/lib/blog'
 
-import { AuthorLine } from '../molecules/author-line'
+import { Avatar } from '../atoms/avatar'
+import { Link } from '../atoms/link'
 import { CardGrid, type CardItem } from './card'
 
 // Post -> card mapping; cover/date become media + badge, excerpt the body,
-// and the author slug becomes a byline linking to the agent's archive.
+// and the author becomes a header byline: avatar left, linked name as
+// subtitle — the link targets the agent's archive (/blog/<author>).
 export const postToCardItem = (
   post: Post,
   agents?: Record<string, AgentRef>,
@@ -16,19 +18,19 @@ export const postToCardItem = (
   const media =
     post.cover && typeof post.cover === 'object' ? post.cover : undefined
   const author = post.author ? agents?.[post.author] : undefined
+  const name = author?.name ?? post.author ?? ''
   return {
     badge: formatDate(post.publishedAt) || undefined,
     description: post.excerpt ?? undefined,
     href: post.path,
+    lead: post.author ? (
+      <Avatar name={name} size="lg" src={author?.avatarUrl} />
+    ) : undefined,
     linkLabel: 'Continue',
     mediaAlt: media?.alt ?? post.title,
     mediaSrc: media?.url ?? undefined,
-    meta: post.author ? (
-      <AuthorLine
-        avatarUrl={author?.avatarUrl}
-        href={`/blog/${post.author}`}
-        name={author?.name ?? post.author}
-      />
+    subtitle: post.author ? (
+      <Link href={`/blog/${post.author}`}>{name}</Link>
     ) : undefined,
     title: post.title,
   }

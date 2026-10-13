@@ -12,10 +12,12 @@ export type CardItem = {
   description?: string
   href?: string
   icon?: IconName
+  lead?: React.ReactNode
   linkLabel?: string
   mediaAlt?: string
   mediaSrc?: string
   meta?: React.ReactNode
+  subtitle?: React.ReactNode
   title: string
 }
 
@@ -27,16 +29,18 @@ export const Card = ({
   description,
   href,
   icon,
+  lead,
   linkLabel,
   mediaAlt,
   mediaSrc,
   meta,
+  subtitle,
   title,
 }: CardItem) => (
   <div className="card">
     {badge ? <Badge className="card-badge">{badge}</Badge> : null}
     {mediaSrc ? <CardMedia alt={mediaAlt ?? title} src={mediaSrc} /> : null}
-    <CardHeader icon={icon} title={title} />
+    <CardHeader icon={icon} lead={lead} subtext={subtitle} title={title} />
     {description ? (
       <CardBody>
         <p className="card-text">{description}</p>

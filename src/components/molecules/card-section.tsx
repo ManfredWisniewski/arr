@@ -12,16 +12,18 @@ import { IconBox } from './icon-box'
 export const CardHeader = ({
   className,
   icon,
+  lead,
   subtext,
   title,
 }: {
   className?: string
   icon?: IconName
-  subtext?: string
+  lead?: React.ReactNode
+  subtext?: React.ReactNode
   title: string
 }) => (
   <div className={cx('card-header', className)}>
-    {icon ? <IconBox name={icon} /> : null}
+    {lead ?? (icon ? <IconBox name={icon} /> : null)}
     <div>
       <Heading className="card-title" level={3}>
         {title}

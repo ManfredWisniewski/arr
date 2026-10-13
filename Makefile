@@ -7,7 +7,7 @@ SITE ?= witconsult.de
 -include sites/$(SITE)/.env
 export PAYLOAD_BASE_URL PAYLOAD_API_KEY
 
-CONTENT_REPO ?= ../obs-seo-witconsult/$(SITE)
+CONTENT_REPO ?= ../../clients/seo-wit/$(SITE)
 THEME ?= wit
 BITI_DIR ?= biti
 CSS_DIR ?= $(BITI_DIR)/tokens/build/css

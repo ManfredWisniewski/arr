@@ -12,6 +12,15 @@ release.
 
 ### Added
 
+- SEO plumbing: `/robots.txt` (`app/(frontend)/robots.ts` — allows all,
+  disallows `/admin`, `/api`, `/preview`, advertises the sitemap),
+  `/sitemap.xml` (`app/(frontend)/sitemap.ts` — published `pages` +
+  `posts` plus `/blog` author/category/tag archives) and blog feeds —
+  RSS 2.0 at `/rss.xml`, `/feed`, `/index.xml`, Atom at `/atom.xml`
+  (`src/lib/feed.ts`). The instance base URL resolves per request from
+  `SITE_URL` or the proxy's `x-forwarded-*` headers (`src/lib/site.ts`),
+  so no domain is baked into the image.
+
 - `posts` collection (`src/collections/Posts.ts`): blog posts synced from
   `<site>/blog/<agent>/*_webtext*.md` via a new `collections` glob map in
   `.arrcontent.yml` (`wit_pytools/payloadtools`). Front matter adds

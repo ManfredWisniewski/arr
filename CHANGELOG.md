@@ -12,6 +12,23 @@ release.
 
 ### Added
 
+- Internationalization, German (default) + English: Payload field-level
+  localization (`de`/`en`, `localized: true` on editorial fields of
+  `pages`, `posts`, `media` and `structures.data`;
+  ids/slugs/paths/dates stay shared), experimental per-locale publish
+  status (`experimental.localizeStatus` + `versions.drafts.localizeStatus`),
+  admin UI in German and English. Frontend routes moved under
+  `app/(frontend)/[lang]` with `next-intl` middleware — every public URL
+  carries an explicit `/de` or `/en` prefix (`/` redirects to `/de`) and
+  the route locale is passed to every Payload read. Public reads use
+  `fallbackLocale: false` (no mixed-language pages); draft previews fall
+  back to `de`. UI strings come from `messages/{de,en}.json`; internal
+  links are locale-prefixed by the `Link` atom. Per-locale feeds
+  (`/de/rss.xml`, `/en/rss.xml`, …) and `sitemap.xml` (per-locale URLs
+  with `hreflang` alternates + `x-default`), canonical/hreflang metadata
+  on every page. Migration `20261013_211826_i18n` copies existing rows
+  into the `de` locale tables before dropping the old columns. See
+  `+intent/decisions.md` D08–D11.
 - SEO plumbing: `/robots.txt` (`app/(frontend)/robots.ts` — allows all,
   disallows `/admin`, `/api`, `/preview`, advertises the sitemap),
   `/sitemap.xml` (`app/(frontend)/sitemap.ts` — published `pages` +
@@ -170,6 +187,13 @@ release.
 
 ### Changed
 
+- **Breaking URL scheme**: all public URLs are locale-prefixed —
+  `/blog/kategorie/<c>` became `/{de,en}/blog/category/<c>`, feeds live
+  at `/{de,en}/{rss.xml,feed,index.xml,atom.xml}`, and the Payload admin
+  preview links target `/<locale><path>` via the `/preview` handler.
+  Content writes must send `?locale=<de|en>` (`fallback-locale=none` for
+  strict reads) — `wit_pytools/payloadtools` needs a follow-up to emit
+  localized writes
 - `Button` atom: `ghost` variant, `size="sm|lg"`, `loading` (spinner +
   no interaction) and `disabled` per the catalog spec
 - `Modal` organism: `title` renders `.modal-header` (Heading + close),

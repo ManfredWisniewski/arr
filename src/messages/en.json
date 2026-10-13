@@ -1,0 +1,47 @@
+{
+  "blog": {
+    "categoryFallback": "Category: {slug}",
+    "empty": "No posts found.",
+    "feedDescription": "Latest posts on the {siteName} blog",
+    "feedTitle": "{siteName} Blog",
+    "readMore": "Continue",
+    "tagFallback": "Tag: {slug}",
+    "title": "Blog"
+  },
+  "dashboard": {
+    "reset": "Reset",
+    "statusActive": "Active",
+    "statusDraft": "Draft",
+    "statusPlaceholder": "Status"
+  },
+  "docs": {
+    "contentTab": "Content",
+    "home": "Home",
+    "notesBody": "Notes tab — additional information about the same document without leaving the page.",
+    "notesTab": "Notes",
+    "sidebarTitle": "Documentation"
+  },
+  "nav": {
+    "footer": "Footer navigation",
+    "menu": "Menu",
+    "primary": "Main navigation"
+  },
+  "notFound": {
+    "message": "Page not found.",
+    "title": "404"
+  },
+  "pricing": {
+    "faqHeading": "Frequently asked questions"
+  },
+  "pagination": {
+    "ariaLabel": "Pagination",
+    "next": "Next",
+    "previous": "Back"
+  },
+  "theme": {
+    "dark": "Dark",
+    "label": "Color scheme",
+    "light": "Light",
+    "system": "System"
+  }
+}

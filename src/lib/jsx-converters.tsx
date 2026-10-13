@@ -17,6 +17,7 @@ import type { Media } from '@/payload-types'
 import { Link } from '@/components/atoms/link'
 import { Figure } from '@/components/molecules/figure'
 import { WitSpace, type WitSpaceAuthor } from '@/components/organisms/wit-space'
+import type { Locale } from '@/i18n/routing'
 import { getAgents, getMediaUrl } from '@/lib/blog'
 
 // Upload nodes hold the populated media document when depth > 0 (default).
@@ -46,21 +47,22 @@ const Code = ({
 // (blockType "witSpace"); nulls fall back to the component defaults.
 // `authors` rows hold agent slugs — resolved async against the
 // structures doc (name/role/avatar → /blog/<slug> cards).
-const WitSpaceScene = async ({
-  node,
-}: {
-  node: SerializedBlockNode<{
-    authors?: { agent?: null | string; face?: null | string; vert?: null | number }[]
-    depth?: number
-    maxTilt?: number
-    size?: number
-  }>
-}) => {
+const WitSpaceScene = (locale: Locale) =>
+  async function WitSpaceSceneInner({
+    node,
+  }: {
+    node: SerializedBlockNode<{
+      authors?: { agent?: null | string; face?: null | string; vert?: null | number }[]
+      depth?: number
+      maxTilt?: number
+      size?: number
+    }>
+  }) {
   const rows = node.fields?.authors ?? []
   let authors: WitSpaceAuthor[] = []
   if (rows.length) {
     const draft = (await draftMode()).isEnabled
-    const agents = await getAgents(draft)
+    const agents = await getAgents(draft, locale)
     authors = (
       await Promise.all(
         rows.map(async (row): Promise<null | WitSpaceAuthor> => {
@@ -70,9 +72,9 @@ const WitSpaceScene = async ({
           }
           return {
             face: row.face === 'near' || row.face === 'far' ? row.face : undefined,
-            href: `/blog/${agent.slug}`,
+            href: `/${locale}/blog/${agent.slug}`,
             name: agent.name,
-            picture: await getMediaUrl(agent.avatar, draft, 'avatar'),
+            picture: await getMediaUrl(agent.avatar, draft, 'avatar', locale),
             role: agent.role,
             vert: row.vert,
           }
@@ -120,12 +122,14 @@ const link = ({
   )
 }
 
-export const jsxConverters: JSXConvertersFunction<DefaultNodeTypes> = ({
-  defaultConverters,
-}) => ({
-  ...defaultConverters,
-  upload,
-  autolink: link,
-  link,
-  blocks: { Code, witSpace: WitSpaceScene },
-})
+// Locale-aware factory: agents/media lookups inside converters are
+// localized (D08); the locale prefix on links is handled by the Link atom.
+export const jsxConverters =
+  (locale: Locale): JSXConvertersFunction<DefaultNodeTypes> =>
+  ({ defaultConverters }) => ({
+    ...defaultConverters,
+    upload,
+    autolink: link,
+    link,
+    blocks: { Code, witSpace: WitSpaceScene(locale) },
+  })

@@ -1,7 +1,9 @@
 import { getPayload } from 'payload'
+import { getTranslations } from 'next-intl/server'
 import React from 'react'
 
 import config from '@/payload.config'
+import type { Locale } from '@/i18n/routing'
 
 import { Accordion } from '../molecules/accordion'
 import { CardGrid } from '../organisms/card'
@@ -24,12 +26,14 @@ type PricingData = {
   }[]
 }
 
-async function getPricing(): Promise<PricingData> {
+async function getPricing(locale: Locale): Promise<PricingData> {
   try {
     const payload = await getPayload({ config: await config })
     const { docs } = await payload.find({
       collection: 'structures',
+      fallbackLocale: false,
       limit: 1,
+      locale,
       where: { name: { equals: 'pricing' } },
     })
     return (docs[0]?.data as PricingData | undefined) ?? {}
@@ -41,8 +45,15 @@ async function getPricing(): Promise<PricingData> {
 // Pricing-page layout — LeadSection + plan cards (PricingCard) in a
 // grid + FAQ accordion, all fed by the `pricing` structure doc
 // (+structure/pricing.yml) + markdown body.
-export const PricingTemplate = async ({ page, renderBody }: TemplateProps) => {
-  const { faq = [], plans = [] } = await getPricing()
+export const PricingTemplate = async ({
+  locale,
+  page,
+  renderBody,
+}: TemplateProps) => {
+  const [{ faq = [], plans = [] }, t] = await Promise.all([
+    getPricing(locale),
+    getTranslations({ locale, namespace: 'pricing' }),
+  ])
   return (
     <article className="page" data-template="pricing">
       <LeadSection
@@ -70,7 +81,7 @@ export const PricingTemplate = async ({ page, renderBody }: TemplateProps) => {
       </CardGrid>
       {faq.length ? (
         <>
-          <Heading level={2}>Häufige Fragen</Heading>
+          <Heading level={2}>{t('faqHeading')}</Heading>
           <Accordion
             items={faq
               .filter((item) => item.title)

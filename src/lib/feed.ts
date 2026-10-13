@@ -1,12 +1,14 @@
 import { getPayload } from 'payload'
 
 import config from '@/payload.config'
+import type { Locale } from '@/i18n/routing'
 
 import { getAgents } from './blog'
 
-// Shared builders for the blog feed endpoints (/rss.xml, /feed,
-// /index.xml → RSS 2.0; /atom.xml → Atom). Published posts only — feeds
-// never go through draft mode.
+// Shared builders for the per-locale blog feed endpoints
+// (/{de,en}/rss.xml, /feed, /index.xml → RSS 2.0; /atom.xml → Atom).
+// Published posts only — feeds never go through draft mode, and public
+// reads never fall back to another locale (D11).
 export const FEED_POST_LIMIT = 50
 
 export type FeedItem = {
@@ -24,10 +26,18 @@ export type FeedItem = {
   updatedAt: string
 }
 
+// Assembled per route: title/description are dict strings resolved at the
+// edge; getFeedData supplies items, siteName and an optional description.
 export type FeedData = {
   description: string
   items: FeedItem[]
   title: string
+}
+
+export type FeedQuery = {
+  description?: string
+  items: FeedItem[]
+  siteName: string
 }
 
 function escapeXml(value: string): string {
@@ -44,21 +54,25 @@ function toDate(value?: null | string): Date {
   return Number.isNaN(date.getTime()) ? new Date(0) : date
 }
 
-export async function getFeedData(): Promise<FeedData> {
+export async function getFeedData(locale: Locale): Promise<FeedQuery> {
   const payload = await getPayload({ config: await config })
 
   const [{ docs: posts }, agents, intro, theme] = await Promise.all([
     payload.find({
       collection: 'posts',
+      fallbackLocale: false,
       limit: FEED_POST_LIMIT,
+      locale,
       sort: '-publishedAt',
       where: { _status: { equals: 'published' } },
     }),
-    getAgents(false),
+    getAgents(false, locale),
     payload
       .find({
         collection: 'pages',
+        fallbackLocale: false,
         limit: 1,
+        locale,
         where: {
           _status: { equals: 'published' },
           path: { equals: '/blog' },
@@ -72,7 +86,6 @@ export async function getFeedData(): Promise<FeedData> {
   ])
 
   const authorNames = new Map(agents.map((a) => [a.slug, a.name]))
-  const siteName = theme?.meta?.siteName ?? 'witconsult'
 
   const items = posts.map((post) => ({
       author: post.author ? authorNames.get(post.author) : undefined,
@@ -96,11 +109,9 @@ export async function getFeedData(): Promise<FeedData> {
     }))
 
   return {
-    description:
-      intro?.meta?.description ??
-      `${siteName} Blog`,
+    description: intro?.meta?.description ?? undefined,
     items,
-    title: `${siteName} Blog`,
+    siteName: theme?.meta?.siteName ?? 'witconsult',
   }
 }
 
@@ -108,13 +119,14 @@ export function buildRss(
   { description, items, title }: FeedData,
   base: string,
   selfPath: string,
+  locale: Locale,
 ): string {
   const updated = items.length
     ? toDate(items[0].publishedAt ?? items[0].updatedAt)
     : new Date()
   const entries = items
     .map((item) => {
-      const url = `${base}${item.path}`
+      const url = `${base}/${locale}${item.path}`
       return [
         '    <item>',
         `      <title>${escapeXml(item.title)}</title>`,
@@ -144,10 +156,10 @@ export function buildRss(
 <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>${escapeXml(title)}</title>
-    <link>${escapeXml(`${base}/blog`)}</link>
+    <link>${escapeXml(`${base}/${locale}/blog`)}</link>
     <atom:link href="${escapeXml(`${base}${selfPath}`)}" rel="self" type="application/rss+xml"/>
     <description>${escapeXml(description)}</description>
-    <language>de</language>
+    <language>${locale}</language>
     <lastBuildDate>${updated.toUTCString()}</lastBuildDate>
 ${entries}
   </channel>
@@ -159,13 +171,14 @@ export function buildAtom(
   { description, items, title }: FeedData,
   base: string,
   selfPath: string,
+  locale: Locale,
 ): string {
   const updated = items.length
     ? toDate(items[0].updatedAt)
     : new Date()
   const entries = items
     .map((item) => {
-      const url = `${base}${item.path}`
+      const url = `${base}/${locale}${item.path}`
       return [
         '  <entry>',
         `    <title>${escapeXml(item.title)}</title>`,
@@ -190,10 +203,10 @@ export function buildAtom(
     .join('\n')
 
   return `<?xml version="1.0" encoding="UTF-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="de">
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="${locale}">
   <title>${escapeXml(title)}</title>
   <subtitle>${escapeXml(description)}</subtitle>
-  <link href="${escapeXml(`${base}/blog`)}"/>
+  <link href="${escapeXml(`${base}/${locale}/blog`)}"/>
   <link href="${escapeXml(`${base}${selfPath}`)}" rel="self"/>
   <id>${escapeXml(`${base}/blog`)}</id>
   <updated>${updated.toISOString()}</updated>

@@ -1,5 +1,7 @@
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
+import { de } from '@payloadcms/translations/languages/de'
+import { en } from '@payloadcms/translations/languages/en'
 import path from 'path'
 import { buildConfig } from 'payload'
 import sharp from 'sharp'
@@ -23,6 +25,23 @@ export default buildConfig({
   },
   collections: [Users, Media, Pages, Posts, Structures],
   globals: [Theme],
+  // D08: field-level de/en; D10: per-locale publish status; D11: no
+  // implicit fallback — public reads pass fallbackLocale explicitly.
+  localization: {
+    locales: [
+      { code: 'de', label: 'Deutsch' },
+      { code: 'en', label: 'English' },
+    ],
+    defaultLocale: 'de',
+    fallback: false,
+    defaultLocalePublishOption: 'active',
+  },
+  experimental: {
+    localizeStatus: true,
+  },
+  i18n: {
+    supportedLanguages: { de, en },
+  },
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {

@@ -12,7 +12,10 @@ export const Structures: CollectionConfig = {
     useAsTitle: 'name',
   },
   versions: {
-    drafts: true,
+    drafts: {
+      // D10: de/en publish independently
+      localizeStatus: true,
+    },
   },
   access: {
     read: () => true,
@@ -34,6 +37,7 @@ export const Structures: CollectionConfig = {
     {
       name: 'data',
       type: 'json',
+      localized: true,
       required: true,
     },
     {

@@ -2,6 +2,7 @@ import { createElement } from 'react'
 import type React from 'react'
 
 import type { Page } from '@/payload-types'
+import type { Locale } from '@/i18n/routing'
 
 import { ContactTemplate } from './contact'
 import { DashboardTemplate } from './dashboard'
@@ -33,5 +34,7 @@ export const resolveTemplate = (name?: null | string) =>
 // type inside render (react-hooks/static-components).
 export const renderTemplate = (
   page: Page,
+  locale: Locale,
   renderBody: TemplateProps['renderBody'],
-) => createElement(resolveTemplate(page.template), { page, renderBody })
+) =>
+  createElement(resolveTemplate(page.template), { locale, page, renderBody })

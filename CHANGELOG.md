@@ -188,8 +188,9 @@ release.
   (`src/components/organisms/site-footer.tsx`)
 - Frontend UI strings switched to English (site default language):
   `Weiterlesen`→`Continue`, `Keine Beiträge gefunden.`→`No posts
-  found.`, `Kategorie:`→`Category:`, 404 text, and `formatDate` now
-  uses `en-GB` (`11 October 2026`)
+  found.`, `Kategorie:`→`Category:`, `Zurück`/`Weiter` pagination →
+  `Back`/`Next`, 404 text, and `formatDate` now uses `en-GB`
+  (`11 October 2026`)
 - Post cards show an author byline in the header — avatar (`lg`) left
   of the title with the author name as a linked subtitle targeting
   `/blog/<author>` — via new `lead`/`subtitle` slots on `Card`/

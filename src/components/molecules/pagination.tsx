@@ -22,10 +22,10 @@ export const Pagination = ({
     return null
   }
   return (
-    <nav aria-label="Seitennavigation" className={cx('pagination', className)}>
+    <nav aria-label="Pagination" className={cx('pagination', className)}>
       {current > 1 ? (
         <Link className="pagination-item pagination-prev" href={hrefFor(current - 1)}>
-          <Icon name="chevron-left" /> Zurück
+          <Icon name="chevron-left" /> Back
         </Link>
       ) : null}
       {Array.from({ length: total }, (_, i) => i + 1).map((page) =>
@@ -45,7 +45,7 @@ export const Pagination = ({
       )}
       {current < total ? (
         <Link className="pagination-item pagination-next" href={hrefFor(current + 1)}>
-          Weiter <Icon name="chevron-right" />
+          Next <Icon name="chevron-right" />
         </Link>
       ) : null}
     </nav>

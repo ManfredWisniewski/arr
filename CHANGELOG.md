@@ -198,3 +198,10 @@ release.
   `getAgentMap` resolves names + avatar URLs for the listed authors
   (`src/components/{organisms,molecules}/{card,post-list,card-section}.tsx`,
   `src/lib/blog.ts`)
+- `WitSpace` updated to the current biti version: vertex hover halos
+  with 2D overlay twins (fixes 3D occlusion), red pulse, face labels,
+  and author cards — a new `authors` array field on the `witSpace`
+  block pins agent slugs to logo vertices (`slug@vert[:face]` in the
+  markdown tag); `WitSpaceScene` resolves them against the `agents`
+  structure doc (name/role/avatar, links to `/blog/<slug>`). Only
+  authored vertices are hoverable now.

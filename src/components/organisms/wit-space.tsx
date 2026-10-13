@@ -103,6 +103,44 @@ const EDGES = LOGO_PATHS.flatMap((p) =>
   sampleRods(p.outline).map(([x, y]) => ({ x, y, fill: p.fill })),
 )
 
+/** Face labels — text + anchor point + direction angle (svg units, deg).
+    Rendered in the 2D overlay, not inside the layer planes: the
+    compositor re-sorts coplanar preserve-3d content on rebuild
+    (reload, window occlusion), making in-plane labels appear to jump
+    to the other face. Two anchor points per label give screen
+    position, projected angle and scale each frame. */
+const LABEL_FONT = 4.475
+const LABELS = [
+  { text: 'front•end', layer: LAYERS - 1, x: 15, y: 261, a: 60 },
+  { text: 'back•end', layer: 0, x: 122, y: 281, a: 269 },
+] as const
+
+/** flat index of a vertex inside one face — paths render in
+    LOGO_PATHS order (t 0–7, V 8–16, bar 17–22); the same set repeats
+    per layer, so DOM order is layer0's 23 verts then layer1's */
+const VERT_OFFSETS = LOGO_PATHS.map((_, j) =>
+  LOGO_PATHS.slice(0, j).reduce((n, q) => n + q.verts.length, 0),
+)
+/** Vertices off-limits for author cards — 19 (bar top, 103.7,231.8)
+    nearly overlaps 2 (t top, 104.5,229.5), so their cards would
+    stack. Authors assigned here are ignored. */
+const OFF_LIMITS_VERTS = new Set([19])
+
+export interface WitSpaceAuthor {
+  /** Flat vertex index within a face (see VERT_OFFSETS). */
+  vert: number
+  /** Which face's copy triggers and anchors the card — omit for either.
+      `near` = the +z face closest to the viewer (readable logo),
+      `far` = the copy behind it. */
+  face?: 'near' | 'far'
+  name: string
+  role?: string
+  /** Avatar image URL (CMS Media url resolved at call site). */
+  picture?: string
+  /** Link target — card renders as an anchor (e.g. the agent's blog page). */
+  href?: string
+}
+
 export interface WitSpaceProps extends React.HTMLAttributes<HTMLDivElement> {
   /** Logo width in px. */
   size?: number
@@ -110,13 +148,37 @@ export interface WitSpaceProps extends React.HTMLAttributes<HTMLDivElement> {
   maxTilt?: number
   /** Extrusion depth in px (default size * 0.15). */
   depth?: number
+  /** Author cards revealed on vertex hover — one entry per vertex. */
+  authors?: WitSpaceAuthor[]
 }
 
 /** Vector-space logo — the wit mark extruded through stacked SVG layers,
     shearing under inertial lag; tilts toward the pointer. */
-const WitSpace: React.FC<WitSpaceProps> = ({ className, size = 900, maxTilt = 30, depth, ...props }) => {
+const WitSpace: React.FC<WitSpaceProps> = ({
+  className,
+  size = 900,
+  maxTilt = 30,
+  depth,
+  authors = [],
+  ...props
+}) => {
   const cubeRef = React.useRef<HTMLDivElement>(null)
   const d = depth ?? size * 0.15
+
+  // per-face authored vert sets — drives data-author (hover target)
+  // in markup; face-less authors mark both copies
+  const authoredByFace = {
+    near: new Set(
+      authors
+        .filter((a) => a.face !== 'far' && !OFF_LIMITS_VERTS.has(a.vert))
+        .map((a) => a.vert),
+    ),
+    far: new Set(
+      authors
+        .filter((a) => a.face !== 'near' && !OFF_LIMITS_VERTS.has(a.vert))
+        .map((a) => a.vert),
+    ),
+  }
 
   React.useEffect(() => {
     const cube = cubeRef.current
@@ -139,9 +201,13 @@ const WitSpace: React.FC<WitSpaceProps> = ({ className, size = 900, maxTilt = 30
     // vertex hover — JS proximity check, because CSS :hover can't reach
     // a vertex occluded by the other face in 3D: every vert whose
     // projected hit disc covers the pointer gets -near, depth order
-    // doesn't matter
+    // doesn't matter. Only authored verts participate (data-author
+    // in markup) — the rest keep their dot but are inert
     const overlay = cube.parentElement!.querySelector('.wit-space-overlay') as HTMLElement
-    const verts = Array.from(cube.querySelectorAll('.wit-space-vert')).map((el) => {
+    const verts = Array.from(cube.querySelectorAll('.wit-space-layer')).flatMap(
+      (svg, li) =>
+        Array.from(svg.querySelectorAll('.wit-space-vert[data-author]')).map((el) => ({ el, li })),
+    ).map(({ el, li }) => {
       // 2D overlay copy of the halo+dot — the svg vert can't be lifted
       // out of its layer plane (preserve-3d doesn't cross into svg), so
       // a back-face vert's halo renders behind the front face. This
@@ -163,8 +229,70 @@ const WitSpace: React.FC<WitSpaceProps> = ({ className, size = 900, maxTilt = 30
         el: el as SVGGElement,
         hit: el.querySelector('.wit-space-hit') as SVGCircleElement,
         ov: { el: ov, ring, ringW, dot },
+        vIdx: Number(el.getAttribute('data-vert')),
+        // DOM order is far-face verts first, near-face (+z) last
+        isNear: li === LAYERS - 1,
       }
     })
+    // face labels — 2D overlay spans pinned to two anchor points inside
+    // the layer svgs (in-plane text gets re-sorted by the compositor,
+    // appearing to jump faces; see LABELS)
+    const labels = Array.from(cube.querySelectorAll('.wit-space-label-anchor')).map((el) => {
+      const span = document.createElement('span')
+      span.className = 'wit-space-label'
+      span.textContent = el.getAttribute('data-text')
+      overlay.appendChild(span)
+      return {
+        a: el.querySelector('.wit-space-label-a') as SVGCircleElement,
+        b: el.querySelector('.wit-space-label-b') as SVGCircleElement,
+        el: span,
+      }
+    })
+    // author boxes — overlay cards revealed on vertex proximity, one
+    // entry per vertex+face; `any` authors reveal from either copy,
+    // `near`/`far` authors only from their own face's copy, offset
+    // 30px toward the component center
+    const authorBoxes = new Map<
+      string,
+      { el: HTMLElement; near: boolean; x: number; y: number }
+    >()
+    for (const a of authors) {
+      if (OFF_LIMITS_VERTS.has(a.vert)) continue
+      const box = document.createElement(a.href ? 'a' : 'div')
+      if (a.href) {
+        ;(box as HTMLAnchorElement).href = a.href
+        // aria-hidden subtree — pointer-only card must not take focus
+        box.tabIndex = -1
+      }
+      box.className = 'wit-space-author'
+      if (a.picture) {
+        const img = document.createElement('img')
+        img.className = 'wit-space-author-pic'
+        img.src = a.picture
+        img.alt = ''
+        box.appendChild(img)
+      } else {
+        const ph = document.createElement('i')
+        ph.className = 'wit-space-author-pic wit-space-author-pic-empty'
+        box.appendChild(ph)
+      }
+      const info = document.createElement('div')
+      info.className = 'wit-space-author-info'
+      const nm = document.createElement('b')
+      nm.className = 'wit-space-author-name'
+      nm.textContent = a.name
+      info.appendChild(nm)
+      if (a.role) {
+        const rl = document.createElement('span')
+        rl.className = 'wit-space-author-role'
+        rl.textContent =
+          a.role.length > 40 ? a.role.slice(0, 39).trimEnd() + '…' : a.role
+        info.appendChild(rl)
+      }
+      box.appendChild(info)
+      overlay.appendChild(box)
+      authorBoxes.set(`${a.face ?? 'any'}:${a.vert}`, { el: box, near: false, x: 0, y: 0 })
+    }
     const pointer = { x: -1e4, y: -1e4 }
 
     const target = { rx: -20, ry: 20 }
@@ -232,6 +360,7 @@ const WitSpace: React.FC<WitSpaceProps> = ({ className, size = 900, maxTilt = 30
       // halo (CSS :hover can't reach verts occluded in 3D) and place
       // the 2D overlay twin on top at the measured screen position
       const ob = overlay.getBoundingClientRect()
+      for (const a of authorBoxes.values()) a.near = false
       for (const v of verts) {
         const r = v.hit.getBoundingClientRect()
         const dx = r.left + r.width / 2 - pointer.x
@@ -239,6 +368,18 @@ const WitSpace: React.FC<WitSpaceProps> = ({ className, size = 900, maxTilt = 30
         const near = Math.hypot(dx, dy) < r.width / 2
         v.el.classList.toggle('wit-space-vert-near', near)
         v.ov.el.style.opacity = near ? '1' : '0'
+        // `any` authors update from both copies — DOM order puts the
+        // near face last, so it wins the anchor; face authors only
+        // ever see their own face's copy
+        for (const ab of [
+          authorBoxes.get(`any:${v.vIdx}`),
+          authorBoxes.get(v.isNear ? `near:${v.vIdx}` : `far:${v.vIdx}`),
+        ]) {
+          if (!ab) continue
+          ab.near ||= near
+          ab.x = r.left + r.width / 2 - ob.left
+          ab.y = r.top + r.height / 2 - ob.top
+        }
         if (near) {
           const s = r.width / 6 // px per svg unit (hit disc diameter = 6)
           v.ov.el.style.transform =
@@ -255,6 +396,38 @@ const WitSpace: React.FC<WitSpaceProps> = ({ className, size = 900, maxTilt = 30
           v.ov.dot.style.cssText =
             `width:${(1.41 * s).toFixed(1)}px;height:${(1.41 * s).toFixed(1)}px;` +
             `margin:${(-0.705 * s).toFixed(1)}px 0 0 ${(-0.705 * s).toFixed(1)}px`
+        }
+      }
+      // face labels — projected position/angle/scale from the two
+      // anchors (b−a is a 10-unit direction vector in svg space)
+      for (const l of labels) {
+        const ra = l.a.getBoundingClientRect()
+        const rb = l.b.getBoundingClientRect()
+        const ax = ra.left + ra.width / 2 - ob.left
+        const ay = ra.top + ra.height / 2 - ob.top
+        const ang = Math.atan2(
+          rb.top + rb.height / 2 - ob.top - ay,
+          rb.left + rb.width / 2 - ob.left - ax,
+        )
+        const s = Math.hypot(rb.left + rb.width / 2 - ob.left - ax, rb.top + rb.height / 2 - ob.top - ay) / 10
+        l.el.style.transform =
+          `translate(${ax.toFixed(1)}px,${ay.toFixed(1)}px) ` +
+          `rotate(${ang.toFixed(4)}rad) translateY(-0.8em)`
+        l.el.style.fontSize = `${(LABEL_FONT * s).toFixed(2)}px`
+      }
+      // author boxes — show when the vertex was near on any face or
+      // the card itself is hovered (so a link card stays up long
+      // enough to click); offset toward the component center
+      // (left half → +30, right → −30)
+      for (const a of authorBoxes.values()) {
+        a.el.classList.toggle(
+          'wit-space-author-near',
+          a.near || a.el.matches(':hover'),
+        )
+        if (a.near) {
+          const off = a.x < ob.width / 2 ? 30 : -30
+          a.el.style.transform =
+            `translate(${(a.x + off).toFixed(1)}px,${a.y.toFixed(1)}px) translateY(-50%)`
         }
       }
       // sleep when settled — stop scheduling rAF until the pointer moves
@@ -275,8 +448,9 @@ const WitSpace: React.FC<WitSpaceProps> = ({ className, size = 900, maxTilt = 30
     return () => {
       cancelAnimationFrame(raf)
       window.removeEventListener('pointermove', onMove)
+      overlay.replaceChildren()
     }
-  }, [maxTilt, d, size])
+  }, [maxTilt, d, size, authors])
 
   return (
     <div
@@ -299,9 +473,16 @@ const WitSpace: React.FC<WitSpaceProps> = ({ className, size = 900, maxTilt = 30
           position: relative; display: inline-flex;
           align-items: center; justify-content: center;
         }
-        .wit-space-cube { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; }
+        .wit-space-cube {
+          position: relative; width: 100%; height: 100%;
+          transform-style: preserve-3d;
+        }
         .wit-space-layer { position: absolute; inset: 0; pointer-events: none; }
         .wit-space-vert { pointer-events: all; }
+        /* only authored verts are hover targets — the rest have no
+           hit disc and no halo (pointer-events none also blocks the
+           CSS :hover fallback) */
+        .wit-space-vert:not([data-author]) { pointer-events: none; }
         .wit-space-edge {
           position: absolute; width: var(--wit-space-depth);
           height: calc(var(--wit-space-size) / 150 * 0.2);
@@ -320,6 +501,64 @@ const WitSpace: React.FC<WitSpaceProps> = ({ className, size = 900, maxTilt = 30
         @keyframes wit-space-dot { 0%, 100% { fill: currentColor; } 50% { fill: #c93018; } }
         @media (prefers-reduced-motion: reduce) { .wit-space-dot, .wit-space-ov-dot { animation: none; } }
         .wit-space-overlay { position: absolute; inset: 0; pointer-events: none; }
+        .wit-space-label {
+          position: absolute; left: 0; top: 0;
+          transform-origin: 0 0;
+          color: #fff; opacity: 0.5;
+          font-family: var(--font-open-sans), sans-serif;
+          letter-spacing: 0.1em; white-space: nowrap;
+        }
+        /* in-plane fallback only for reduced motion (no rAF loop) —
+           hidden otherwise so only the overlay twin renders */
+        @media (prefers-reduced-motion: no-preference) {
+          .wit-space-label-static { display: none; }
+        }
+        /* author card — placeholder styling until the Figma molecule lands */
+        .wit-space-author {
+          position: absolute; left: 0; top: 0;
+          display: flex; align-items: flex-start;
+          width: 171px; box-sizing: border-box; overflow: hidden;
+          gap: calc(var(--padding-padding-6px, 6) * 1px);
+          padding: calc(var(--padding-padding-6px, 6) * 1px);
+          background: var(--background-fill-background-fill-surface, #fafafa);
+          color: var(--typography-heading, #0e1223);
+          border: 1px solid var(--background-stroke-background-stroke-surface, #e0e2e7);
+          border-radius: calc(var(--radius-radius-sm-3x, 6) * 1px);
+          box-shadow: 0 8px calc(var(--blurr-blurr-sm, 10) * 1px) 0 rgb(0 0 0 / 0.06);
+          opacity: 0; transition: opacity .3s ease;
+          white-space: normal; pointer-events: none;
+          text-decoration: none;
+        }
+        .wit-space-author-near { opacity: 1; }
+        /* link cards stay interactive through the fade-out — the
+           delayed visibility transition keeps them hoverable for the
+           .3s it takes the pointer to cross the gap from the vertex */
+        a.wit-space-author {
+          pointer-events: auto; visibility: hidden;
+          transition: opacity .3s ease, visibility 0s .3s;
+        }
+        a.wit-space-author-near {
+          visibility: visible; transition: opacity .3s ease;
+        }
+        .wit-space-author-pic {
+          width: 44px; height: 44px;
+          border-radius: calc(var(--radius-radius-infinity, 9999) * 1px);
+          object-fit: cover; flex: none;
+        }
+        .wit-space-author-pic-empty { background: var(--muted); display: block; }
+        .wit-space-author-info {
+          display: flex; flex-direction: column; justify-content: center;
+          align-items: flex-start; flex: none; width: 115px; height: 44px;
+          line-height: normal; word-break: break-word;
+        }
+        .wit-space-author-name {
+          width: 100%; height: 21px; flex: none;
+          font-size: 14.4px; font-weight: 600; letter-spacing: -0.3px;
+        }
+        .wit-space-author-role {
+          width: 100%; flex: none; font-size: 12px; font-weight: 400;
+          color: var(--typography-body-soft, #667085);
+        }
         .wit-space-ov { position: absolute; left: 0; top: 0; opacity: 0; transition: opacity .3s ease; }
         .wit-space-ov-ring {
           position: absolute; border-radius: 50%;
@@ -363,9 +602,55 @@ const WitSpace: React.FC<WitSpaceProps> = ({ className, size = 900, maxTilt = 30
                 strokeWidth="0.4"
               />
             ))}
+            {LABELS.map((L) =>
+              i === L.layer ? (
+                <g key={L.text} className="wit-space-label-anchor" data-text={L.text}>
+                  <circle
+                    className="wit-space-label-a"
+                    cx={L.x}
+                    cy={L.y}
+                    r="0.5"
+                    fill="#fff"
+                    fillOpacity="0"
+                  />
+                  <circle
+                    className="wit-space-label-b"
+                    cx={L.x + 10 * Math.cos((L.a * Math.PI) / 180)}
+                    cy={L.y + 10 * Math.sin((L.a * Math.PI) / 180)}
+                    r="0.5"
+                    fill="#fff"
+                    fillOpacity="0"
+                  />
+                  <text
+                    className="wit-space-label-static"
+                    x={L.x}
+                    y={L.y}
+                    transform={`rotate(${L.a} ${L.x} ${L.y})`}
+                    fontSize={LABEL_FONT}
+                    fill="#fff"
+                    fillOpacity="0.5"
+                    style={{
+                      fontFamily: 'var(--font-open-sans), sans-serif',
+                      letterSpacing: '0.1em',
+                    }}
+                  >
+                    {L.text}
+                  </text>
+                </g>
+              ) : null,
+            )}
             {LOGO_PATHS.flatMap((p, j) =>
               p.verts.map(([x, y], k) => (
-                <g key={`${j}-${k}`} className="wit-space-vert">
+                <g
+                  key={`${j}-${k}`}
+                  className="wit-space-vert"
+                  data-vert={VERT_OFFSETS[j] + k}
+                  data-author={
+                    (i === LAYERS - 1 ? authoredByFace.near : authoredByFace.far).has(
+                      VERT_OFFSETS[j] + k,
+                    ) || undefined
+                  }
+                >
                   <circle
                     className="wit-space-halo"
                     cx={x}

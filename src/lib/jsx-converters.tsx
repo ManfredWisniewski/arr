@@ -11,10 +11,13 @@ import type {
 } from '@payloadcms/richtext-lexical/react'
 import React from 'react'
 
+import { draftMode } from 'next/headers'
+
 import type { Media } from '@/payload-types'
 import { Link } from '@/components/atoms/link'
 import { Figure } from '@/components/molecules/figure'
-import { WitSpace } from '@/components/organisms/wit-space'
+import { WitSpace, type WitSpaceAuthor } from '@/components/organisms/wit-space'
+import { getAgents, getMediaUrl } from '@/lib/blog'
 
 // Upload nodes hold the populated media document when depth > 0 (default).
 const upload = ({ node }: { node: SerializedUploadNode }) => {
@@ -41,17 +44,51 @@ const Code = ({
 
 // witSpace block serializes its fields directly on the node
 // (blockType "witSpace"); nulls fall back to the component defaults.
-const WitSpaceScene = ({
+// `authors` rows hold agent slugs — resolved async against the
+// structures doc (name/role/avatar → /blog/<slug> cards).
+const WitSpaceScene = async ({
   node,
 }: {
-  node: SerializedBlockNode<{ depth?: number; maxTilt?: number; size?: number }>
-}) => (
-  <WitSpace
-    depth={node.fields?.depth ?? undefined}
-    maxTilt={node.fields?.maxTilt ?? undefined}
-    size={node.fields?.size ?? undefined}
-  />
-)
+  node: SerializedBlockNode<{
+    authors?: { agent?: null | string; face?: null | string; vert?: null | number }[]
+    depth?: number
+    maxTilt?: number
+    size?: number
+  }>
+}) => {
+  const rows = node.fields?.authors ?? []
+  let authors: WitSpaceAuthor[] = []
+  if (rows.length) {
+    const draft = (await draftMode()).isEnabled
+    const agents = await getAgents(draft)
+    authors = (
+      await Promise.all(
+        rows.map(async (row): Promise<null | WitSpaceAuthor> => {
+          const agent = agents.find((a) => a.slug === row.agent)
+          if (!agent || row.vert == null) {
+            return null
+          }
+          return {
+            face: row.face === 'near' || row.face === 'far' ? row.face : undefined,
+            href: `/blog/${agent.slug}`,
+            name: agent.name,
+            picture: await getMediaUrl(agent.avatar, draft),
+            role: agent.role,
+            vert: row.vert,
+          }
+        }),
+      )
+    ).filter((a): a is WitSpaceAuthor => a !== null)
+  }
+  return (
+    <WitSpace
+      authors={authors}
+      depth={node.fields?.depth ?? undefined}
+      maxTilt={node.fields?.maxTilt ?? undefined}
+      size={node.fields?.size ?? undefined}
+    />
+  )
+}
 
 // Rich-text links go through the Link atom: external URLs open in a new
 // tab by default, internal paths through next/link. The editor's newTab

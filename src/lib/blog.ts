@@ -141,7 +141,7 @@ export async function getAgentMap(
           [
             agent.slug,
             {
-              avatarUrl: await getMediaUrl(agent.avatar, draft),
+              avatarUrl: await getMediaUrl(agent.avatar, draft, 'avatar'),
               name: agent.name,
               slug: agent.slug,
             },
@@ -181,6 +181,7 @@ export async function getTaxonomyTerm(
 export async function getMediaUrl(
   sourcePath: string | undefined,
   draft: boolean,
+  size?: 'avatar' | 'card',
 ) {
   if (!sourcePath) {
     return undefined
@@ -193,7 +194,8 @@ export async function getMediaUrl(
       limit: 1,
       where: { sourcePath: { equals: sourcePath } },
     })
-    return (docs[0] as Media | undefined)?.url ?? undefined
+    const doc = docs[0] as Media | undefined
+    return (size ? doc?.sizes?.[size]?.url : undefined) ?? doc?.url ?? undefined
   } catch {
     return undefined
   }

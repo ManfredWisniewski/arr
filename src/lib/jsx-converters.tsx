@@ -18,7 +18,6 @@ import { Link } from '@/components/atoms/link'
 import { Figure } from '@/components/molecules/figure'
 import { WitSpace, type WitSpaceAuthor } from '@/components/organisms/wit-space'
 import { getAgents, getMediaUrl } from '@/lib/blog'
-import { optimizeMediaUrl } from '@/lib/media'
 
 // Upload nodes hold the populated media document when depth > 0 (default).
 const upload = ({ node }: { node: SerializedUploadNode }) => {
@@ -73,10 +72,7 @@ const WitSpaceScene = async ({
             face: row.face === 'near' || row.face === 'far' ? row.face : undefined,
             href: `/blog/${agent.slug}`,
             name: agent.name,
-            picture: optimizeMediaUrl(
-              await getMediaUrl(agent.avatar, draft),
-              96,
-            ),
+            picture: await getMediaUrl(agent.avatar, draft, 'avatar'),
             role: agent.role,
             vert: row.vert,
           }

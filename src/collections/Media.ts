@@ -33,5 +33,13 @@ export const Media: CollectionConfig = {
       index: true,
     },
   ],
-  upload: true,
+  // Variants generated at upload so cards/bylines never ship the
+  // ~400 KB originals: `avatar` covers sm/lg bylines + wit-space cards,
+  // `card` covers post-card media.
+  upload: {
+    imageSizes: [
+      { name: 'avatar', height: 128, position: 'centre', width: 128 },
+      { name: 'card', width: 640, withoutEnlargement: true },
+    ],
+  },
 }

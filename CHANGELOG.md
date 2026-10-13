@@ -206,6 +206,10 @@ release.
   structure doc (name/role/avatar, links to `/blog/<slug>`). Only
   authored vertices are hoverable now.
 - Media display URLs route through `/_next/image` (`optimizeMediaUrl`,
-  `src/lib/media.ts`): avatar atom (64/128px), wit-space author cards
-  (96px) and post-card covers (640px) no longer pull ~400 KB originals;
-  `next.config` `localPatterns` already covered `/api/media/file/**`
+  `src/lib/media.ts`) as the fallback, and `Media` now generates
+  `imageSizes` at upload — `avatar` (128×128 centre crop, serves sm/lg
+  bylines and wit-space cards) and `card` (640px wide, post-card covers);
+  `getMediaUrl` takes a size name and returns the sized file URL when
+  present. `sharp` wired into `payload.config.ts` (was already a dep).
+  Migration `20261013_192611_add_media_image_sizes`; sizes only exist for
+  media uploaded after deploy — re-push media docs to generate them.

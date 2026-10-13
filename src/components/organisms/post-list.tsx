@@ -29,7 +29,8 @@ export const postToCardItem = (
     ) : undefined,
     linkLabel: 'Continue',
     mediaAlt: media?.alt ?? post.title,
-    mediaSrc: optimizeMediaUrl(media?.url ?? undefined, 640),
+    mediaSrc:
+      media?.sizes?.card?.url ?? optimizeMediaUrl(media?.url ?? undefined, 640),
     subtitle: post.author ? (
       <Link href={`/blog/${post.author}`}>{name}</Link>
     ) : undefined,

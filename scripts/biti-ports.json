@@ -1,0 +1,39 @@
+{
+  "//": [
+    "Ported components: biti src file → arr src file, with the mechanical",
+    "adaptations applied on copy. `sha256` is the hash of the biti file at",
+    "the last port — `check_biti_ports.py` warns when it drifts.",
+    "",
+    "Per-entry transforms:",
+    "  regex:   [pattern, replacement] pairs, applied with re.sub (DOTALL)",
+    "  strings: literal [old, new] pairs, applied with str.replace",
+    "After a --apply run, verify with `npx tsc --noEmit` + eslint."
+  ],
+  "ports": [
+    {
+      "src": "biti/src/components/ui/wit/wit-space.tsx",
+      "dst": "src/components/organisms/wit-space.tsx",
+      "sha256": "de8140d420cf9f62caa4cc5e4a19ec612d826f28c30657ff1ecf9a05048bb6f7",
+      "regex": [
+        ["import localFont from 'next/font/local'\\n", ""],
+        ["\\n?const authorFont = localFont\\(\\{.*?\\}\\)\\n", ""]
+      ],
+      "strings": [
+        ["import { cn } from '@/utilities/ui'", "import { cx } from '@/lib/cx'"],
+        ["cn('wit-space-author', authorFont.className)", "'wit-space-author'"],
+        [
+          "cn('relative inline-flex items-center justify-center', className)",
+          "cx('wit-space', className)"
+        ],
+        [
+          "className=\"wit-space-cube relative w-full h-full\"",
+          "className=\"wit-space-cube\""
+        ],
+        [
+          "        .wit-space-cube { transform-style: preserve-3d; }",
+          "        .wit-space {\n          position: relative; display: inline-flex;\n          align-items: center; justify-content: center;\n        }\n        .wit-space-cube {\n          position: relative; width: 100%; height: 100%;\n          transform-style: preserve-3d;\n        }"
+        ]
+      ]
+    }
+  ]
+}

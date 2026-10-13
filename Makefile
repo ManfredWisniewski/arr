@@ -3,8 +3,12 @@
 # sites/<site>/.env (PAYLOAD_BASE_URL, PAYLOAD_API_KEY) — never commit
 # real .env files. Usage: make publish [SITE=w1t.org] [THEME=arr|wit]
 
-SITE ?= witconsult.de
+# SITE unset → `make publish` pushes every site in SITES, one sub-make
+# each (so each site gets its own sites/<site>/.env + site.mk).
+# `make publish SITE=x` (or sync/theme/site) still targets one site.
+SITES ?= w1t.org witconsult.de
 -include sites/$(SITE)/.env
+-include sites/$(SITE)/site.mk
 export PAYLOAD_BASE_URL PAYLOAD_API_KEY
 
 CONTENT_REPO ?= ../../../clients/seo-wit/$(SITE)
@@ -44,10 +48,19 @@ FONT_VARS_wit := \
 
 FONT_ARGS := $(FONT_ARGS_$(THEME)) $(FONT_VARS_$(THEME))
 
-.PHONY: publish publish-local dev tokens theme site sync
+.PHONY: publish publish-site publish-local dev tokens theme site sync biti-ports biti-port
 
-publish: tokens theme site sync
-	$(info NOTE: pages and structures are pushed as drafts - publish them in the Payload admin to go live.)
+publish:
+ifeq ($(SITE),)
+	@for s in $(SITES); do \
+		$(MAKE) --no-print-directory publish-site SITE=$$s || exit 1; \
+	done
+else
+	@$(MAKE) --no-print-directory publish-site SITE=$(SITE)
+endif
+
+publish-site: tokens biti-ports theme site sync
+	$(info NOTE [$(SITE)]: pages and structures are pushed as drafts - publish them in the Payload admin to go live.)
 ifneq ($(IMAGE_DIRTY),)
 	$(info NOTE: image files changed ($(IMAGE_PATHS)) - rebuild and redeploy the image; push does not ship code changes. See CHANGELOG.md.)
 endif
@@ -63,6 +76,15 @@ site:
 
 sync:
 	$(PT) sync --repo $(CONTENT_REPO)
+
+# Warn when a component ported from the biti submodule has drifted
+# (manifest: scripts/biti-ports.json). `make biti-port` re-applies the
+# recorded transforms — verify with tsc + eslint afterwards.
+biti-ports:
+	python scripts/check_biti_ports.py
+
+biti-port:
+	python scripts/check_biti_ports.py --apply
 
 # Local dev server (hot reload) on :3000 — docker compose when Docker is
 # installed, else a local PostgreSQL (auto-installed/started by the script,

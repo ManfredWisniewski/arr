@@ -207,9 +207,13 @@ release.
   authored vertices are hoverable now.
 - Media display URLs route through `/_next/image` (`optimizeMediaUrl`,
   `src/lib/media.ts`) as the fallback, and `Media` now generates
-  `imageSizes` at upload — `avatar` (128×128 centre crop, serves sm/lg
-  bylines and wit-space cards) and `card` (640px wide, post-card covers);
-  `getMediaUrl` takes a size name and returns the sized file URL when
-  present. `sharp` wired into `payload.config.ts` (was already a dep).
-  Migration `20261013_192611_add_media_image_sizes`; sizes only exist for
-  media uploaded after deploy — re-push media docs to generate them.
+  `imageSizes` at upload covering every render path: `logo` (256px,
+  header/footer marks), `avatar` (128×128 centre crop, sm/lg bylines and
+  wit-space cards), `card` (640px, post-card covers), `content` (960px,
+  figures and onboarding steps), `hero` (1920px, page/lead heroes).
+  `mediaUrl(doc, size)` resolves the sized URL; `getMediaUrl` takes the
+  same names for sourcePath lookups. `sharp` wired into
+  `payload.config.ts` (was already a dep). Migrations
+  `20261013_192611_add_media_image_sizes` +
+  `20261013_192901_extend_media_image_sizes`; sizes only exist for media
+  uploaded after deploy — re-push media docs to generate them.

@@ -1,6 +1,7 @@
 import React from 'react'
 
 import { cx } from '@/lib/cx'
+import { mediaUrl } from '@/lib/media'
 
 import type { Media } from '@/payload-types'
 
@@ -79,8 +80,12 @@ export const LeadSection = ({
         )}
       </div>
     ) : null}
-    {media?.url ? (
-      <Img alt={media.alt} className="lead-section-media" src={media.url} />
+    {mediaUrl(media, 'hero', 1920) ? (
+      <Img
+        alt={media?.alt ?? ''}
+        className="lead-section-media"
+        src={mediaUrl(media, 'hero', 1920)}
+      />
     ) : null}
     {children}
   </section>

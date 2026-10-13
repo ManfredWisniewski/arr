@@ -1,6 +1,7 @@
 import React from 'react'
 
 import type { Media } from '@/payload-types'
+import { mediaUrl } from '@/lib/media'
 
 import { Icon } from '../atoms/icon'
 import { Img } from '../atoms/image'
@@ -26,8 +27,13 @@ export const SiteHeader = ({
   // .nav-brand so band items align under .site-nav.
   const spacerBrand = (
     <span className="site-name">
-      {logo && typeof logo === 'object' && logo.url ? (
-        <Img alt="" className="site-logo" loading="eager" src={logo.url} />
+      {logo && typeof logo === 'object' && mediaUrl(logo, 'logo', 256) ? (
+        <Img
+          alt=""
+          className="site-logo"
+          loading="eager"
+          src={mediaUrl(logo, 'logo', 256)}
+        />
       ) : (
         siteName
       )}

@@ -33,13 +33,17 @@ export const Media: CollectionConfig = {
       index: true,
     },
   ],
-  // Variants generated at upload so cards/bylines never ship the
-  // ~400 KB originals: `avatar` covers sm/lg bylines + wit-space cards,
-  // `card` covers post-card media.
+  // Variants generated at upload so no render path ships full-size
+  // originals: `logo` for header/footer marks, `avatar` for sm/lg
+  // bylines + wit-space cards, `card` for post-card media, `content`
+  // for figures/steps in page bodies, `hero` for page/lead heroes.
   upload: {
     imageSizes: [
+      { name: 'logo', width: 256, withoutEnlargement: true },
       { name: 'avatar', height: 128, position: 'centre', width: 128 },
       { name: 'card', width: 640, withoutEnlargement: true },
+      { name: 'content', width: 960, withoutEnlargement: true },
+      { name: 'hero', width: 1920, withoutEnlargement: true },
     ],
   },
 }

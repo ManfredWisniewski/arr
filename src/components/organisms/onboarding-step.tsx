@@ -1,6 +1,7 @@
 import React from 'react'
 
 import { cx } from '@/lib/cx'
+import { mediaUrl } from '@/lib/media'
 
 import type { Media } from '@/payload-types'
 
@@ -35,8 +36,12 @@ export const OnboardingStep = ({
       value={step}
     />
     <TextBlock lead={lead} title={title} />
-    {media?.url ? (
-      <Img alt={media.alt} className="onboarding-step-media" src={media.url} />
+    {mediaUrl(media, 'content', 960) ? (
+      <Img
+        alt={media?.alt ?? ''}
+        className="onboarding-step-media"
+        src={mediaUrl(media, 'content', 960)}
+      />
     ) : null}
     {actions?.length ? <ButtonGroup items={actions} /> : null}
   </section>

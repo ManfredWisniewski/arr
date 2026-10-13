@@ -1,6 +1,7 @@
 import React from 'react'
 
 import type { Media, Page } from '@/payload-types'
+import { mediaUrl } from '@/lib/media'
 
 import { Img } from '../atoms/image'
 import { Heading, Lead } from '../atoms/text'
@@ -23,9 +24,13 @@ export const PageHero = ({
         <Lead className="page-hero-lead">{page.meta.description}</Lead>
       ) : null}
     </header>
-    {media?.url ? (
+    {mediaUrl(media, 'hero', 1920) ? (
       <div className="page-hero-media">
-        <Img alt={media.alt} loading="eager" src={media.url} />
+        <Img
+          alt={media?.alt ?? ''}
+          loading="eager"
+          src={mediaUrl(media, 'hero', 1920)}
+        />
       </div>
     ) : null}
   </>

@@ -29,6 +29,17 @@ release.
   on every page. Migration `20261013_211826_i18n` copies existing rows
   into the `de` locale tables before dropping the old columns. See
   `+intent/decisions.md` D08–D11.
+- Visitor chat widget: `ChatWidget` client component
+  (`app/(frontend)/[lang]/chat-widget.tsx`) rendered by the frontend
+  layout when `CHAT_WEBHOOK_URL` is set — fixed bubble → panel, AI
+  disclosure shown before first input, `sessionId` persisted in
+  `localStorage`. Posts to the new same-origin `POST /api/chat` route
+  (`app/(frontend)/api/chat/route.ts`), which validates input, rate-limits
+  per session+IP (20/h) and proxies to the n8n chat webhook with
+  `Authorization: Bearer ${CHAT_WEBHOOK_SECRET}` — webhook URL and secret
+  never reach the browser. Labels via `CHAT_TITLE`, `CHAT_GREETING`,
+  `CHAT_DISCLOSURE`. Plan:
+  `+wit/development/plans/chat/2026-10-13_plan-website-chat-claudia.md`.
 - SEO plumbing: `/robots.txt` (`app/(frontend)/robots.ts` — allows all,
   disallows `/admin`, `/api`, `/preview`, advertises the sitemap),
   `/sitemap.xml` (`app/(frontend)/sitemap.ts` — published `pages` +

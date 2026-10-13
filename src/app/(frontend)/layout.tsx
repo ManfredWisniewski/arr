@@ -10,6 +10,7 @@ import { SiteFooter } from '@/components/organisms/site-footer'
 import { SiteHeader } from '@/components/organisms/site-header'
 
 import './styles.css'
+import { ChatWidget } from './chat-widget'
 import { ThemeSwitcher } from './theme-switcher'
 import { getThemeVariants } from './theme-variants'
 
@@ -93,6 +94,16 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
         />
         <main>{children}</main>
         <SiteFooter navItems={navItems} />
+        {process.env.CHAT_WEBHOOK_URL ? (
+          <ChatWidget
+            disclosure={
+              process.env.CHAT_DISCLOSURE ??
+              'Ich bin ein KI-Assistent. Ich arbeite mit einem Sprachmodell, kann Fehler machen und habe keine eigene Entscheidungsbefugnis.'
+            }
+            greeting={process.env.CHAT_GREETING}
+            title={process.env.CHAT_TITLE ?? 'Assistent'}
+          />
+        ) : null}
         {variants.length ? (
           <ThemeSwitcher variants={variants.map((v) => v.name)} />
         ) : null}

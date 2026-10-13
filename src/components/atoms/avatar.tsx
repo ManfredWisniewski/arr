@@ -1,6 +1,7 @@
 import React from 'react'
 
 import { cx } from '@/lib/cx'
+import { optimizeMediaUrl } from '@/lib/media'
 
 import { Img } from './image'
 
@@ -26,7 +27,14 @@ export const Avatar = ({
     .toUpperCase()
   return (
     <span className={cx('avatar', size && `avatar-${size}`, className)}>
-      {src ? <Img alt={name} src={src} /> : initials}
+      {src ? (
+        <Img
+          alt={name}
+          src={optimizeMediaUrl(src, size === 'lg' ? 128 : 64)}
+        />
+      ) : (
+        initials
+      )}
     </span>
   )
 }

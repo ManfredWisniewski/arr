@@ -205,3 +205,7 @@ release.
   markdown tag); `WitSpaceScene` resolves them against the `agents`
   structure doc (name/role/avatar, links to `/blog/<slug>`). Only
   authored vertices are hoverable now.
+- Media display URLs route through `/_next/image` (`optimizeMediaUrl`,
+  `src/lib/media.ts`): avatar atom (64/128px), wit-space author cards
+  (96px) and post-card covers (640px) no longer pull ~400 KB originals;
+  `next.config` `localPatterns` already covered `/api/media/file/**`

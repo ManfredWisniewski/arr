@@ -3,6 +3,7 @@ import React from 'react'
 import type { Post } from '@/payload-types'
 import type { AgentRef } from '@/lib/blog'
 import { formatDate } from '@/lib/blog'
+import { optimizeMediaUrl } from '@/lib/media'
 
 import { Avatar } from '../atoms/avatar'
 import { Link } from '../atoms/link'
@@ -28,7 +29,7 @@ export const postToCardItem = (
     ) : undefined,
     linkLabel: 'Continue',
     mediaAlt: media?.alt ?? post.title,
-    mediaSrc: media?.url ?? undefined,
+    mediaSrc: optimizeMediaUrl(media?.url ?? undefined, 640),
     subtitle: post.author ? (
       <Link href={`/blog/${post.author}`}>{name}</Link>
     ) : undefined,

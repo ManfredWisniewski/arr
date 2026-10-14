@@ -52,17 +52,30 @@ never a source of truth.
   in `/admin`. Publish state is the only data the content repo does not own.
 - **`users` collection**: `auth: { useAPIKey: true }`, `role` field
   (`editor` / `content-bot`).
+- **Localization (D08–D12)**: field-level `de` (default) + `en`;
+  public routes are locale-prefixed `/de/*` + `/en/*` (`[lang]` segment,
+  `/` → `/de`); `path`/`slug` stay locale-independent; publish status is
+  per-locale (`experimental.localizeStatus`); public reads use no
+  fallback (`fallbackLocale: false`), previews may opt into `de`.
+- **UI dictionaries**: frontend chrome strings (pagination, 404, empty
+  states, feed titles) come from `next-intl` message files
+  (`messages/{de,en}.json`), not from Payload.
 
 ## Scope
 
-- In scope: the Payload app — collections (`pages`, `media`, `users`), the
-  `theme` global, the markdown hook, access rules, the frontend route
-  `app/(frontend)/[...path]` rendering Lexical + theme vars, the block library
-  styled exclusively with `var(--…)`, `/api/health`, `seed-admin`, Dockerfile,
-  GitHub Actions → GHCR.
+- In scope: the Payload app — collections (`pages`, `posts`, `media`,
+  `users`, `structures`), the `theme` global, the markdown hook, access
+  rules, localization config + migrations, the frontend routes under
+  `app/(frontend)/[lang]` rendering Lexical + theme vars, per-locale
+  feeds/sitemap/hreflang, UI dictionaries (`next-intl`), the block library
+  styled exclusively with `var(--…)`, `/api/health`, `seed-admin`,
+  Dockerfile, GitHub Actions → GHCR.
 - Out of scope: content and `.arrcontent.yml` (`obs-seo-witconsult`), token
   authoring (`wit-tokens`), Ansible deployment (`wit.docker_apps`), the sync
-  CLI (`wit_pytools/payloadtools`).
+  CLI (`wit_pytools/payloadtools` — it must learn `?locale=<code>` writes
+  and per-locale structure pushes, but that change ships from its own
+  repo), `biti` localization (own `+intent`), translation-completeness
+  reporting (backlog).
 
 ## Software projects
 
@@ -82,8 +95,9 @@ never a source of truth.
 - Code change → PR → GitHub Actions → image in GHCR → pin tag+digest bump in
   `wit.docker_apps` → Ansible redeploy (`payload migrate` on container start,
   seconds of downtime).
-- Content change → `witcontent sync` → `POST/PATCH /api/pages?draft=true` →
-  human reviews and publishes in `/admin`.
+- Content change → `witcontent sync` → `POST/PATCH /api/<col>?draft=true&locale=<code>`
+  (per-locale writes; `sourcePath` still keys the shared document) → human
+  reviews and publishes per locale in `/admin`.
 - Theme change → `wit-tokens` build → `witcontent theme` →
   `PATCH /api/globals/theme` → frontend injects CSS vars.
 - Style iteration: local `pnpm dev`; optional second instance
@@ -140,4 +154,7 @@ never a source of truth.
 - Smoke-test field-level access on `_status`; fall back to `beforeChange`.
 - Content-side open questions (marker spec, meta mapping, WordPress URL
   inventory/redirects) are tracked in the plan's "Open questions".
-- Unresolved decisions: `decisions.md`, section "Backlog".
+- Unresolved decisions: `decisions.md`, section "Backlog" (localized slugs,
+  translation-completeness reporting).
+- `experimental.localizeStatus` is experimental upstream — revisit when
+  Payload stabilises per-locale status; verify on every Payload upgrade.

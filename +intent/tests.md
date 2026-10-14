@@ -54,6 +54,28 @@ types:  npx payload generate:types && npx tsc
 - Adding a display context means adding an `imageSizes` entry plus a
   migration, not serving the original.
 
+### A07 Localization (D08–D12)
+
+- `GET /de/<path>` and `GET /en/<path>` render the page in that locale;
+  `<html lang>` follows the route; `GET /` redirects to `/de`.
+- Localized fields (`title`, `content`, `meta.*`, media `alt`/`caption`,
+  `structures.data`) return per-locale values; `slug`, `path`,
+  `sourcePath`, `author`, `categories` stay identical across locales.
+- Public reads never mix languages: an untranslated field is empty rather
+  than German (`fallbackLocale: false`); draft preview may pass
+  `fallbackLocale=de`.
+- `de` can be `published` while `en` is still `draft` and vice versa
+  (`localizeStatus`); `content-bot` still cannot publish in any locale.
+- Page metadata carries `alternates.languages` (`de`, `en`, `x-default`)
+  and a per-locale canonical; `/sitemap.xml` lists `/de/*` + `/en/*`
+  variants.
+- Feeds exist per locale (`/de/rss.xml`, `/en/atom.xml`, …) with matching
+  `xml:lang`/`language`; `robots.txt` is locale-agnostic.
+- `messages/de.json` and `messages/en.json` contain the same key set;
+  UI chrome strings render in the route locale.
+- REST: `GET /api/pages?locale=en&fallback-locale=none` returns `en`
+  values; `PATCH …&locale=de` writes only the `de` variant.
+
 ## Not tested
 
 - REST-level publish denial by the bot key — covered by the `beforeChange`

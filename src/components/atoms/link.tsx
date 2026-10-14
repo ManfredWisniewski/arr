@@ -1,8 +1,10 @@
-import NextLink from 'next/link'
 import React from 'react'
 
-// Internal paths go through next/link (client navigation); external URLs
-// get a plain <a> opening in a new tab.
+import { Link as IntlLink } from '@/i18n/navigation'
+
+// Internal paths go through the locale-aware link (client navigation,
+// /de|/en prefix added automatically); external URLs get a plain <a>
+// opening in a new tab.
 export const Link = ({
   children,
   className,
@@ -23,8 +25,8 @@ export const Link = ({
     )
   }
   return (
-    <NextLink className={className} href={href} {...rest}>
+    <IntlLink className={className} href={href} {...rest}>
       {children}
-    </NextLink>
+    </IntlLink>
   )
 }

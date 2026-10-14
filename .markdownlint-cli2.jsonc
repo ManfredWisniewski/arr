@@ -7,5 +7,13 @@
     "MD034": false,
     "MD060": false
   },
-  "ignores": ["node_modules/**", "+wit-*/**", "biti/**", "__*/**"]
+  "ignores": [
+    "node_modules/**",
+    ".next/**",
+    "+wit/**",
+    "+wit-*/**",
+    "biti/**",
+    "wit_pytools/**",
+    "__*/**"
+  ]
 }

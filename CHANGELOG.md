@@ -12,11 +12,28 @@ release.
 
 ### Added
 
+- Internationalization, German (default) + English: Payload field-level
+  localization (`de`/`en`, `localized: true` on editorial fields of
+  `pages`, `posts`, `media` and `structures.data`;
+  ids/slugs/paths/dates stay shared), experimental per-locale publish
+  status (`experimental.localizeStatus` + `versions.drafts.localizeStatus`),
+  admin UI in German and English. Frontend routes moved under
+  `app/(frontend)/[lang]` with `next-intl` middleware — every public URL
+  carries an explicit `/de` or `/en` prefix (`/` redirects to `/de`) and
+  the route locale is passed to every Payload read. Public reads use
+  `fallbackLocale: false` (no mixed-language pages); draft previews fall
+  back to `de`. UI strings come from `messages/{de,en}.json`; internal
+  links are locale-prefixed by the `Link` atom. Per-locale feeds
+  (`/de/rss.xml`, `/en/rss.xml`, …) and `sitemap.xml` (per-locale URLs
+  with `hreflang` alternates + `x-default`), canonical/hreflang metadata
+  on every page. Migration `20261013_211826_i18n` copies existing rows
+  into the `de` locale tables before dropping the old columns. See
+  `+intent/decisions.md` D08–D11.
 - Visitor chat widget: `ChatWidget` client component
-  (`app/(frontend)/chat-widget.tsx`) rendered by the frontend layout when
-  `CHAT_WEBHOOK_URL` is set — fixed bubble → panel, AI disclosure shown
-  before first input, `sessionId` persisted in `localStorage`. Posts to
-  the new same-origin `POST /api/chat` route
+  (`app/(frontend)/[lang]/chat-widget.tsx`) rendered by the frontend
+  layout when `CHAT_WEBHOOK_URL` is set — fixed bubble → panel, AI
+  disclosure shown before first input, `sessionId` persisted in
+  `localStorage`. Posts to the new same-origin `POST /api/chat` route
   (`app/(frontend)/api/chat/route.ts`), which validates input, rate-limits
   per session+IP (20/h) and proxies to the n8n chat webhook with
   `Authorization: Bearer ${CHAT_WEBHOOK_SECRET}` — webhook URL and secret
@@ -181,6 +198,13 @@ release.
 
 ### Changed
 
+- **Breaking URL scheme**: all public URLs are locale-prefixed —
+  `/blog/kategorie/<c>` became `/{de,en}/blog/category/<c>`, feeds live
+  at `/{de,en}/{rss.xml,feed,index.xml,atom.xml}`, and the Payload admin
+  preview links target `/<locale><path>` via the `/preview` handler.
+  Content writes must send `?locale=<de|en>` (`fallback-locale=none` for
+  strict reads) — `wit_pytools/payloadtools` needs a follow-up to emit
+  localized writes
 - `Button` atom: `ghost` variant, `size="sm|lg"`, `loading` (spinner +
   no interaction) and `disabled` per the catalog spec
 - `Modal` organism: `title` renders `.modal-header` (Heading + close),

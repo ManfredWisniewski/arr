@@ -1,0 +1,47 @@
+{
+  "blog": {
+    "categoryFallback": "Kategorie: {slug}",
+    "empty": "Keine Beiträge gefunden.",
+    "feedDescription": "Neue Beiträge im {siteName} Blog",
+    "feedTitle": "{siteName} Blog",
+    "readMore": "Weiterlesen",
+    "tagFallback": "Tag: {slug}",
+    "title": "Blog"
+  },
+  "dashboard": {
+    "reset": "Zurücksetzen",
+    "statusActive": "Aktiv",
+    "statusDraft": "Entwurf",
+    "statusPlaceholder": "Status"
+  },
+  "docs": {
+    "contentTab": "Inhalt",
+    "home": "Start",
+    "notesBody": "Hinweise-Tab — ergänzende Informationen zum gleichen Dokument ohne eigenen Seitenwechsel.",
+    "notesTab": "Hinweise",
+    "sidebarTitle": "Dokumentation"
+  },
+  "nav": {
+    "footer": "Fußzeilen-Navigation",
+    "menu": "Menü",
+    "primary": "Hauptnavigation"
+  },
+  "notFound": {
+    "message": "Seite nicht gefunden.",
+    "title": "404"
+  },
+  "pricing": {
+    "faqHeading": "Häufige Fragen"
+  },
+  "pagination": {
+    "ariaLabel": "Seitennavigation",
+    "next": "Weiter",
+    "previous": "Zurück"
+  },
+  "theme": {
+    "dark": "Dunkel",
+    "label": "Farbschema",
+    "light": "Hell",
+    "system": "System"
+  }
+}

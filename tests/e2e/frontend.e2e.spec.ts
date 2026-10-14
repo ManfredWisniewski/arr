@@ -49,17 +49,29 @@ test.describe('Frontend', () => {
     await cleanupHomePage()
   })
 
-  test('renders a published page on its route', async () => {
-    await page.goto('http://localhost:3000')
+  test('redirects / to the default-locale prefix', async () => {
+    const response = await page.goto('http://localhost:3000')
+    expect(page.url()).toBe('http://localhost:3000/de')
+    expect(response?.status()).toBe(200)
+  })
+
+  test('renders a published page on its de route', async () => {
+    await page.goto('http://localhost:3000/de')
 
     const heading = page.locator('h1').first()
-
     await expect(heading).toHaveText('Welcome')
+    await expect(page.locator('html')).toHaveAttribute('lang', 'de')
+  })
+
+  test('404s for a page published only in de when read as en', async () => {
+    // strict public reads (D11): seeded page has no en version
+    const response = await page.goto('http://localhost:3000/en')
+    expect(response?.status()).toBe(404)
   })
 
   test('returns 404 for an unknown route', async () => {
     const response = await page.goto(
-      'http://localhost:3000/does-not-exist',
+      'http://localhost:3000/de/does-not-exist',
     )
 
     expect(response?.status()).toBe(404)

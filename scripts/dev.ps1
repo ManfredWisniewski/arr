@@ -18,19 +18,24 @@ if (-not $env:PAYLOAD_SEED_ADMIN_EMAIL) {
 Start-Job -ScriptBlock {
     param($root, $docker)
     Set-Location $root
-    $up = $false
+    # probe both loopback families - another process may shadow one side
+    # (e.g. an app holding 127.0.0.1:3000 while next dev binds [::])
+    $base = $null
     foreach ($i in 1..120) {
-        try {
-            $r = Invoke-WebRequest -Uri 'http://127.0.0.1:3000/api/health' `
-                -UseBasicParsing -TimeoutSec 2
-            if ($r.StatusCode -eq 200) { $up = $true; break }
-        } catch {}
+        foreach ($h in 'http://127.0.0.1:3000', 'http://[::1]:3000') {
+            try {
+                $r = Invoke-WebRequest -Uri "$h/api/health" `
+                    -UseBasicParsing -TimeoutSec 2
+                if ($r.StatusCode -eq 200) { $base = $h; break }
+            } catch {}
+        }
+        if ($base) { break }
         Start-Sleep -Seconds 1
     }
-    if (-not $up) { return }
+    if (-not $base) { return }
     foreach ($i in 1..30) {
         try {
-            Invoke-RestMethod 'http://127.0.0.1:3000/api/pages?limit=1' `
+            Invoke-RestMethod "$base/api/pages?limit=1" `
                 -TimeoutSec 5 | Out-Null
             break
         } catch { Start-Sleep -Seconds 2 }
@@ -47,7 +52,7 @@ Start-Job -ScriptBlock {
         if ($LASTEXITCODE -eq 0) { break }
         Start-Sleep -Seconds 3
     }
-    Start-Process 'http://localhost:3000'
+    Start-Process $base
 } -ArgumentList (Get-Location).Path, $useDocker | Out-Null
 
 if ($useDocker) {
@@ -91,14 +96,20 @@ if ($pgService) {
         Invoke-CimMethod -ClassName Win32_Process -MethodName Create `
             -Arguments @{ CommandLine = "`"$pgBin\pg_ctl.exe`" -D `"$dataDir`" -l `"$dataDir\server.log`" start" } |
             Out-Null
-        # wait for the server to accept connections
-        foreach ($i in 1..30) {
-            & "$pgBin\psql.exe" -U postgres -d postgres -w -tAc 'select 1' `
-                *>$null
-            if ($LASTEXITCODE -eq 0) { break }
-            Start-Sleep -Seconds 1
-        }
     }
+}
+
+# wait until the server accepts connections - covers all three start
+# paths (service already running is an instant pass). pg_isready is
+# quiet: a psql stderr write under *>$null throws on EAP=Stop / PS5.1.
+$pgReady = $false
+foreach ($i in 1..30) {
+    & "$pgBin\pg_isready.exe" -q *>$null
+    if ($LASTEXITCODE -eq 0) { $pgReady = $true; break }
+    Start-Sleep -Seconds 1
+}
+if (-not $pgReady) {
+    throw "PostgreSQL did not come up within 30s - check $dataDir\server.log"
 }
 
 # same credentials as docker-compose.yml

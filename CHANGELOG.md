@@ -12,6 +12,13 @@ release.
 
 ### Added
 
+- `journey` page template (`src/components/templates/journey.tsx`):
+  scroll-scrubbed SVG parallax after the isladjan demo — the body splits
+  at every `h2` into `.journey-stage` cards presented over a pinned
+  `.journey-scene` backdrop (`src/components/organisms/journey-scene.tsx`,
+  client driver writes `--jp`; all motion lives in the new `.journey-*`
+  shell.css contract). No JS or reduced motion renders plain stacked
+  cards. Select via `template: journey` page front matter.
 - SEO plumbing: `/robots.txt` (`app/(frontend)/robots.ts` — allows all,
   disallows `/admin`, `/api`, `/preview`, advertises the sitemap),
   `/sitemap.xml` (`app/(frontend)/sitemap.ts` — published `pages` +
@@ -167,6 +174,11 @@ release.
 - Code blocks render on the frontend: JSX converter for the `Code` block
   (`pre`/`code` + `data-language`) was missing
   (`src/app/(frontend)/[[...path]]/converters.tsx`)
+- Dev server now serves `/_next` assets (client chunks, HMR websocket)
+  to `[::1]` and the LAN IP: `allowedDevOrigins` in `next.config.ts`.
+  Without it Next 16's dev cross-origin guard 403s the client runtime
+  for non-`localhost` origins and hydration silently never happens
+  (all client components inert, no console hint on the page itself)
 
 ### Changed
 

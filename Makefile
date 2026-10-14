@@ -94,11 +94,13 @@ dev:
 
 # Same push pipeline against the local stack. Defaults to the dev-only
 # key seeded by `make dev`; set $env:PAYLOAD_API_KEY to override.
-publish-local: export PAYLOAD_BASE_URL := http://127.0.0.1:3000
-publish-local: export PAYLOAD_API_KEY ?= 6927128c-70b0-4e85-a455-835e4d184afa
+# ($(or …) not ?= : the bare `export` above already defines the vars as
+# empty — `?=` can never fire on a defined variable.)
+publish-local: export PAYLOAD_BASE_URL := $(or $(PAYLOAD_BASE_URL),http://127.0.0.1:3000)
+publish-local: export PAYLOAD_API_KEY := $(or $(PAYLOAD_API_KEY),6927128c-70b0-4e85-a455-835e4d184afa)
 publish-local: theme site sync
 	$(info published to http://127.0.0.1:3000)
 
 # Push the mockup demo site (all templates/elements) to the local stack.
-demo: CONTENT_REPO := ../obs-seo-witconsult/demo
+demo: CONTENT_REPO := ../../../clients/seo-wit/@demo
 demo: publish-local

@@ -10,6 +10,12 @@ release.
 
 ## Unreleased
 
+### Fixed
+
+- SVG media (e.g. the site logo) no longer routed through `/_next/image` —
+  the raster optimizer rejects SVG, so `optimizeMediaUrl` now returns the
+  raw `/api/media/file/` URL, fixing the broken logo on production.
+
 ### Added
 
 - `journey` page template (`src/components/templates/journey.tsx`):
@@ -179,6 +185,10 @@ release.
   Without it Next 16's dev cross-origin guard 403s the client runtime
   for non-`localhost` origins and hydration silently never happens
   (all client components inert, no console hint on the page itself)
+- Dev showcase hydration error: `SearchField`, `InputGroup` and
+  `Dropdown` are `<div>`-rooted and may not nest in `Paragraph` (`<p>`)
+  — now wrapped in `.page-actions` rows instead
+  (`src/components/component-showcase.tsx`)
 
 ### Changed
 

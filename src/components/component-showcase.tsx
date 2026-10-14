@@ -284,13 +284,13 @@ export const ComponentShowcase = ({ media }: { media?: Media | null }) => (
     />
 
     <Heading level={3}>SearchField / InputGroup / ButtonGroup</Heading>
-    <Paragraph>
+    <div className="page-actions">
       <SearchField />
-    </Paragraph>
-    <Paragraph>
-      <InputGroup placeholder="benutzername" suffix="@witconsult.de" />{' '}
+    </div>
+    <div className="page-actions">
+      <InputGroup placeholder="benutzername" suffix="@witconsult.de" />
       <InputGroup placeholder="0,00" prefix="€" />
-    </Paragraph>
+    </div>
     <ButtonGroup
       items={[
         { label: 'Abbrechen' },
@@ -360,14 +360,14 @@ export const ComponentShowcase = ({ media }: { media?: Media | null }) => (
     />
 
     <Heading level={3}>Dropdown / UserMenu</Heading>
-    <Paragraph>
+    <div className="page-actions">
       <Dropdown
         items={[
           { href: '/elemente', label: 'Eintrag eins' },
           { href: '/bereich', label: 'Eintrag zwei' },
         ]}
         label="Menü öffnen"
-      />{' '}
+      />
       <UserMenu
         badge="Admin"
         items={[
@@ -378,7 +378,7 @@ export const ComponentShowcase = ({ media }: { media?: Media | null }) => (
         name="Max Mustermann"
         role="Redakteur"
       />
-    </Paragraph>
+    </div>
 
     <Heading level={3}>Figure</Heading>
     {media ? (

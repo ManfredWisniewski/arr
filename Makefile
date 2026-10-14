@@ -11,7 +11,7 @@ SITES ?= w1t.org witconsult.de
 -include sites/$(SITE)/site.mk
 export PAYLOAD_BASE_URL PAYLOAD_API_KEY
 
-CONTENT_REPO ?= ../../../clients/seo-wit/$(SITE)
+CONTENT_REPO ?= P:/clients/seo-wit/$(SITE)
 THEME ?= wit
 BITI_DIR ?= biti
 CSS_DIR ?= $(BITI_DIR)/tokens/build/css
@@ -102,5 +102,5 @@ publish-local: theme site sync
 	$(info published to http://127.0.0.1:3000)
 
 # Push the mockup demo site (all templates/elements) to the local stack.
-demo: CONTENT_REPO := ../../../clients/seo-wit/@demo
+demo: CONTENT_REPO := P:/clients/seo-wit/@demo
 demo: publish-local

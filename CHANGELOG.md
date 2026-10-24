@@ -12,6 +12,11 @@ release.
 
 ### Fixed
 
+- Missing migration for `media.source_repo` (field added with the
+  security-audit commit but never migrated — every media query 500'd
+  with `column "source_repo" does not exist`). Generated
+  `20261024_201751_add_media_source_repo`.
+
 - Code block `language` options now cover the markdown fence tags used
   by the content repos (`bash`, `text`, `json`, `sh`, `yml`, …) — pages
   with such fences failed validation on publish ("Content > Language").

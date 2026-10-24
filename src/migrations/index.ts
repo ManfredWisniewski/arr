@@ -7,6 +7,7 @@ import * as migration_20261003_073413_add_theme_favicon from './20261003_073413_
 import * as migration_20261012_153224_add_posts from './20261012_153224_add_posts';
 import * as migration_20261013_192611_add_media_image_sizes from './20261013_192611_add_media_image_sizes';
 import * as migration_20261013_192901_extend_media_image_sizes from './20261013_192901_extend_media_image_sizes';
+import * as migration_20261024_201751_add_media_source_repo from './20261024_201751_add_media_source_repo';
 
 export const migrations = [
   {
@@ -52,6 +53,11 @@ export const migrations = [
   {
     up: migration_20261013_192901_extend_media_image_sizes.up,
     down: migration_20261013_192901_extend_media_image_sizes.down,
-    name: '20261013_192901_extend_media_image_sizes'
+    name: '20261013_192901_extend_media_image_sizes',
+  },
+  {
+    up: migration_20261024_201751_add_media_source_repo.up,
+    down: migration_20261024_201751_add_media_source_repo.down,
+    name: '20261024_201751_add_media_source_repo'
   },
 ];

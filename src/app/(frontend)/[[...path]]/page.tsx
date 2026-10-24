@@ -10,8 +10,11 @@ import config from '@/payload.config'
 import { renderTemplate } from '@/components/templates/registry'
 import { jsxConverters } from '@/lib/jsx-converters'
 
+import { LangBlog, isLangBlogPath, langBlogMetadata } from './lang-blog'
+
 type Props = {
   params: Promise<{ path?: string[] }>
+  searchParams: Promise<{ page?: string }>
 }
 
 async function findPage(route: string, draft: boolean) {
@@ -31,6 +34,9 @@ async function findPage(route: string, draft: boolean) {
 export async function generateMetadata({ params }: Props) {
   const { path = [] } = await params
   const { isEnabled } = await draftMode()
+  if (isLangBlogPath(path)) {
+    return langBlogMetadata(path, isEnabled)
+  }
   const page = await findPage(`/${path.join('/')}`, isEnabled)
   if (!page) {
     return {}
@@ -41,16 +47,22 @@ export async function generateMetadata({ params }: Props) {
   }
 }
 
-export default async function SitePage({ params }: Props) {
+export default async function SitePage({ params, searchParams }: Props) {
   const { path = [] } = await params
+  const { page } = await searchParams
   const { isEnabled } = await draftMode()
-  const page = await findPage(`/${path.join('/')}`, isEnabled)
 
-  if (!page) {
+  if (isLangBlogPath(path)) {
+    return <LangBlog draft={isEnabled} page={page} segments={path} />
+  }
+
+  const doc = await findPage(`/${path.join('/')}`, isEnabled)
+
+  if (!doc) {
     notFound()
   }
 
-  return renderTemplate(page, (data) =>
+  return renderTemplate(doc, (data) =>
     data ? <RichText converters={jsxConverters} data={data} /> : null,
   )
 }

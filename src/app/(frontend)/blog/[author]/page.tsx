@@ -2,10 +2,13 @@ import { draftMode } from 'next/headers'
 import { notFound } from 'next/navigation.js'
 import React from 'react'
 
-import { Avatar } from '@/components/atoms/avatar'
-import { Pagination } from '@/components/molecules/pagination'
-import { PostList } from '@/components/organisms/post-list'
-import { getAgent, getMediaUrl, getPostsPage } from '@/lib/blog'
+import {
+  getAgent,
+  getMediaUrl,
+  getPostsPage,
+} from '@/lib/blog'
+
+import { AuthorArchiveView } from '../views'
 
 type Props = {
   params: Promise<{ author: string }>
@@ -36,39 +39,22 @@ export default async function AuthorBlog({ params, searchParams }: Props) {
   const current = Math.max(1, Number(page) || 1)
   const [avatarUrl, result] = await Promise.all([
     getMediaUrl(agent.avatar, isEnabled),
-    getPostsPage({ author: agent.slug, draft: isEnabled, page: current }),
+    getPostsPage({
+      author: agent.slug,
+      draft: isEnabled,
+      page: current,
+      pathPrefix: '/blog',
+    }),
   ])
-  const basePath = `/blog/${agent.slug}`
 
   return (
-    <article className="page author-archive">
-      <header className="author-header">
-        <Avatar name={agent.name} size="lg" src={avatarUrl} />
-        <div>
-          <h1>{agent.name}</h1>
-          {agent.role ? <p className="author-role">{agent.role}</p> : null}
-          {agent.bio ? <p className="author-bio">{agent.bio}</p> : null}
-        </div>
-      </header>
-      {result.docs.length ? (
-        <PostList
-          agents={{
-            [agent.slug]: {
-              avatarUrl,
-              name: agent.name,
-              slug: agent.slug,
-            },
-          }}
-          posts={result.docs}
-        />
-      ) : (
-        <p className="empty">No posts found.</p>
-      )}
-      <Pagination
-        current={result.page ?? current}
-        hrefFor={(p) => (p > 1 ? `${basePath}?page=${p}` : basePath)}
-        total={result.totalPages}
-      />
-    </article>
+    <AuthorArchiveView
+      agent={agent}
+      avatarUrl={avatarUrl}
+      basePath={`/blog/${agent.slug}`}
+      current={result.page ?? current}
+      posts={result.docs}
+      totalPages={result.totalPages}
+    />
   )
 }

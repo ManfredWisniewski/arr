@@ -2,6 +2,7 @@ import type { MetadataRoute } from 'next'
 import { getPayload } from 'payload'
 
 import config from '@/payload.config'
+import { blogRoot } from '@/lib/blog'
 import { getSiteUrl } from '@/lib/site'
 
 // Published pages + posts plus the public /blog archive routes. Drafts
@@ -29,14 +30,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     const archives = new Set<string>(['/blog'])
     for (const post of posts.docs) {
+      const root = blogRoot(post.path)
+      archives.add(`${root}/blog`)
       if (post.author) {
-        archives.add(`/blog/${post.author}`)
+        archives.add(`${root}/blog/${post.author}`)
       }
       for (const c of post.categories ?? []) {
-        archives.add(`/blog/kategorie/${c}`)
+        archives.add(`${root}/blog/kategorie/${c}`)
       }
       for (const t of post.tags ?? []) {
-        archives.add(`/blog/tag/${t}`)
+        archives.add(`${root}/blog/tag/${t}`)
       }
     }
 

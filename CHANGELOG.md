@@ -10,6 +10,18 @@ release.
 
 ## Unreleased
 
+### Added
+
+- Localized blog trees: `/<lang>/blog/…` routes (index, author, post,
+  `kategorie`/`tag` archives — same shape as `/blog`) served through the
+  `[[...path]]` catch-all (`src/app/(frontend)/[[...path]]/lang-blog.tsx`).
+  `getPostsPage` gained a `pathPrefix` filter; `/blog` and the feeds
+  (`src/lib/feed.ts`) now list English `/blog/…` posts only, `/<lang>/blog`
+  lists that language's posts. Localized post pages show a machine-
+  translation notice (`TranslationNotice`) linking to the English original.
+  Shared views extracted to `blog/views.tsx`; sitemap archives derive the
+  language root from `post.path`.
+
 ### Fixed
 
 - SVG media (e.g. the site logo) no longer routed through `/_next/image` —

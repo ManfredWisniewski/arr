@@ -52,7 +52,10 @@ export async function getFeedData(): Promise<FeedData> {
       collection: 'posts',
       limit: FEED_POST_LIMIT,
       sort: '-publishedAt',
-      where: { _status: { equals: 'published' } },
+      where: {
+        _status: { equals: 'published' },
+        path: { like: '/blog/%' },
+      },
     }),
     getAgents(false),
     payload

@@ -2,7 +2,7 @@ import React from 'react'
 
 import type { Post } from '@/payload-types'
 import type { AgentRef } from '@/lib/blog'
-import { formatDate } from '@/lib/blog'
+import { formatDate, parentPath } from '@/lib/blog'
 import { mediaUrl } from '@/lib/media'
 
 import { Avatar } from '../atoms/avatar'
@@ -31,7 +31,7 @@ export const postToCardItem = (
     mediaAlt: media?.alt ?? post.title,
     mediaSrc: mediaUrl(media, 'card', 640),
     subtitle: post.author ? (
-      <Link href={`/blog/${post.author}`}>{name}</Link>
+      <Link href={parentPath(post.path)}>{name}</Link>
     ) : undefined,
     title: post.title,
   }

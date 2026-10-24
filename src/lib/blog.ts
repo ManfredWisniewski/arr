@@ -1,6 +1,6 @@
 import { getPayload, type Where } from 'payload'
 
-import type { Media, Post } from '@/payload-types'
+import type { Media, Page, Post } from '@/payload-types'
 import config from '@/payload.config'
 
 // Shared queries for the /blog routes. Taxonomy is data: agent profiles
@@ -26,17 +26,29 @@ export type TaxonomyTerm = {
 const publishedOnly = (draft: boolean): Where =>
   draft ? {} : { _status: { equals: 'published' } }
 
+// Path helpers for localized blogs: English posts live at /blog/…,
+// translations under /<lang>/blog/… (mirrors the `*/blog/**` sync route).
+// blogRoot('//blog/x' → ''), parentPath('/de/blog/a/b' → '/de/blog/a'),
+// originalPostPath('/de/blog/a/b' → '/blog/a/b').
+export const blogRoot = (path: string) => path.slice(0, path.indexOf('/blog'))
+export const parentPath = (path: string) =>
+  path.slice(0, path.lastIndexOf('/'))
+export const originalPostPath = (path: string) =>
+  path.replace(/^\/[^/]+(?=\/blog\/)/, '')
+
 export async function getPostsPage({
   author,
   category,
   draft,
   page = 1,
+  pathPrefix,
   tag,
 }: {
   author?: string
   category?: string
   draft: boolean
   page?: number
+  pathPrefix?: string
   tag?: string
 }) {
   const payload = await getPayload({ config: await config })
@@ -50,9 +62,26 @@ export async function getPostsPage({
       ...publishedOnly(draft),
       ...(author ? { author: { equals: author } } : {}),
       ...(category ? { categories: { contains: category } } : {}),
+      ...(pathPrefix ? { path: { like: `${pathPrefix}/%` } } : {}),
       ...(tag ? { tags: { contains: tag } } : {}),
     },
   })
+}
+
+// Optional intro/meta source for a blog index: a `pages` doc at the index
+// path (e.g. /blog or /de/blog) supplies copy above the post list.
+export async function getIntroPage(path: string, draft: boolean) {
+  const payload = await getPayload({ config: await config })
+  const { docs } = await payload.find({
+    collection: 'pages',
+    draft,
+    limit: 1,
+    where: {
+      ...publishedOnly(draft),
+      path: { equals: path },
+    },
+  })
+  return docs[0] as Page | undefined
 }
 
 export async function getPostByPath(path: string, draft: boolean) {

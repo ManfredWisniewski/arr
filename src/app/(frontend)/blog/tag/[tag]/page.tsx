@@ -28,7 +28,12 @@ export default async function TagArchive({ params, searchParams }: Props) {
   const current = Math.max(1, Number(page) || 1)
   const [term, result] = await Promise.all([
     getTaxonomyTerm('tags', tag, isEnabled),
-    getPostsPage({ draft: isEnabled, page: current, tag }),
+    getPostsPage({
+      draft: isEnabled,
+      page: current,
+      pathPrefix: '/blog',
+      tag,
+    }),
   ])
   const agents = await getAgentMap(
     result.docs.map((post) => post.author),

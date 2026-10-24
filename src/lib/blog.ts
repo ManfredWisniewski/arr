@@ -36,6 +36,17 @@ export const parentPath = (path: string) =>
 export const originalPostPath = (path: string) =>
   path.replace(/^\/[^/]+(?=\/blog\/)/, '')
 
+// `like` is useless for prefixes — the drizzle adapter wraps the value in
+// %…% (substring match), so '/de/blog/…' matches `like '/blog/%'`. Use a
+// half-open range instead: '/' sorts just below '0', so
+// [pathPrefix + '/', pathPrefix + '0') covers exactly pathPrefix/… .
+export const pathPrefixWhere = (prefix: string): Where => ({
+  and: [
+    { path: { greater_than_equal: `${prefix}/` } },
+    { path: { less_than: `${prefix}0` } },
+  ],
+})
+
 export async function getPostsPage({
   author,
   category,
@@ -62,7 +73,7 @@ export async function getPostsPage({
       ...publishedOnly(draft),
       ...(author ? { author: { equals: author } } : {}),
       ...(category ? { categories: { contains: category } } : {}),
-      ...(pathPrefix ? { path: { like: `${pathPrefix}/%` } } : {}),
+      ...(pathPrefix ? pathPrefixWhere(pathPrefix) : {}),
       ...(tag ? { tags: { contains: tag } } : {}),
     },
   })

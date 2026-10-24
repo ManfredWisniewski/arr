@@ -2,7 +2,7 @@ import { getPayload } from 'payload'
 
 import config from '@/payload.config'
 
-import { getAgents } from './blog'
+import { getAgents, pathPrefixWhere } from './blog'
 
 // Shared builders for the blog feed endpoints (/rss.xml, /feed,
 // /index.xml → RSS 2.0; /atom.xml → Atom). Published posts only — feeds
@@ -54,7 +54,7 @@ export async function getFeedData(): Promise<FeedData> {
       sort: '-publishedAt',
       where: {
         _status: { equals: 'published' },
-        path: { like: '/blog/%' },
+        ...pathPrefixWhere('/blog'),
       },
     }),
     getAgents(false),

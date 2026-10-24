@@ -21,7 +21,7 @@ export const postToCardItem = (
   const author = post.author ? agents?.[post.author] : undefined
   const name = author?.name ?? post.author ?? ''
   return {
-    badge: formatDate(post.publishedAt) || undefined,
+    badge: formatDate(post.publishedAt, post.path) || undefined,
     description: post.excerpt ?? undefined,
     href: post.path,
     lead: post.author ? (

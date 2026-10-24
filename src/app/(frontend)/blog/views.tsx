@@ -140,7 +140,7 @@ export const PostArticle = ({
         <div className="post-meta">
           {doc.publishedAt ? (
             <time dateTime={doc.publishedAt}>
-              {formatDate(doc.publishedAt)}
+              {formatDate(doc.publishedAt, doc.path)}
             </time>
           ) : null}
           {doc.author ? (

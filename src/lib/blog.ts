@@ -248,7 +248,7 @@ export async function getMediaUrl(
   }
 }
 
-export function formatDate(value?: null | string) {
+export function formatDate(value?: null | string, path?: string) {
   if (!value) {
     return ''
   }
@@ -256,7 +256,10 @@ export function formatDate(value?: null | string) {
   if (Number.isNaN(date.getTime())) {
     return ''
   }
-  return date.toLocaleDateString('en-GB', {
+  // post paths carry the lang prefix (/<lang>/blog/…); the default tree
+  // is German, /en keeps the previous en-GB rendering
+  const lang = path ? blogRoot(path).slice(1) : ''
+  return date.toLocaleDateString(lang === 'en' ? 'en-GB' : lang || 'de', {
     day: 'numeric',
     month: 'long',
     year: 'numeric',

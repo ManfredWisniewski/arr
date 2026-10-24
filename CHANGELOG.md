@@ -12,6 +12,10 @@ release.
 
 ### Fixed
 
+- `formatDate` hardcoded `en-GB` — post dates on the German default tree
+  showed English month names. It now derives the locale from the post
+  path (`/<lang>/blog/…` → that lang, `en` keeps `en-GB`, default `de`).
+
 - Missing migration for `media.source_repo` (field added with the
   security-audit commit but never migrated — every media query 500'd
   with `column "source_repo" does not exist`). Generated

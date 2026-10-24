@@ -66,7 +66,7 @@ ifneq ($(IMAGE_DIRTY),)
 endif
 
 tokens:
-	npm --prefix $(BITI_DIR)/tokens run build
+	npm --prefix $(BITI_DIR)/tokens run preview
 
 theme: tokens
 	$(PT) theme --css-light $(CSS_DIR)/$(THEME)-light.css --css-dark $(CSS_DIR)/$(THEME)-dark.css $(FONT_ARGS)

@@ -10,6 +10,23 @@ release.
 
 ## Unreleased
 
+### Fixed
+
+- Code block `language` options now cover the markdown fence tags used
+  by the content repos (`bash`, `text`, `json`, `sh`, `yml`, …) — pages
+  with such fences failed validation on publish ("Content > Language").
+  `src/editor.ts` now passes a curated `languages` map to `CodeBlock`
+  with `defaultLanguage: 'plaintext'`.
+
+### Changed
+
+- `NavList` submenu band markup follows the updated shell.css navbar
+  contract: each top-level band now starts with a `.band-spacer` li
+  holding `.band-ghosts` (invisible `.nav-brand--spacer` + `.nav-item`
+  clones of the bar up to but not including the parent item) plus a
+  `.band-anchor` slot that stacks the first band cell on an invisible
+  clone of the parent, so it matches the parent's left edge and width.
+
 ### Added
 
 - Localized blog trees: `/<lang>/blog/…` routes (index, author, post,

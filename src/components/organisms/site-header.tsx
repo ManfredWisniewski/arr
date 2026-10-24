@@ -23,8 +23,9 @@ export const SiteHeader = ({
   navItems: NavItem[]
   siteName: string
 }) => {
-  // Non-interactive brand copy for the submenu-band spacer — same width as
-  // .nav-brand so band items align under .site-nav.
+  // Non-interactive brand copy for the submenu-band ghosts — same width as
+  // .nav-brand so the band spacer can replicate the bar up to the parent
+  // item and align the first band cell to its left edge and width.
   const spacerBrand = (
     <span className="site-name">
       {logo && typeof logo === 'object' && mediaUrl(logo, 'logo', 256) ? (

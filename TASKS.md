@@ -16,4 +16,6 @@ Example line (inside a code block, so it is not parsed as a task):
 
 ## Open
 
+- [ ] #task payloadtools sync: design + implement cleanup for deleted/moved webtext files — pages/posts/structures docs are never removed, so orphans stay live at their old route (media/ already mirrors with a delete pass; mirror per-collection by comparing local relpaths vs remote sourcePath + sourceRepo) ⏳ 2026-10-24 #persona/manfred
+
 ## Done

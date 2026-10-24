@@ -1,7 +1,9 @@
 import { draftMode } from 'next/headers'
 import React from 'react'
 
-import { getAgentMap, getIntroPage, getPostsPage } from '@/lib/blog'
+import { getAgentMap, getIntroPage, getPostsPage,
+  parsePageParam,
+} from '@/lib/blog'
 
 import { BlogIndexView } from './views'
 
@@ -21,7 +23,7 @@ export async function generateMetadata() {
 export default async function BlogIndex({ searchParams }: Props) {
   const { isEnabled } = await draftMode()
   const { page } = await searchParams
-  const current = Math.max(1, Number(page) || 1)
+  const current = parsePageParam(page)
   const [intro, result] = await Promise.all([
     getIntroPage('/blog', isEnabled),
     getPostsPage({ draft: isEnabled, page: current, pathPrefix: '/blog' }),

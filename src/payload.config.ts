@@ -20,6 +20,11 @@ export default buildConfig({
     importMap: {
       baseDir: path.resolve(dirname),
     },
+    meta: {
+      // /api/og is public and renders a satori+sharp image per request —
+      // we don't use the admin OG image, so disable the endpoint.
+      defaultOGImageType: 'off',
+    },
   },
   collections: [Users, Media, Pages, Posts, Structures],
   globals: [Theme],

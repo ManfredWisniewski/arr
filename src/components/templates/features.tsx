@@ -1,3 +1,4 @@
+import { draftMode } from 'next/headers'
 import { getPayload } from 'payload'
 import React from 'react'
 
@@ -17,11 +18,16 @@ type FeatureItem = {
 
 async function getFeatures(): Promise<CardItem[]> {
   try {
+    const { isEnabled } = await draftMode()
     const payload = await getPayload({ config: await config })
     const { docs } = await payload.find({
       collection: 'structures',
+      draft: isEnabled,
       limit: 1,
-      where: { name: { equals: 'features' } },
+      where: {
+        name: { equals: 'features' },
+        ...(isEnabled ? {} : { _status: { equals: 'published' } }),
+      },
     })
     const items = (docs[0]?.data as { items?: FeatureItem[] } | undefined)
       ?.items

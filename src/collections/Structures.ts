@@ -1,6 +1,11 @@
 import type { CollectionConfig } from 'payload'
 
-import { authenticated, editorOnly } from '../access/roles'
+import {
+  authenticated,
+  editorOnly,
+  publishedOrAuthenticated,
+} from '../access/roles'
+import { clampPublicFind } from '../hooks/clampPublicFind'
 import { enforceEditorPublish } from '../hooks/enforceEditorPublish'
 
 // Non-page site structure data (navigation, footer, header, …) pushed by the
@@ -15,12 +20,13 @@ export const Structures: CollectionConfig = {
     drafts: true,
   },
   access: {
-    read: () => true,
+    read: publishedOrAuthenticated,
     create: authenticated,
     update: authenticated,
     delete: editorOnly,
   },
   hooks: {
+    beforeOperation: [clampPublicFind],
     beforeChange: [enforceEditorPublish],
   },
   fields: [

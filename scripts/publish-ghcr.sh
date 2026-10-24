@@ -13,7 +13,6 @@ fi
 
 TAG="${1:-test-$(date -u +%Y%m%d-%H%M%S)}"
 IMAGE="${IMAGE_REPOSITORY}:${TAG}"
-LOCAL_IMAGE="arr:publish-test"
 
 if ! command -v docker >/dev/null 2>&1; then
   echo "docker is required" >&2
@@ -30,12 +29,6 @@ if [[ "$CLEAN_DOCKER" == "1" ]]; then
   docker builder prune -af
   docker image prune -af
 fi
-
-echo "Building local image ${LOCAL_IMAGE}..."
-docker build --tag "$LOCAL_IMAGE" .
-
-echo "Running image tests before publishing..."
-PAYLOAD_IMAGE_UNDER_TEST="$LOCAL_IMAGE" ./scripts/test-image.sh
 
 if [[ "${SKIP_GHCR_LOGIN:-0}" == "1" ]]; then
   echo "Using the existing Docker credentials for ghcr.io..."
@@ -65,6 +58,13 @@ if [[ ! "$DIGEST" =~ ^sha256:[0-9a-f]{64}$ ]]; then
   echo "Could not read a valid image digest: ${DIGEST:-<empty>}" >&2
   exit 1
 fi
+
+# Test the exact artifact that will be deployed — the digest-pinned pushed
+# manifest, not a separately built look-alike.
+echo "Testing the published image (${IMAGE_REPOSITORY}@${DIGEST})..."
+docker pull "${IMAGE_REPOSITORY}@${DIGEST}"
+PAYLOAD_IMAGE_UNDER_TEST="${IMAGE_REPOSITORY}@${DIGEST}" \
+  ./scripts/test-image.sh
 
 cat > "$DIGEST_FILE" <<EOF
 payload_image_repository: "$IMAGE_REPOSITORY"

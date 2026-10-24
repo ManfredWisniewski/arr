@@ -1,3 +1,4 @@
+import { draftMode } from 'next/headers'
 import { getPayload } from 'payload'
 import React from 'react'
 
@@ -32,11 +33,16 @@ type DashboardData = {
 
 async function getDashboard(): Promise<DashboardData> {
   try {
+    const { isEnabled } = await draftMode()
     const payload = await getPayload({ config: await config })
     const { docs } = await payload.find({
       collection: 'structures',
+      draft: isEnabled,
       limit: 1,
-      where: { name: { equals: 'dashboard' } },
+      where: {
+        name: { equals: 'dashboard' },
+        ...(isEnabled ? {} : { _status: { equals: 'published' } }),
+      },
     })
     return (docs[0]?.data as DashboardData | undefined) ?? {}
   } catch {

@@ -2,6 +2,8 @@ import type { CollectionConfig } from 'payload'
 
 import { authenticated, editorOnly } from '../access/roles'
 
+import { clampPublicFind } from '../hooks/clampPublicFind'
+
 export const Media: CollectionConfig = {
   slug: 'media',
   access: {
@@ -9,6 +11,9 @@ export const Media: CollectionConfig = {
     create: authenticated,
     update: authenticated,
     delete: editorOnly,
+  },
+  hooks: {
+    beforeOperation: [clampPublicFind],
   },
   fields: [
     {
@@ -29,6 +34,13 @@ export const Media: CollectionConfig = {
     {
       // path of the file inside the content repository
       name: 'sourcePath',
+      type: 'text',
+      index: true,
+    },
+    {
+      // name of the content repository the file was synced from; lets the
+      // media mirror scope its delete pass to the repo it is syncing
+      name: 'sourceRepo',
       type: 'text',
       index: true,
     },

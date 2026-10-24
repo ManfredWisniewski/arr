@@ -8,6 +8,13 @@ import config from '@/payload.config'
 // "taxonomies" — both pushed from <site>/+structure/*.yml.
 export const POSTS_PER_PAGE = 12
 
+// ?page= parser shared by all blog routes — Number() alone would pass
+// Infinity and fractions through to the Postgres OFFSET.
+export const parsePageParam = (page: string | undefined): number => {
+  const n = Number(page)
+  return Number.isFinite(n) && n >= 1 ? Math.floor(n) : 1
+}
+
 export type AgentProfile = {
   // media sourcePath, resolved to a URL via getMediaUrl()
   avatar?: string

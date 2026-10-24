@@ -5,6 +5,17 @@ import config from '@/payload.config'
 import { blogRoot } from '@/lib/blog'
 import { getSiteUrl } from '@/lib/site'
 
+// Next serialises <loc> verbatim, so stored fields reaching the URL must
+// be XML-escaped (field validation is the primary control; this is the
+// belt-and-suspenders layer for pre-existing rows).
+const escapeXml = (value: string) =>
+  value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;')
+
 // Published pages + posts plus the public /blog archive routes. Drafts
 // are never listed; a failing DB yields just the static entries instead
 // of a 500 (same fail-open pattern as layout.tsx).
@@ -33,24 +44,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       const root = blogRoot(post.path)
       archives.add(`${root}/blog`)
       if (post.author) {
-        archives.add(`${root}/blog/${post.author}`)
+        archives.add(`${root}/blog/${escapeXml(post.author)}`)
       }
       for (const c of post.categories ?? []) {
-        archives.add(`${root}/blog/kategorie/${c}`)
+        archives.add(`${root}/blog/kategorie/${escapeXml(c)}`)
       }
       for (const t of post.tags ?? []) {
-        archives.add(`${root}/blog/tag/${t}`)
+        archives.add(`${root}/blog/tag/${escapeXml(t)}`)
       }
     }
 
     return [
       ...pages.docs.map((doc) => ({
         lastModified: doc.updatedAt,
-        url: `${base}${doc.path}`,
+        url: `${base}${escapeXml(doc.path)}`,
       })),
       ...posts.docs.map((doc) => ({
         lastModified: doc.publishedAt ?? doc.updatedAt,
-        url: `${base}${doc.path}`,
+        url: `${base}${escapeXml(doc.path)}`,
       })),
       ...[...archives].map((path) => ({ url: `${base}${path}` })),
     ]

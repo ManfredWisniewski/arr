@@ -24,6 +24,41 @@ release.
 
 ### Fixed
 
+- Security audit remediations (`src/`, `wit_pytools/`, CI):
+  - `users` collection: explicit `access` block (`editorOnly` incl.
+    `unlock`) — Payload defaults previously allowed any authenticated
+    principal (incl. the content-bot API key) full users CRUD and unlock.
+  - `enforceEditorPublish` now also blocks non-editor `_status: 'draft'`
+    demotion of published documents (bot could unpublish live pages).
+  - Anonymous reads on `pages`/`posts`/`structures` now constrained to
+    `_status: 'published'` (`publishedOrAuthenticated`); `clampPublicFind`
+    caps anonymous `find` at `limit ≤ 50`, forces pagination, drops
+    `draft=true`.
+  - `theme` global: `cssLight`/`cssDark` reject values containing `</`
+    (stored `</style><script>` breakout into every page `<head>`).
+  - `path`/`author`/`categories`/`tags` reject whitespace/markup chars;
+    `sitemap.ts` XML-escapes stored values before emitting `<loc>`.
+  - `admin.meta.defaultOGImageType: 'off'` — disables the anonymous
+    per-request satori/sharp renderer at `/api/og`.
+  - `src/proxy.ts` + `proxyClientMaxBodySize` cap API request bodies
+    (Payload buffered JSON unbounded before access checks).
+  - `/preview` canonicalizes `path` before the `//` check (backslash/tab
+    protocol-relative smuggling); `getSiteUrl` validates the forwarded
+    host before emitting it into sitemap/robots/feeds.
+  - Blog `?page=` uses `parsePageParam` (integer/finite) — `Infinity`
+    and fractions no longer reach the Postgres OFFSET.
+  - `users` login `LockedAuth` is rewritten to the generic auth error
+    (registered-email oracle removed).
+  - `Media` gained `sourceRepo`; `payloadtools` media mirror delete is
+    now scoped to the syncing repo, pages/posts upserts refuse docs
+    owned by another repo, and all repo scans skip symlinks.
+  - `payloadtools site` logo/favicon paths are contained to the repo
+    (no `..`/absolute exfil, no symlink upload); markdown/cover image
+    resolution checks containment before any filesystem probe;
+    `load_dotenv` is pinned to the working directory.
+  - `publish-ghcr.sh` tests the pushed digest image instead of a
+    separate local build; `build.yml` gains a lint/typecheck test gate
+    and a `release` environment before GHCR push.
 - SVG media (e.g. the site logo) no longer routed through `/_next/image` —
   the raster optimizer rejects SVG, so `optimizeMediaUrl` now returns the
   raw `/api/media/file/` URL, fixing the broken logo on production.

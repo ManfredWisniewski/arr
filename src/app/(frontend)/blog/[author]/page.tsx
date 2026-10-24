@@ -6,6 +6,7 @@ import {
   getAgent,
   getMediaUrl,
   getPostsPage,
+  parsePageParam,
 } from '@/lib/blog'
 
 import { AuthorArchiveView } from '../views'
@@ -36,7 +37,7 @@ export default async function AuthorBlog({ params, searchParams }: Props) {
   if (!agent) {
     notFound()
   }
-  const current = Math.max(1, Number(page) || 1)
+  const current = parsePageParam(page)
   const [avatarUrl, result] = await Promise.all([
     getMediaUrl(agent.avatar, isEnabled),
     getPostsPage({

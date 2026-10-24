@@ -1,3 +1,4 @@
+import { draftMode } from 'next/headers'
 import { getPayload } from 'payload'
 import React from 'react'
 
@@ -26,11 +27,16 @@ type PricingData = {
 
 async function getPricing(): Promise<PricingData> {
   try {
+    const { isEnabled } = await draftMode()
     const payload = await getPayload({ config: await config })
     const { docs } = await payload.find({
       collection: 'structures',
+      draft: isEnabled,
       limit: 1,
-      where: { name: { equals: 'pricing' } },
+      where: {
+        name: { equals: 'pricing' },
+        ...(isEnabled ? {} : { _status: { equals: 'published' } }),
+      },
     })
     return (docs[0]?.data as PricingData | undefined) ?? {}
   } catch {

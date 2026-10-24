@@ -2,7 +2,9 @@ import { draftMode } from 'next/headers'
 import { notFound } from 'next/navigation.js'
 import React from 'react'
 
-import { getAgentMap, getPostsPage, getTaxonomyTerm } from '@/lib/blog'
+import { getAgentMap, getPostsPage, getTaxonomyTerm,
+  parsePageParam,
+} from '@/lib/blog'
 
 import { TaxonomyArchive } from '../../taxonomy-archive'
 
@@ -25,7 +27,7 @@ export default async function CategoryArchive({ params, searchParams }: Props) {
   const { category } = await params
   const { page } = await searchParams
   const { isEnabled } = await draftMode()
-  const current = Math.max(1, Number(page) || 1)
+  const current = parsePageParam(page)
   const [term, result] = await Promise.all([
     getTaxonomyTerm('categories', category, isEnabled),
     getPostsPage({

@@ -9,6 +9,7 @@ import {
   getPostByPath,
   getPostsPage,
   getTaxonomyTerm,
+  parsePageParam,
 } from '@/lib/blog'
 
 import { TaxonomyArchive } from '../blog/taxonomy-archive'
@@ -81,7 +82,7 @@ export async function LangBlog({
 }) {
   const base = `/${segments[0]}/blog`
   const rest = segments.slice(2)
-  const current = Math.max(1, Number(page) || 1)
+  const current = parsePageParam(page)
 
   if (!rest.length) {
     const [intro, result] = await Promise.all([

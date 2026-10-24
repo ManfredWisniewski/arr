@@ -1,7 +1,12 @@
 import type { CollectionConfig } from 'payload'
 
-import { authenticated, editorOnly } from '../access/roles'
+import {
+  authenticated,
+  editorOnly,
+  publishedOrAuthenticated,
+} from '../access/roles'
 import { pagesEditor } from '../editor'
+import { clampPublicFind } from '../hooks/clampPublicFind'
 import { enforceEditorPublish } from '../hooks/enforceEditorPublish'
 import { markdownToContent } from '../hooks/markdownToContent'
 
@@ -17,12 +22,13 @@ export const Pages: CollectionConfig = {
     drafts: true,
   },
   access: {
-    read: () => true,
+    read: publishedOrAuthenticated,
     create: authenticated,
     update: authenticated,
     delete: editorOnly,
   },
   hooks: {
+    beforeOperation: [clampPublicFind],
     beforeValidate: [markdownToContent],
     beforeChange: [enforceEditorPublish],
   },
@@ -43,6 +49,10 @@ export const Pages: CollectionConfig = {
       type: 'text',
       required: true,
       unique: true,
+      validate: (value: unknown) =>
+        typeof value === 'string' && /^[^\s<>&"']+$/.test(value)
+          ? true
+          : 'Path must not contain whitespace or markup characters',
     },
     {
       // markdown as pushed by the sync tool; converted to `content` on write

@@ -25,8 +25,18 @@ export function ThemeSwitcher({ variants }: { variants: string[] }) {
         selectRef.current.value = ''
       }
     }
+    // another ThemeSwitcher instance changed the variant — mirror it
+    const sync = (event: Event) => {
+      if (selectRef.current) {
+        selectRef.current.value = (event as CustomEvent<string>).detail
+      }
+    }
     window.addEventListener('arr:theme-mode', reset)
-    return () => window.removeEventListener('arr:theme-mode', reset)
+    window.addEventListener('arr:theme-variant', sync)
+    return () => {
+      window.removeEventListener('arr:theme-mode', reset)
+      window.removeEventListener('arr:theme-variant', sync)
+    }
   }, [])
 
   const onChange = (next: string) => {
@@ -36,6 +46,7 @@ export function ThemeSwitcher({ variants }: { variants: string[] }) {
       delete document.documentElement.dataset.variant
     }
     localStorage.setItem(VARIANT_KEY, next)
+    window.dispatchEvent(new CustomEvent('arr:theme-variant', { detail: next }))
   }
 
   return (

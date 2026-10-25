@@ -8,16 +8,20 @@ import {
   Button,
   ColorSwatch,
   Divider,
+  Fab,
   Heading,
   Icon,
+  IconButton as M3IconButton,
   Img,
   Input,
   Label,
   Link,
   Paragraph,
   Progress,
+  RangeSlider,
   Select,
   Skeleton,
+  Slider,
   Spacer,
   Spinner,
   Textarea,
@@ -31,6 +35,7 @@ import {
   Checkbox,
   CheckboxGroup,
   Dropdown,
+  FabMenu,
   Figure,
   IconBox,
   IconButton,
@@ -43,42 +48,64 @@ import {
   Radio,
   RadioGroup,
   SearchField,
+  SegmentedButton,
+  SegmentedButtonSet,
+  SplitButton,
   Tabs,
   TagInput,
   TextBlock,
   Toast,
   Toggle,
+  Toolbar,
   UserMenu,
 } from '@/components/molecules'
 import {
   BadgeGroup,
+  BlueprintPanel,
   CardGrid,
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
   ChatBubble,
   DashboardWidget,
   DataTable,
+  DatePicker,
   FilterBar,
   FormField,
   FormSection,
+  Gear,
   ItemList,
   LeadSection,
   ListItem,
   LoginForm,
+  NavigationBar,
+  NavigationRail,
   NotificationList,
   OnboardingStep,
+  PressureGauge,
   PricingCard,
+  RichTooltip,
   Sidebar,
+  TimePicker,
   Timeline,
   Tooltip,
+  WitCube,
+  WitSpaceSmall,
 } from '@/components/organisms'
 
 import { DrawerDemo } from './drawer-demo'
 import { ModalDemo } from './modal-demo'
+import { ChipsDemo } from './chip-demo'
+import { SearchDemo } from './search-demo'
 
 // Renders every atom/molecule/organism with fixture props — shared by the
 // dev-only /components route and the `showcase` template (demo site).
 // `media` is an optional fixture (usually the theme logo).
-export const ComponentShowcase = ({ media }: { media?: Media | null }) => (
+export const ComponentShowcase = ({ media, themeControls }: { media?: Media | null; themeControls?: React.ReactNode }) => (
   <>
+    {themeControls ? <div className="showcase-themes">{themeControls}</div> : null}
     <Heading level={2}>Atoms</Heading>
 
     <Heading level={3}>Text</Heading>
@@ -671,6 +698,138 @@ export const ComponentShowcase = ({ media }: { media?: Media | null }) => (
         links={[{ href: '/passwort-vergessen', label: 'Passwort vergessen?' }]}
       />
     </form>
+
+    <Heading level={3}>Slider / RangeSlider (atom)</Heading>
+    <Slider defaultValue={40} />
+    <RangeSlider defaultValue={[20, 70]} />
+
+    <Heading level={3}>Fab / M3 IconButton (atom)</Heading>
+    <div className="page-actions">
+      <Fab aria-label="Hinzufuegen" />
+      <Fab aria-label="Bearbeiten" icon="edit" variant="secondary" />
+      <Fab aria-label="Favorit" icon="star" size="sm" variant="surface" />
+      <Fab extended icon="send" label="Senden" />
+      <M3IconButton aria-label="Suche" icon="search" />
+      <M3IconButton aria-label="Filter" icon="settings" variant="tonal" />
+      <M3IconButton aria-label="Download" icon="download" variant="outlined" />
+      <M3IconButton aria-label="Umschalten" icon="star" toggle />
+    </div>
+
+    <Heading level={3}>Progress circular (atom)</Heading>
+    <div className="page-actions">
+      <Progress value={65} variant="circular" />
+      <Progress indeterminate variant="circular" />
+      <Progress indeterminate variant="linear" />
+    </div>
+
+    <Heading level={3}>Chips / SegmentedButton / SplitButton / Toolbar / FabMenu</Heading>
+    <ChipsDemo />
+    <SegmentedButtonSet defaultValue="tag">
+      <SegmentedButton value="tag">Tag</SegmentedButton>
+      <SegmentedButton value="woche">Woche</SegmentedButton>
+      <SegmentedButton value="monat">Monat</SegmentedButton>
+    </SegmentedButtonSet>
+    <SegmentedButtonSet defaultValue={['a']} multi orientation="vertical">
+      <SegmentedButton icon="check" value="a">Option A</SegmentedButton>
+      <SegmentedButton icon="star" value="b">Option B</SegmentedButton>
+    </SegmentedButtonSet>
+    <div className="page-actions">
+      <SplitButton
+        action="Speichern"
+        items={[
+          { label: 'Als Entwurf speichern' },
+          { label: 'Duplizieren' },
+          { label: 'Exportieren' },
+        ]}
+        variant="primary"
+      />
+      <Toolbar aria-label="Formatierung" variant="docked">
+        <M3IconButton aria-label="Bearbeiten" icon="edit" />
+        <M3IconButton aria-label="Bild" icon="image" />
+        <M3IconButton aria-label="Link" icon="external" />
+      </Toolbar>
+      <FabMenu
+        items={[
+          { icon: 'edit', label: 'Bearbeiten' },
+          { icon: 'image', label: 'Bild einfuegen' },
+          { icon: 'download', label: 'Exportieren' },
+        ]}
+      />
+    </div>
+
+    <Heading level={3}>Tabs secondary</Heading>
+    <Tabs
+      items={[
+        { content: <Paragraph>Erster Tab.</Paragraph>, label: 'Eins' },
+        { content: <Paragraph>Zweiter Tab.</Paragraph>, label: 'Zwei' },
+      ]}
+      variant="secondary"
+    />
+
+    <Heading level={3}>Carousel (organism)</Heading>
+    <Carousel layout="multiBrowse">
+      <CarouselContent>
+        {[1, 2, 3, 4, 5].map((n) => (
+          <CarouselItem key={n}>
+            <div className="card" style={{ padding: '2rem', textAlign: 'center' }}>
+              Karte {n}
+            </div>
+          </CarouselItem>
+        ))}
+      </CarouselContent>
+      <CarouselPrevious />
+      <CarouselNext />
+    </Carousel>
+
+    <Heading level={3}>NavigationRail / NavigationBar (organisms)</Heading>
+    <div className="page-actions" style={{ alignItems: 'stretch' }}>
+      <NavigationRail
+        items={[
+          { active: true, icon: 'menu', label: 'Start' },
+          { icon: 'search', label: 'Suche' },
+          { badge: <Badge>3</Badge>, icon: 'info', label: 'Info' },
+        ]}
+      />
+      <div style={{ flex: 1, alignSelf: 'flex-end' }}>
+        <NavigationBar
+          items={[
+            { active: true, icon: 'menu', label: 'Start' },
+            { icon: 'search', label: 'Suche' },
+            { badge: <Badge>3</Badge>, icon: 'user', label: 'Konto' },
+          ]}
+        />
+      </div>
+    </div>
+
+    <Heading level={3}>RichTooltip / SearchView / Pickers (organisms)</Heading>
+    <div className="page-actions">
+      <RichTooltip
+        actions={<Button size="sm" variant="ghost">Mehr</Button>}
+        content="Ein interaktiver Tooltip mit Headline, Text und Aktionen."
+        headline="Rich Tooltip"
+      >
+        <Button variant="secondary">Hover mich</Button>
+      </RichTooltip>
+      <SearchDemo />
+      <DatePicker mode="single" />
+      <DatePicker mode="range" placeholder="Zeitraum waehlen" />
+      <TimePicker defaultValue="14:30" mode="dial" />
+      <TimePicker mode="input" />
+    </div>
+
+    <Heading level={3}>Trurl signature (organisms)</Heading>
+    <div className="page-actions">
+      <BlueprintPanel fig="FIG. 03">
+        <Paragraph>Schematic panel with grid paper.</Paragraph>
+      </BlueprintPanel>
+      <PressureGauge label="Druck" unit="kPa" value={68} />
+      <Gear speed={12} style={{ width: 64, height: 64 }} />
+      <Gear reverse speed={8} style={{ width: 40, height: 40 }} teeth={14} />
+    </div>
+
+    <Heading level={3}>Wit signature (organisms)</Heading>
+    <WitCube size={240} />
+    <WitSpaceSmall size={320} />
 
     <Paragraph>
       SiteHeader, SiteFooter and the theme toggle frame this page.

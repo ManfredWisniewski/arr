@@ -14,20 +14,23 @@ export type TabItem = {
 }
 
 // Tab switcher — tablist of triggers + single visible panel, proper
-// tab/tabpanel roles (.tabs* contract classes).
+// tab/tabpanel roles (.tabs* contract classes). `variant="secondary"`
+// renders the pill-container indicator instead of the underline.
 export const Tabs = ({
   className,
   defaultIndex = 0,
   items,
+  variant = 'primary',
 }: {
   className?: string
   defaultIndex?: number
   items: TabItem[]
+  variant?: 'primary' | 'secondary'
 }) => {
   const [active, setActive] = useState(defaultIndex)
   const id = React.useId()
   return (
-    <div className={cx('tabs', className)}>
+    <div className={cx('tabs', variant === 'secondary' && 'tabs-secondary', className)}>
       <div className="tabs-list" role="tablist">
         {items.map((item, index) => (
           <button

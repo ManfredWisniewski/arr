@@ -10,7 +10,44 @@ release.
 
 ## Unreleased
 
+### Added
+
+- M3 component parity with the biti `src/components/ui` catalog,
+  re-implemented as contract-class components (no Radix/Tailwind —
+  native `<dialog>`/`<details>`/`<input type="range">` + shell.css
+  hooks). New atoms: `Ripple`, `Fab`, `IconButton` (icon-only, M3
+  variant — distinct from the labeled molecule of the same name),
+  `Slider` + `RangeSlider`; `Progress` gains `variant="circular"` +
+  `indeterminate`. New molecules: `Chip` + `ChipSet`,
+  `SegmentedButton`/`Set` (single + multi), `SplitButton`, `Toolbar`,
+  `FabMenu`; `Tabs` gains `variant="secondary"`, `Checkbox` gains
+  `indeterminate`. New organisms: `Carousel`, `DatePicker` (own
+  `Calendar` grid, single + range), `TimePicker` (input + clock dial),
+  `SearchBar`/`SearchView`, `NavigationRail`, `NavigationBar`,
+  `RichTooltip`; `Drawer` gains `side` (`left`/`bottom`) and
+  `modal={false}` (standard sheet). Theme signature components ported
+  from biti: `WitCube`, `WitSpaceSmall` (wit) and `BlueprintPanel`,
+  `PressureGauge`, `Gear` (trurl) — recorded in
+  `scripts/biti-ports.json`. Styling lives in biti `tokens/shell.css`
+  (new contract classes: `.fab`, `.iconbtn`, `.slider`, `.range-slider`,
+  `.chip(s)`, `.segmented`, `.splitbtn`, `.toolbar`, `.fabmenu`,
+  `.drawer-*` side variants, `.carousel`, `.navrail`, `.bottomnav`,
+  `.rich-tooltip`, `.searchbar`/`.searchview`, `.datepicker`/`.calendar`,
+  `.timepicker`/`.tp-*`, `.blueprint`, `.gauge`, `.gear`,
+  `.tabs-secondary`, `.showcase-themes`) — needs a token rebuild +
+  theme repush to render styled.
+
+- `/components` showcase: covers the new components and now embeds the
+  theme controls (`ThemeToggle` + `ThemeSwitcher`) at the top via a
+  `themeControls` prop; the floating `ThemeSwitcher` stays in sync via
+  an `arr:theme-variant` event.
+
 ### Fixed
+
+- Dev hydration dead on `127.0.0.1` — Next 16 blocked `/_next` chunks as
+  cross-origin (`allowedDevOrigins` only had `[::1]` + LAN IP), leaving
+  every client component inert. Added `127.0.0.1` + `localhost` to the
+  allowlist.
 
 - `formatDate` hardcoded `en-GB` — post dates on the German default tree
   showed English month names. It now derives the locale from the post

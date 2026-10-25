@@ -168,6 +168,7 @@ export interface Media {
   caption?: string | null;
   sourceHash?: string | null;
   sourcePath?: string | null;
+  sourceRepo?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -444,6 +445,7 @@ export interface MediaSelect<T extends boolean = true> {
   caption?: T;
   sourceHash?: T;
   sourcePath?: T;
+  sourceRepo?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;

@@ -15,7 +15,7 @@ const nextConfig: NextConfig = {
   // [::1] (IPv6 loopback) and the LAN IP are not in the default dev-origin
   // allowlist — without this every /_next asset 403s and hydration dies
   // when browsing the dev server from those origins.
-  allowedDevOrigins: ['[::1]', '192.168.2.135'],
+  allowedDevOrigins: ['[::1]', '127.0.0.1', 'localhost', '192.168.2.135'],
   images: {
     localPatterns: [
       {

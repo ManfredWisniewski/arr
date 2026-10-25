@@ -66,7 +66,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
   const variants = getThemeVariants()
 
   return (
-    <html lang="de">
+    <html lang="de" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT }} />
         {theme?.favicon && typeof theme.favicon === 'object'

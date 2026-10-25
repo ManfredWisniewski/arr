@@ -41,9 +41,11 @@ const DIAL_CENTER = DIAL_SIZE / 2
 const DIAL_NUMBER_R = 100
 const DIAL_HAND_R = 78
 
+// toFixed(2) — raw trig output differs in the last ulp between Node and
+// browser V8, which breaks hydration on rendered attributes.
 const dialPoint = (angleDeg: number, r: number) => ({
-  x: DIAL_CENTER + r * Math.sin((angleDeg * Math.PI) / 180),
-  y: DIAL_CENTER - r * Math.cos((angleDeg * Math.PI) / 180),
+  x: Number((DIAL_CENTER + r * Math.sin((angleDeg * Math.PI) / 180)).toFixed(2)),
+  y: Number((DIAL_CENTER - r * Math.cos((angleDeg * Math.PI) / 180)).toFixed(2)),
 })
 
 // Clock-face dial — click/drag or arrow keys; hour phase advances to

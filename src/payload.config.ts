@@ -34,6 +34,12 @@ export default buildConfig({
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
   db: postgresAdapter({
+    // In dev this resolves to src/migrations (the .ts sources). In the
+    // production image, migrate.js is an esbuild bundle at /app — this
+    // resolves to /app/migrations, the bundled .js files. Without it,
+    // findMigrationDir picks the traced src/migrations/*.ts in the image
+    // and plain node dies on the .ts extension.
+    migrationDir: path.resolve(dirname, 'migrations'),
     pool: {
       // DATABASE_URI is the canonical name (wit.docker_apps template);
       // DATABASE_URL is kept as a fallback for older deployments

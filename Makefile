@@ -92,14 +92,15 @@ biti-port:
 dev:
 	powershell -NoProfile -ExecutionPolicy Bypass -File scripts/dev.ps1
 
-# Same push pipeline against the local stack. Defaults to the dev-only
-# key seeded by `make dev`; set $env:PAYLOAD_API_KEY to override.
-# ($(or …) not ?= : the bare `export` above already defines the vars as
-# empty — `?=` can never fire on a defined variable.)
-publish-local: export PAYLOAD_BASE_URL := $(or $(PAYLOAD_BASE_URL),http://127.0.0.1:3000)
-publish-local: export PAYLOAD_API_KEY := $(or $(PAYLOAD_API_KEY),6927128c-70b0-4e85-a455-835e4d184afa)
+# Same push pipeline against the local stack. localhost, not 127.0.0.1:
+# another process (e.g. an IDE preview) may squat the v4 loopback while
+# next dev binds [::1]. Site .env credentials are ignored deliberately —
+# origin filter keeps only command-line/environment overrides, so a
+# `publish-local SITE=x` can never push to production by accident.
+publish-local: export PAYLOAD_BASE_URL := $(if $(filter command line environment,$(origin PAYLOAD_BASE_URL)),$(PAYLOAD_BASE_URL),http://localhost:3000)
+publish-local: export PAYLOAD_API_KEY := $(if $(filter command line environment,$(origin PAYLOAD_API_KEY)),$(PAYLOAD_API_KEY),6927128c-70b0-4e85-a455-835e4d184afa)
 publish-local: theme site sync
-	$(info published to http://127.0.0.1:3000)
+	$(info published to $(PAYLOAD_BASE_URL))
 
 # Push the mockup demo site (all templates/elements) to the local stack.
 demo: CONTENT_REPO := P:/clients/seo-wit/@demo

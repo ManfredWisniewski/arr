@@ -1,4 +1,5 @@
 import { draftMode } from 'next/headers'
+import Script from 'next/script'
 import { getPayload } from 'payload'
 import React from 'react'
 
@@ -68,7 +69,9 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
   return (
     <html lang="de" suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: THEME_INIT }} />
+        <Script id="theme-init" strategy="beforeInteractive">
+          {THEME_INIT}
+        </Script>
         {theme?.favicon && typeof theme.favicon === 'object'
           ? <link href={(theme.favicon as Media).url ?? ''} rel="icon" />
           : null}

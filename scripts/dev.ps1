@@ -100,16 +100,18 @@ if ($pgService) {
 }
 
 # wait until the server accepts connections - covers all three start
-# paths (service already running is an instant pass). pg_isready is
-# quiet: a psql stderr write under *>$null throws on EAP=Stop / PS5.1.
+# paths (service already running is an instant pass) and leaves room
+# for crash recovery, which takes longer than a clean start.
+# pg_isready is quiet: a psql stderr write under *>$null throws on
+# EAP=Stop / PS5.1.
 $pgReady = $false
-foreach ($i in 1..30) {
+foreach ($i in 1..60) {
     & "$pgBin\pg_isready.exe" -q *>$null
     if ($LASTEXITCODE -eq 0) { $pgReady = $true; break }
     Start-Sleep -Seconds 1
 }
 if (-not $pgReady) {
-    throw "PostgreSQL did not come up within 30s - check $dataDir\server.log"
+    throw "PostgreSQL did not come up within 60s - check $dataDir\server.log"
 }
 
 # same credentials as docker-compose.yml

@@ -50,6 +50,18 @@ release.
 
 ### Fixed
 
+- Production image crash-loop on boot: `findMigrationDir` prefers
+  `src/migrations` — which `withPayload` file-tracing ships into the
+  image as `.ts` sources — over the esbuild-bundled `/app/migrations`,
+  so plain node died with `ERR_UNKNOWN_FILE_EXTENSION`. The adapter's
+  `migrationDir` is now pinned (`src/migrations` in dev,
+  `/app/migrations` in the bundled `migrate.js`).
+
+- Theme-init inline script in the root layout now uses `next/script`
+  with `strategy="beforeInteractive"` — silences React's "script tag
+  while rendering" console error; still injected into `<head>` and run
+  before hydration, but at bootstrap rather than during HTML parse.
+
 - Dev hydration dead on `127.0.0.1` — Next 16 blocked `/_next` chunks as
   cross-origin (`allowedDevOrigins` only had `[::1]` + LAN IP), leaving
   every client component inert. Added `127.0.0.1` + `localhost` to the

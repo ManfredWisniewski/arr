@@ -23,6 +23,11 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  // /<name>.vcf at the domain root serves the matching media/ upload as
+  // a vCard download — resolved in src/app/(frontend)/vcf/[file]
+  async rewrites() {
+    return [{ source: '/:file([^/]+\\.vcf)', destination: '/vcf/:file' }]
+  },
   webpack: (webpackConfig) => {
     webpackConfig.resolve.extensionAlias = {
       '.cjs': ['.cts', '.cjs'],

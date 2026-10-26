@@ -12,6 +12,12 @@ release.
 
 ### Added
 
+- `/<name>.vcf` at the domain root serves vCards synced from the
+  content repo (`media/<name>.vcf`) as `text/vcard` attachments.
+  `next.config` rewrites `*.vcf` to `/vcf/<name>` where a route handler
+  resolves the media doc by `sourcePath` — re-uploads are picked up
+  even when Payload dedupes the stored filename (`name-1.vcf`, …).
+
 - M3 component parity with the biti `src/components/ui` catalog,
   re-implemented as contract-class components (no Radix/Tailwind —
   native `<dialog>`/`<details>`/`<input type="range">` + shell.css

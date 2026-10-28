@@ -4,12 +4,19 @@ import { NextResponse } from 'next/server'
 // Payload buffers JSON request bodies unbounded before access control
 // (addDataAndFileToRequest -> req.text()). Reject oversized bodies here;
 // proxyClientMaxBodySize in next.config.ts additionally caps the actual
-// stream for chunked requests without Content-Length.
-const MAX_API_BODY = 1_048_576
+// stream for chunked requests without Content-Length. Multipart media
+// uploads stream through Payload's file handler instead — they get a
+// higher ceiling than JSON bodies.
+const MAX_JSON_BODY = 1_048_576
+const MAX_UPLOAD_BODY = 8_388_608
 
 export function proxy(request: NextRequest) {
   const length = Number(request.headers.get('content-length') ?? 0)
-  if (Number.isFinite(length) && length > MAX_API_BODY) {
+  const isUpload = request.headers
+    .get('content-type')
+    ?.startsWith('multipart/form-data')
+  const max = isUpload ? MAX_UPLOAD_BODY : MAX_JSON_BODY
+  if (Number.isFinite(length) && length > max) {
     return new NextResponse('Payload Too Large', { status: 413 })
   }
   return NextResponse.next()

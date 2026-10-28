@@ -74,6 +74,13 @@ release.
 
 ### Fixed
 
+- Media uploads via `POST /api/media` failed with `413 Payload Too
+  Large` above 1 MB: `src/proxy.ts` applied the JSON body cap to every
+  API request. Multipart uploads now get an 8 MB ceiling (images are
+  downscaled into `imageSizes` at upload anyway); JSON bodies stay at
+  1 MB, and `proxyClientMaxBodySize` in `next.config.ts` is raised to
+  `8mb` to match.
+
 - Production image crash-loop on boot: `findMigrationDir` prefers
   `src/migrations` — which `withPayload` file-tracing ships into the
   image as `.ts` sources — over the esbuild-bundled `/app/migrations`,

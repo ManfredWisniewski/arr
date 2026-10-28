@@ -50,6 +50,17 @@ release.
 
 ### Changed
 
+- `PageHero` redesigned after the Biti-WIT Figma `Hero`: with hero
+  media present it now renders as a full-bleed band capped at 35vh
+  (`.page-hero--media`) — cover image + tint/readability scrim +
+  `page-hero-message` block (title + lead in light heading type) with
+  the open-frame corner accent; without media it keeps the plain text
+  header. The accent is `public/open-frame.svg` — the Dockerfile now
+  copies `public/` into the image (was commented out) so root-level
+  static assets are served. Styling lives in biti `tokens/shell.css`
+  (`.page-hero-media`, `.page-hero-message`, `.page-hero-frame`) —
+  needs a token rebuild + theme repush to render styled.
+
 - `SiteFooter` redesigned after the Biti-WIT Figma `Footer-Nav`:
   top-level `navigation` items now render as centered link columns
   (label = heading, children = links) instead of a flat expanded list,

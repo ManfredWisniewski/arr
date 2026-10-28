@@ -71,8 +71,8 @@ ENV NODE_ENV=production
 # The official Node image already provides the non-root node user (UID/GID 1000).
 
 
-# Remove this line if you do not have this folder
-# COPY --from=builder /app/public ./public
+# Static assets served at the site root (e.g. /open-frame.svg)
+COPY --from=builder /app/public ./public
 
 # Set the correct permission for prerender cache
 RUN mkdir .next

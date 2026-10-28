@@ -63,6 +63,52 @@ export const SiteHeader = ({
           <ThemeToggle />
         </div>
       </nav>
+      {/* Marks open nav bands .is-wrapped when their items wrap onto
+          extra rows so the ghost offset can be switched off (shell.css
+          .band-ghosts). Sticky per open — resize re-evaluates. */}
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `(function () {
+  var pending = false
+  function refresh() {
+    pending = false
+    var uls = document.querySelectorAll('.site-nav li > ul')
+    for (var i = 0; i < uls.length; i++) {
+      var ul = uls[i]
+      if (!ul.offsetHeight) continue
+      var kids = ul.children
+      var wrapped = false
+      for (var j = 1; j < kids.length; j++) {
+        if (kids[j].offsetTop !== kids[0].offsetTop) {
+          wrapped = true
+          break
+        }
+      }
+      if (wrapped) ul.classList.add('is-wrapped')
+    }
+  }
+  function schedule() {
+    if (!pending) {
+      pending = true
+      requestAnimationFrame(refresh)
+    }
+  }
+  document.addEventListener('mouseover', function (e) {
+    var t = e.target
+    if (t && t.closest && t.closest('.site-nav')) schedule()
+  })
+  document.addEventListener('focusin', schedule)
+  addEventListener('resize', function () {
+    document
+      .querySelectorAll('.site-nav li > ul.is-wrapped')
+      .forEach(function (ul) {
+        ul.classList.remove('is-wrapped')
+      })
+    schedule()
+  })
+})()`,
+        }}
+      />
     </header>
   )
 }

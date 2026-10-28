@@ -48,6 +48,19 @@ release.
   `themeControls` prop; the floating `ThemeSwitcher` stays in sync via
   an `arr:theme-variant` event.
 
+### Changed
+
+- `SiteFooter` redesigned after the Biti-WIT Figma `Footer-Nav`:
+  top-level `navigation` items now render as centered link columns
+  (label = heading, children = links) instead of a flat expanded list,
+  and a legal row appears below when a `structures` doc `footer`
+  (`{ links: [{ label, path }], copyright }` from
+  `<site>/+structure/footer.yml`) exists — it is omitted otherwise.
+  Styling lives in biti `tokens/shell.css` (`.site-footer-group`,
+  `.site-footer-heading`, `.site-footer-links`, `.site-footer-legal`,
+  `.site-footer-legal-links`, `.site-footer-copy`) — needs a token
+  rebuild + theme repush to render styled.
+
 ### Fixed
 
 - Production image crash-loop on boot: `findMigrationDir` prefers

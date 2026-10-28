@@ -7,7 +7,10 @@ import type { Media, Theme } from '@/payload-types'
 import config from '@/payload.config'
 
 import { mapNavItems, type NavItem } from '@/components/molecules/nav-item'
-import { SiteFooter } from '@/components/organisms/site-footer'
+import {
+  type FooterData,
+  SiteFooter,
+} from '@/components/organisms/site-footer'
 import { SiteHeader } from '@/components/organisms/site-header'
 
 import './styles.css'
@@ -24,7 +27,10 @@ async function getTheme(): Promise<null | Theme> {
   }
 }
 
-async function getNavigation(draft: boolean): Promise<NavItem[]> {
+async function getStructure(
+  name: string,
+  draft: boolean,
+): Promise<unknown> {
   try {
     const payload = await getPayload({ config: await config })
     const { docs } = await payload.find({
@@ -32,15 +38,34 @@ async function getNavigation(draft: boolean): Promise<NavItem[]> {
       draft,
       limit: 1,
       where: {
-        name: { equals: 'navigation' },
+        name: { equals: name },
         ...(draft ? {} : { _status: { equals: 'published' } }),
       },
     })
-    return mapNavItems(
-      (docs[0]?.data as { items?: unknown } | undefined)?.items,
-    )
+    return docs[0]?.data
   } catch {
-    return []
+    return undefined
+  }
+}
+
+async function getNavigation(draft: boolean): Promise<NavItem[]> {
+  const data = (await getStructure('navigation', draft)) as
+    | { items?: unknown }
+    | undefined
+  return mapNavItems(data?.items)
+}
+
+async function getFooter(draft: boolean): Promise<FooterData | null> {
+  const data = (await getStructure('footer', draft)) as
+    | { copyright?: unknown; links?: unknown }
+    | undefined
+  if (!data) {
+    return null
+  }
+  return {
+    copyright:
+      typeof data.copyright === 'string' ? data.copyright : undefined,
+    links: mapNavItems(data.links),
   }
 }
 
@@ -58,9 +83,10 @@ const THEME_INIT = `(function(){try{var v=localStorage.getItem('theme-variant');
 export default async function RootLayout(props: { children: React.ReactNode }) {
   const { children } = props
   const { isEnabled } = await draftMode()
-  const [theme, navItems] = await Promise.all([
+  const [theme, navItems, footer] = await Promise.all([
     getTheme(),
     getNavigation(isEnabled),
+    getFooter(isEnabled),
   ])
   const siteName = theme?.meta?.siteName ?? 'witconsult'
   // dev-only theme variants (empty in production / without biti build)
@@ -95,7 +121,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
           siteName={siteName}
         />
         <main>{children}</main>
-        <SiteFooter navItems={navItems} />
+        <SiteFooter footer={footer} navItems={navItems} />
         {variants.length ? (
           <ThemeSwitcher variants={variants.map((v) => v.name)} />
         ) : null}

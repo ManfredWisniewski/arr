@@ -40,11 +40,12 @@ FONT_VARS_arr := \
 FONT_ARGS_wit := \
 	$(call font_arg,Inter,inter-v*.woff2) \
 	$(call font_arg,Inter Tight,inter-tight-*.woff2) \
-	$(call font_arg,Roboto,roboto-*.woff2)
+	$(call font_arg,Roboto,roboto-*.woff2) \
+	$(call font_arg,Roboto Serif,roboto-serif-*.woff2)
 FONT_VARS_wit := \
-	--font-var "typography-typeface-change-font-here-body=Inter" \
-	--font-var "typography-typeface-change-font-here-display=Roboto" \
-	--font-var "typography-typeface-change-font-here-heading=Roboto"
+	--font-var "typography-typeface-change-font-here-body=Roboto Serif" \
+	--font-var "typography-typeface-change-font-here-display=Inter" \
+	--font-var "typography-typeface-change-font-here-heading=Inter"
 
 FONT_ARGS := $(FONT_ARGS_$(THEME)) $(FONT_VARS_$(THEME))
 

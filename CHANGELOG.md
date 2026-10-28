@@ -79,7 +79,10 @@ release.
   API request. Multipart uploads now get an 8 MB ceiling (images are
   downscaled into `imageSizes` at upload anyway); JSON bodies stay at
   1 MB, and `proxyClientMaxBodySize` in `next.config.ts` is raised to
-  `8mb` to match.
+  `8mb` to match. `/api/media/file/*` responses also gain
+  `Cache-Control: public, max-age=31536000, immutable` — Payload sends
+  none, so browsers re-downloaded media on every page load (content
+  changes get fresh deduped filenames, so immutable is safe).
 
 - Production image crash-loop on boot: `findMigrationDir` prefers
   `src/migrations` — which `withPayload` file-tracing ships into the

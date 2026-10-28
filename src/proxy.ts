@@ -19,7 +19,17 @@ export function proxy(request: NextRequest) {
   if (Number.isFinite(length) && length > max) {
     return new NextResponse('Payload Too Large', { status: 413 })
   }
-  return NextResponse.next()
+  const response = NextResponse.next()
+  // Media files carry no cache headers from Payload — without them every
+  // page load re-downloads. Content changes get fresh filenames (Payload
+  // dedupes to name-1.ext), so long immutable caching is safe.
+  if (request.nextUrl.pathname.startsWith('/api/media/file/')) {
+    response.headers.set(
+      'Cache-Control',
+      'public, max-age=31536000, immutable',
+    )
+  }
+  return response
 }
 
 export const config = {

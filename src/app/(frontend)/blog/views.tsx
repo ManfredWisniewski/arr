@@ -11,6 +11,8 @@ import {
 } from '@/lib/blog'
 import { jsxConverters } from '@/lib/jsx-converters'
 
+import { asSlideOptions } from '@/lib/slides'
+
 import { Link } from '@/components/atoms/link'
 import { Avatar } from '@/components/atoms/avatar'
 import { Alert } from '@/components/molecules/alert'
@@ -19,6 +21,7 @@ import { Figure } from '@/components/molecules/figure'
 import { Pagination } from '@/components/molecules/pagination'
 import { Pill } from '@/components/molecules/pill'
 import { PostList } from '@/components/organisms/post-list'
+import { SlideDeck } from '@/components/organisms/slide-deck'
 
 // Shared bodies for the /blog routes — the English tree (this folder) and
 // localized trees served through [[...path]] (/<lang>/blog/…) render the
@@ -134,7 +137,11 @@ export const PostArticle = ({
     doc.cover && typeof doc.cover === 'object' ? doc.cover : undefined
 
   return (
-    <article className="page post" data-author={doc.author ?? undefined}>
+    <article
+      className="page post"
+      data-author={doc.author ?? undefined}
+      data-template={doc.template || undefined}
+    >
       <header className="post-header">
         <h1>{doc.title}</h1>
         <div className="post-meta">
@@ -167,10 +174,19 @@ export const PostArticle = ({
         ) : null}
       </header>
       {notice}
-      {cover ? <Figure media={cover} /> : null}
-      {doc.content ? (
-        <RichText converters={jsxConverters} data={doc.content} />
-      ) : null}
+      {doc.template === 'slide' ? (
+        <SlideDeck
+          markdown={doc.markdownRaw ?? ''}
+          options={asSlideOptions(doc.slideOptions)}
+        />
+      ) : (
+        <>
+          {cover ? <Figure media={cover} /> : null}
+          {doc.content ? (
+            <RichText converters={jsxConverters} data={doc.content} />
+          ) : null}
+        </>
+      )}
     </article>
   )
 }

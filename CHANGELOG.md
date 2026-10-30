@@ -12,6 +12,14 @@ release.
 
 ### Added
 
+- Slide presentations: a `slide` template renders HedgeDoc slide-mode
+  markdown as an embedded reveal.js deck (`---`/`----` separators,
+  `Note:` speaker notes, `<!-- .slide: -->` attributes, mermaid blocks,
+  raw HTML; fullscreen toggle included). `posts` gains `template` +
+  `slideOptions`, `pages` gains `slideOptions` — the sync tool maps
+  front matter `type: slide` to `template: slide` and pushes
+  `slideOptions` verbatim.
+
 - `/<name>.vcf` at the domain root serves vCards synced from the
   content repo (`media/<name>.vcf`) as `text/vcard` attachments.
   `next.config` rewrites `*.vcf` to `/vcf/<name>` where a route handler

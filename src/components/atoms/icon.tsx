@@ -29,6 +29,9 @@ const paths = {
       <path d="M2.5 13.5h11" />
     </>
   ),
+  expand: (
+    <path d="M9.5 2.5h4v4M13.5 2.5L9 7M6.5 13.5h-4v-4M2.5 13.5L7 9" />
+  ),
   external: <path d="M6.5 3.5H3.5v9h9V9.5M9 3h4v4M12.5 3.5L8 8" />,
   image: (
     <>

@@ -88,6 +88,7 @@ import {
   PricingCard,
   RichTooltip,
   Sidebar,
+  SlideDeck,
   TimePicker,
   Timeline,
   Tooltip,
@@ -826,6 +827,12 @@ export const ComponentShowcase = ({ media, themeControls }: { media?: Media | nu
       <Gear speed={12} style={{ width: 64, height: 64 }} />
       <Gear reverse speed={8} style={{ width: 40, height: 40 }} teeth={14} />
     </div>
+
+    <Heading level={3}>SlideDeck (organism)</Heading>
+    <SlideDeck
+      markdown={'# SlideDeck\n\n## HedgeDoc slide mode on the website\n\n- `---` next slide, `----` vertical stack\n- Pfeiltasten oder Klick zum Blättern\n\nNote: Speaker notes stay hidden.\n\n---\n\n## Markdown content\n\n**Bold**, *italic*, `code`, [links](https://witconsult.de)\n\n1. ordered\n2. lists\n\n> blockquote\n\n---\n\n## Mermaid\n\n```mermaid\ngraph LR\n  A["HedgeDoc"] --> B["markdownRaw"]\n  B --> C["SlideDeck"]\n  C --> D["reveal.js"]\n```\n\n---\n\n## HTML passthrough\n\n<div style="display:flex; gap:40px; align-items:center; text-align:left;">\n<div>\n\n- raw `<div>`/`<img>`/`<figure>`\n- inline styles work\n\n</div>\n<img src="https://payload.witconsult.de/api/media/file/wit_logo.svg" height="80" style="border:none; box-shadow:none;">\n</div>\n'}
+      options={{ height: 540, theme: 'white', transition: 'slide', width: 960 }}
+    />
 
     <Heading level={3}>Wit signature (organisms)</Heading>
     <WitCube size={240} />

@@ -125,6 +125,17 @@ export const Posts: CollectionConfig = {
       relationTo: 'media',
     },
     {
+      // render template name resolved by the frontend registry; empty = default
+      name: 'template',
+      type: 'text',
+    },
+    {
+      // HedgeDoc `slideOptions` front matter, verbatim — reveal.js config
+      // consumed by the `slide` template (theme, transition, width, ...)
+      name: 'slideOptions',
+      type: 'json',
+    },
+    {
       // repository-relative path of the source file; upsert idempotency key
       name: 'sourcePath',
       type: 'text',

@@ -102,6 +102,64 @@ hr {
   margin: var(--space-lg, 2rem) 0;
 }
 
+/* embedded HedgeDoc/reveal.js decks (slide template) */
+.page[data-template='slide'] {
+  max-width: 90rem;
+}
+
+.slide-deck {
+  position: relative;
+  margin: var(--space-md, 1rem) 0;
+}
+
+/* :where() keeps this a zero-specificity fallback — the loaded reveal
+   theme css must always win over the stage background */
+:where(.slide-deck) .reveal-viewport {
+  background: var(--slide-stage, #191919);
+}
+
+.slide-deck .reveal {
+  height: 100%;
+  visibility: hidden;
+}
+
+.slide-deck[data-ready] .reveal {
+  visibility: visible;
+}
+
+/* slide markup sizes images via height attributes; the global
+   img{height:auto} above would wipe them out */
+.slide-deck img {
+  display: inline;
+  height: revert;
+  max-width: none;
+}
+
+.slide-deck pre.mermaid {
+  padding: 0;
+  background: none;
+}
+
+.slide-deck .slide-deck-fullscreen {
+  position: absolute;
+  top: var(--space-xs, 0.5rem);
+  right: var(--space-xs, 0.5rem);
+  z-index: 30;
+}
+
+.slide-deck:fullscreen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--slide-stage, #191919);
+}
+
+.slide-deck:fullscreen .reveal-viewport {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+}
+
 /* dev-only theme switcher widget */
 .theme-switcher {
   position: fixed;

@@ -251,6 +251,15 @@ export interface Page {
   sourcePath?: string | null;
   sourceRepo?: string | null;
   template?: string | null;
+  slideOptions?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   meta?: {
     title?: string | null;
     description?: string | null;
@@ -290,6 +299,16 @@ export interface Post {
   categories?: string[] | null;
   tags?: string[] | null;
   cover?: (number | null) | Media;
+  template?: string | null;
+  slideOptions?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   sourcePath?: string | null;
   sourceRepo?: string | null;
   meta?: {
@@ -525,6 +544,7 @@ export interface PagesSelect<T extends boolean = true> {
   sourcePath?: T;
   sourceRepo?: T;
   template?: T;
+  slideOptions?: T;
   meta?:
     | T
     | {
@@ -551,6 +571,8 @@ export interface PostsSelect<T extends boolean = true> {
   categories?: T;
   tags?: T;
   cover?: T;
+  template?: T;
+  slideOptions?: T;
   sourcePath?: T;
   sourceRepo?: T;
   meta?:

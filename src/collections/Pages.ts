@@ -81,6 +81,12 @@ export const Pages: CollectionConfig = {
       type: 'text',
     },
     {
+      // HedgeDoc `slideOptions` front matter, verbatim — reveal.js config
+      // consumed by the `slide` template (theme, transition, width, ...)
+      name: 'slideOptions',
+      type: 'json',
+    },
+    {
       name: 'meta',
       type: 'group',
       fields: [

@@ -124,6 +124,14 @@ hr {
   visibility: hidden;
 }
 
+/* slide content taller than the canvas scrolls inside the slide instead
+   of clipping — --slide-height is the deck's current canvas height, set
+   by reveal on the viewport */
+.slide-deck .slides section {
+  max-height: var(--slide-height, 100%);
+  overflow-y: auto;
+}
+
 .slide-deck[data-ready] .reveal {
   visibility: visible;
 }

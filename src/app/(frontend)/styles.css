@@ -132,6 +132,29 @@ hr {
   overflow-y: auto;
 }
 
+/* cap font weight at 600 — some reveal themes use heavier headings */
+.slide-deck .reveal :is(h1, h2, h3, h4, h5, h6, strong, b) {
+  font-weight: 600;
+}
+
+.slide-deck .reveal h1 {
+  font-size: calc(var(--r-heading1-size, 2.5em) * 0.7);
+}
+
+.slide-deck .reveal h2 {
+  font-size: calc(var(--r-heading2-size, 1.6em) * 0.9);
+}
+
+/* body text 10% below the (possibly fontScale-adjusted) base */
+.slide-deck .slides {
+  font-size: 0.9em;
+}
+
+/* images render at half size — markdown images come in oversized */
+.slide-deck .slides img {
+  zoom: 0.5;
+}
+
 .slide-deck[data-ready] .reveal {
   visibility: visible;
 }

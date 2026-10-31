@@ -33,6 +33,7 @@ export const BlogIndexView = ({
   current,
   emptyLabel = 'No posts found.',
   intro,
+  linkLabel,
   posts,
   totalPages,
 }: {
@@ -41,6 +42,7 @@ export const BlogIndexView = ({
   current: number
   emptyLabel?: string
   intro?: Page
+  linkLabel?: string
   posts: Post[]
   totalPages: number
 }) => (
@@ -49,7 +51,7 @@ export const BlogIndexView = ({
       <RichText converters={jsxConverters} data={intro.content} />
     ) : null}
     {posts.length ? (
-      <PostList agents={agents} posts={posts} />
+      <PostList agents={agents} linkLabel={linkLabel} posts={posts} />
     ) : (
       <p className="empty">{emptyLabel}</p>
     )}
@@ -67,6 +69,7 @@ export const AuthorArchiveView = ({
   basePath,
   current,
   emptyLabel = 'No posts found.',
+  linkLabel,
   posts,
   totalPages,
 }: {
@@ -75,6 +78,7 @@ export const AuthorArchiveView = ({
   basePath: string
   current: number
   emptyLabel?: string
+  linkLabel?: string
   posts: Post[]
   totalPages: number
 }) => (
@@ -96,6 +100,7 @@ export const AuthorArchiveView = ({
             slug: agent.slug,
           },
         }}
+        linkLabel={linkLabel}
         posts={posts}
       />
     ) : (
@@ -135,6 +140,7 @@ export const PostArticle = ({
   const root = blogRoot(doc.path)
   const cover =
     doc.cover && typeof doc.cover === 'object' ? doc.cover : undefined
+  const date = doc.publishedAt || doc.createdAt
 
   return (
     <article
@@ -145,11 +151,7 @@ export const PostArticle = ({
       <header className="post-header">
         <h1>{doc.title}</h1>
         <div className="post-meta">
-          {doc.publishedAt ? (
-            <time dateTime={doc.publishedAt}>
-              {formatDate(doc.publishedAt, doc.path)}
-            </time>
-          ) : null}
+          <time dateTime={date}>{formatDate(date, doc.path)}</time>
           {doc.author ? (
             <AuthorLine
               avatarUrl={avatarUrl}

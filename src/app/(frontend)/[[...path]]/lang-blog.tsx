@@ -27,6 +27,7 @@ export const isLangBlogPath = (segments: string[]) =>
   segments.length >= 2 && segments[1] === 'blog'
 
 const EMPTY_LABEL = 'Keine Beiträge gefunden.'
+const LINK_LABEL = 'Weiterlesen'
 
 export async function langBlogMetadata(segments: string[], draft: boolean) {
   const base = `/${segments[0]}/blog`
@@ -100,6 +101,7 @@ export async function LangBlog({
         current={result.page ?? current}
         emptyLabel={EMPTY_LABEL}
         intro={intro}
+        linkLabel={LINK_LABEL}
         posts={result.docs}
         totalPages={result.totalPages}
       />
@@ -136,6 +138,7 @@ export async function LangBlog({
         heading={
           term?.label ?? `${isCategory ? 'Kategorie' : 'Tag'}: ${slug}`
         }
+        linkLabel={LINK_LABEL}
         posts={result.docs}
         totalPages={result.totalPages}
       />
@@ -163,6 +166,7 @@ export async function LangBlog({
         basePath={`${base}/${agent.slug}`}
         current={result.page ?? current}
         emptyLabel={EMPTY_LABEL}
+        linkLabel={LINK_LABEL}
         posts={result.docs}
         totalPages={result.totalPages}
       />

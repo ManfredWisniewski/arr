@@ -15,19 +15,24 @@ import { CardGrid, type CardItem } from './card'
 export const postToCardItem = (
   post: Post,
   agents?: Record<string, AgentRef>,
+  linkLabel = 'Continue',
 ): CardItem => {
   const media =
     post.cover && typeof post.cover === 'object' ? post.cover : undefined
   const author = post.author ? agents?.[post.author] : undefined
   const name = author?.name ?? post.author ?? ''
   return {
-    badge: formatDate(post.publishedAt, post.path) || undefined,
-    description: post.excerpt ?? undefined,
+    // front-matter `date`, falling back to the doc's creation time
+    badge:
+      formatDate(post.publishedAt || post.createdAt, post.path) ||
+      undefined,
+    // slide decks and other excerpt-less posts show the meta description
+    description: post.excerpt || post.meta?.description || undefined,
     href: post.path,
     lead: post.author ? (
       <Avatar name={name} size="lg" src={author?.avatarUrl} />
     ) : undefined,
-    linkLabel: 'Continue',
+    linkLabel,
     mediaAlt: media?.alt ?? post.title,
     mediaSrc: mediaUrl(media, 'card', 640),
     subtitle: post.author ? (
@@ -41,14 +46,16 @@ export const postToCardItem = (
 export const PostList = ({
   agents,
   className,
+  linkLabel,
   posts,
 }: {
   agents?: Record<string, AgentRef>
   className?: string
+  linkLabel?: string
   posts: Post[]
 }) => (
   <CardGrid
     className={className ?? 'post-list'}
-    items={posts.map((post) => postToCardItem(post, agents))}
+    items={posts.map((post) => postToCardItem(post, agents, linkLabel))}
   />
 )

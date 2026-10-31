@@ -13,6 +13,7 @@ export const TaxonomyArchive = ({
   current,
   description,
   heading,
+  linkLabel,
   posts,
   totalPages,
 }: {
@@ -21,6 +22,7 @@ export const TaxonomyArchive = ({
   current: number
   description?: string
   heading: string
+  linkLabel?: string
   posts: Post[]
   totalPages: number
 }) => (
@@ -28,7 +30,7 @@ export const TaxonomyArchive = ({
     <h1>{heading}</h1>
     {description ? <p className="lead">{description}</p> : null}
     {posts.length ? (
-      <PostList agents={agents} posts={posts} />
+      <PostList agents={agents} linkLabel={linkLabel} posts={posts} />
     ) : (
       <p className="empty">No posts found.</p>
     )}

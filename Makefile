@@ -6,7 +6,7 @@
 # SITE unset → `make publish` pushes every site in SITES, one sub-make
 # each (so each site gets its own sites/<site>/.env + site.mk).
 # `make publish SITE=x` (or sync/theme/site) still targets one site.
-SITES ?= w1t.org witconsult.de
+SITES ?= w1t.org witsolutions.de witconsult.de
 -include sites/$(SITE)/.env
 -include sites/$(SITE)/site.mk
 export PAYLOAD_BASE_URL PAYLOAD_API_KEY

@@ -5,6 +5,7 @@ import React from 'react'
 import type { SlideOptions } from '@/lib/slides'
 
 import { IconButton } from '../atoms/icon-button'
+import { renderMermaid } from '../molecules/mermaid'
 
 import 'reveal.js/dist/reveal.css'
 
@@ -42,32 +43,6 @@ const CONFIG_KEYS = [
   'transition',
   'transitionSpeed',
 ] as const
-
-// ```mermaid fenced blocks arrive as <pre><code class="language-mermaid">;
-// swap them for mermaid's own nodes and render. Failures keep the source
-// block visible.
-const renderMermaid = async (root: HTMLElement) => {
-  const codes = root.querySelectorAll<HTMLElement>(
-    'pre > code[class*="language-mermaid"]',
-  )
-  if (!codes.length) {
-    return
-  }
-  const nodes = Array.from(codes).map((code) => {
-    const pre = document.createElement('pre')
-    pre.className = 'mermaid'
-    pre.textContent = code.textContent ?? ''
-    code.parentElement?.replaceWith(pre)
-    return pre
-  })
-  try {
-    const mermaid = (await import('mermaid')).default
-    mermaid.initialize({ startOnLoad: false })
-    await mermaid.run({ nodes })
-  } catch {
-    // leave whatever mermaid rendered (error svg or source text) in place
-  }
-}
 
 // HedgeDoc slide-mode document rendered as an embedded reveal.js deck:
 // `---` splits horizontal slides, `----` vertical stacks, `Note:` starts

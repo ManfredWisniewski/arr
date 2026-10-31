@@ -9,8 +9,9 @@ export type SlideOptions = {
   transition?: string
   transitionSpeed?: string
   backgroundTransition?: string
-  width?: number
-  height?: number
+  // absolute px or viewport-relative: '80vmin' | '60vh' | '90vw' | '50vmax'
+  width?: number | string
+  height?: number | string
   margin?: number
   minScale?: number
   maxScale?: number

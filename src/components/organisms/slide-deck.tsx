@@ -113,11 +113,31 @@ export const SlideDeck = ({
           toggleOverview(): void
         }
       | undefined
-    const revealEl = () =>
-      rootRef.current?.querySelector<HTMLElement>('.reveal')
-    const unbindLoad = () =>
-      revealEl()?.removeEventListener('load', fitSlides, true)
     const config = JSON.parse(optionsKey) as SlideOptions
+    // slideOptions width/height accept absolute px or viewport-relative
+    // units (vmin/vmax/vh/vw) — reveal needs numbers, so convert here
+    const toPx = (value: unknown) => {
+      const n = Number(value)
+      if (Number.isFinite(n) && n > 0) {
+        return n
+      }
+      const m = /^([\d.]+)\s*(vmin|vmax|vh|vw)$/i.exec(String(value ?? ''))
+      if (!m) {
+        return undefined
+      }
+      const v = parseFloat(m[1]) / 100
+      const unit = m[2].toLowerCase()
+      if (unit === 'vmin') {
+        return Math.min(window.innerWidth, window.innerHeight) * v
+      }
+      if (unit === 'vmax') {
+        return Math.max(window.innerWidth, window.innerHeight) * v
+      }
+      return (unit === 'vw' ? window.innerWidth : window.innerHeight) * v
+    }
+    // viewport-relative defaults when slideOptions omit width/height
+    const wPx = toPx(config.width ?? '90vw') ?? 960
+    const hPx = toPx(config.height ?? '80vw') ?? 700
 
     const boot = async () => {
       try {
@@ -141,6 +161,9 @@ export const SlideDeck = ({
             (key) => [key, config[key]],
           ),
         )
+        overrides.width = wPx
+        overrides.height = hPx
+        setCanvas({ height: hPx, width: wPx })
         deck = new RevealModule.default(revealEl, {
           controls: true,
           embedded: true,
@@ -164,8 +187,6 @@ export const SlideDeck = ({
         deckRef.current = api
         api.on('overviewshown', () => setOverview(true))
         api.on('overviewhidden', () => setOverview(false))
-        revealEl.addEventListener('load', fitSlides, true)
-        fitSlides()
       } catch (error) {
         console.error('SlideDeck failed to initialize', error)
       } finally {
@@ -175,47 +196,9 @@ export const SlideDeck = ({
       }
     }
 
-    // Grow the canvas until the tallest slide fits — reveal renders
-    // slides on a fixed width×height canvas, so tall content clips.
-    // Hidden slides are display:none and can't be measured directly,
-    // so we measure a display:block clone offscreen (slide coords).
-    let fitted = height
-    const fitSlides = () => {
-      const el = revealEl()
-      const slidesEl = el?.querySelector<HTMLElement>('.slides')
-      if (!el || !slidesEl || !deck) {
-        return
-      }
-      const probe = slidesEl.cloneNode(true) as HTMLElement
-      // keep reveal's inline width/height (slide units) — only hide the
-      // probe and move it offscreen for measurement
-      probe.style.position = 'absolute'
-      probe.style.visibility = 'hidden'
-      probe.style.left = '-99999px'
-      probe.style.top = '0'
-      probe
-        .querySelectorAll<HTMLElement>('section')
-        .forEach((s) => (s.style.display = 'block'))
-      el.appendChild(probe)
-      const needed = Math.max(
-        height,
-        ...Array.from(probe.querySelectorAll<HTMLElement>('section')).map(
-          (s) => s.scrollHeight,
-        ),
-      )
-      probe.remove()
-      if (needed > fitted) {
-        fitted = needed
-        deck.configure({ height: needed })
-        deck.layout()
-        setCanvas({ height: needed, width })
-      }
-    }
-
     void boot()
     return () => {
       cancelled = true
-      unbindLoad()
       deck?.destroy()
     }
   }, [markdown, optionsKey, height, width])

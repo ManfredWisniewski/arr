@@ -25,6 +25,7 @@ const codeLanguages: Record<string, string> = {
   yml: 'YAML',
   markdown: 'Markdown',
   md: 'Markdown',
+  mermaid: 'Mermaid',
   html: 'HTML',
   xml: 'XML',
   css: 'CSS',

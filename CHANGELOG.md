@@ -119,10 +119,10 @@ release.
   `20261024_201751_add_media_source_repo`.
 
 - Code block `language` options now cover the markdown fence tags used
-  by the content repos (`bash`, `text`, `json`, `sh`, `yml`, …) — pages
-  with such fences failed validation on publish ("Content > Language").
-  `src/editor.ts` now passes a curated `languages` map to `CodeBlock`
-  with `defaultLanguage: 'plaintext'`.
+  by the content repos (`bash`, `text`, `json`, `sh`, `yml`, `mermaid`,
+  …) — pages with such fences failed validation on publish ("Content >
+  Language"). `src/editor.ts` now passes a curated `languages` map to
+  `CodeBlock` with `defaultLanguage: 'plaintext'`.
 
 ### Changed
 

@@ -5,5 +5,11 @@ coverage
 test-results
 playwright-report
 .env
+**/.env
 *.log
 media/
+sites/
+# submodules/test assets not needed for `next build`
+wit_pytools
++*
+tests

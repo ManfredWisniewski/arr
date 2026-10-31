@@ -129,7 +129,8 @@ export const SlideDeck = ({
           ])
         const theme =
           config.theme && config.theme in THEME_CSS ? config.theme : 'black'
-        void THEME_CSS[theme]()
+        // awaited: the font scale below measures the themed font-size
+        await THEME_CSS[theme]()
         const revealEl =
           rootRef.current?.querySelector<HTMLElement>('.reveal')
         if (cancelled || !revealEl) {
@@ -151,6 +152,15 @@ export const SlideDeck = ({
         const api = deck
         await api.initialize()
         await renderMermaid(revealEl)
+        // font scale: every theme font size derives from .reveal's
+        // computed font-size, so one inline override scales all text
+        const fontScale = Number(config.fontScale) || 1
+        if (fontScale !== 1) {
+          const base = parseFloat(getComputedStyle(revealEl).fontSize)
+          if (base) {
+            revealEl.style.fontSize = `${base * fontScale}px`
+          }
+        }
         deckRef.current = api
         api.on('overviewshown', () => setOverview(true))
         api.on('overviewhidden', () => setOverview(false))

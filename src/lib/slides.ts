@@ -3,6 +3,9 @@
 
 export type SlideOptions = {
   theme?: string
+  // deck-wide text scale, e.g. 0.5 halves every em/relative font size
+  // (applied to .reveal's computed font-size; not a reveal.js key)
+  fontScale?: number
   transition?: string
   transitionSpeed?: string
   backgroundTransition?: string

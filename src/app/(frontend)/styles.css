@@ -149,6 +149,13 @@ hr {
   background: none;
 }
 
+.slide-deck .slide-deck-overview {
+  position: absolute;
+  top: var(--space-xs, 0.5rem);
+  left: var(--space-xs, 0.5rem);
+  z-index: 30;
+}
+
 .slide-deck .slide-deck-fullscreen {
   position: absolute;
   top: var(--space-xs, 0.5rem);

@@ -81,24 +81,42 @@ export const SlideDeck = ({
   options?: SlideOptions | null
 }) => {
   const rootRef = React.useRef<HTMLDivElement>(null)
+  const deckRef = React.useRef<{ toggleOverview(): void } | null>(null)
   const [ready, setReady] = React.useState(false)
+  const [overview, setOverview] = React.useState(false)
   const width = Number(options?.width) || 960
   const height = Number(options?.height) || 700
   const optionsKey = JSON.stringify(options ?? {})
   const deckKey = `${optionsKey}\n${markdown}`
 
-  // derived state: a new deck resets readiness during render (no effect)
+  // canvas size may grow beyond slideOptions when slide content is
+  // taller than the configured slide box (see fitSlides below)
+  const [canvas, setCanvas] = React.useState({ height, width })
+
+  // derived state: a new deck resets readiness + canvas during render
   const [prevDeckKey, setPrevDeckKey] = React.useState(deckKey)
   if (prevDeckKey !== deckKey) {
     setPrevDeckKey(deckKey)
     setReady(false)
+    setCanvas({ height, width })
   }
 
   React.useEffect(() => {
     let cancelled = false
     let deck:
-      | { destroy(): void; initialize(): Promise<void> }
+      | {
+          configure(c: Record<string, unknown>): void
+          destroy(): void
+          initialize(): Promise<void>
+          layout(): void
+          on(event: string, callback: () => void): void
+          toggleOverview(): void
+        }
       | undefined
+    const revealEl = () =>
+      rootRef.current?.querySelector<HTMLElement>('.reveal')
+    const unbindLoad = () =>
+      revealEl()?.removeEventListener('load', fitSlides, true)
     const config = JSON.parse(optionsKey) as SlideOptions
 
     const boot = async () => {
@@ -130,8 +148,14 @@ export const SlideDeck = ({
           progress: true,
           ...overrides,
         })
-        await deck.initialize()
+        const api = deck
+        await api.initialize()
         await renderMermaid(revealEl)
+        deckRef.current = api
+        api.on('overviewshown', () => setOverview(true))
+        api.on('overviewhidden', () => setOverview(false))
+        revealEl.addEventListener('load', fitSlides, true)
+        fitSlides()
       } catch (error) {
         console.error('SlideDeck failed to initialize', error)
       } finally {
@@ -140,12 +164,51 @@ export const SlideDeck = ({
         }
       }
     }
+
+    // Grow the canvas until the tallest slide fits — reveal renders
+    // slides on a fixed width×height canvas, so tall content clips.
+    // Hidden slides are display:none and can't be measured directly,
+    // so we measure a display:block clone offscreen (slide coords).
+    let fitted = height
+    const fitSlides = () => {
+      const el = revealEl()
+      const slidesEl = el?.querySelector<HTMLElement>('.slides')
+      if (!el || !slidesEl || !deck) {
+        return
+      }
+      const probe = slidesEl.cloneNode(true) as HTMLElement
+      // keep reveal's inline width/height (slide units) — only hide the
+      // probe and move it offscreen for measurement
+      probe.style.position = 'absolute'
+      probe.style.visibility = 'hidden'
+      probe.style.left = '-99999px'
+      probe.style.top = '0'
+      probe
+        .querySelectorAll<HTMLElement>('section')
+        .forEach((s) => (s.style.display = 'block'))
+      el.appendChild(probe)
+      const needed = Math.max(
+        height,
+        ...Array.from(probe.querySelectorAll<HTMLElement>('section')).map(
+          (s) => s.scrollHeight,
+        ),
+      )
+      probe.remove()
+      if (needed > fitted) {
+        fitted = needed
+        deck.configure({ height: needed })
+        deck.layout()
+        setCanvas({ height: needed, width })
+      }
+    }
+
     void boot()
     return () => {
       cancelled = true
+      unbindLoad()
       deck?.destroy()
     }
-  }, [markdown, optionsKey])
+  }, [markdown, optionsKey, height, width])
 
   const toggleFullscreen = () => {
     if (document.fullscreenElement) {
@@ -167,7 +230,7 @@ export const SlideDeck = ({
       <div
         className="reveal-viewport"
         key={deckKey}
-        style={{ aspectRatio: `${width} / ${height}` }}
+        style={{ aspectRatio: `${canvas.width} / ${canvas.height}` }}
       >
         <div className="reveal">
           <div className="slides">
@@ -181,6 +244,15 @@ export const SlideDeck = ({
           </div>
         </div>
       </div>
+      <IconButton
+        aria-label="Übersicht"
+        className="slide-deck-overview"
+        icon="grid"
+        onClick={() => deckRef.current?.toggleOverview()}
+        selected={overview}
+        toggle
+        variant="standard"
+      />
       <IconButton
         aria-label="Vollbild"
         className="slide-deck-fullscreen"

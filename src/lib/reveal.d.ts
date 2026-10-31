@@ -11,6 +11,8 @@ declare module 'reveal.js' {
     destroy(): void
     configure(config: Record<string, unknown>): void
     layout(): void
+    on(event: string, callback: (event?: unknown) => void): void
+    toggleOverview(): void
   }
 }
 

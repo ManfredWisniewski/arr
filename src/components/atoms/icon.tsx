@@ -33,6 +33,9 @@ const paths = {
     <path d="M9.5 2.5h4v4M13.5 2.5L9 7M6.5 13.5h-4v-4M2.5 13.5L7 9" />
   ),
   external: <path d="M6.5 3.5H3.5v9h9V9.5M9 3h4v4M12.5 3.5L8 8" />,
+  grid: (
+    <path d="M2.5 2.5h4.5v4.5H2.5zM9 2.5h4.5v4.5H9zM2.5 9h4.5v4.5H2.5zM9 9h4.5v4.5H9z" />
+  ),
   image: (
     <>
       <rect height="10" rx="1.5" width="11" x="2.5" y="3" />

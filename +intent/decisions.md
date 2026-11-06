@@ -32,6 +32,13 @@
 - **D06 Theme CSS is built in a separate repository and pushed manually via `payloadtools theme`** (alternatives: theme repo as a submodule of the content repository; a published/deployable package; CI pushing directly to the instance). A separate clone keeps build tooling out of the content vault and the image site-agnostic; the manual push is reproducible and can later be replaced by CI without changing the `theme` global contract.
   - *2026-09-30 amendment*: theme/design assets live in the `biti-<slug>` repository family, shared by WIT Next.js applications (arr, einring). `biti-tokens` uses **Terrazzo** (DTCG-native, light/dark as token modes) producing `build/css/{light,dark}.css` — the exact artifacts pushed to `theme.cssLight`/`cssDark`. A sibling `biti-ui` repo holds shared React template/section components (npm package): consumers pin it at build time, so component updates ride the normal image release while token/CSS updates deploy via push without any rebuild.
 
+## Content markup
+
+*Session 2026-11-06.*
+
+- **D08 Link target policy — absolute `http(s)` URLs open in a new tab, everything else (relative paths, fragments, other schemes) stays in the same tab** (alternatives: all links in the same tab; every link decided individually via the editor's `newTab` flag; all external domains except own-domain absolutes). A single predictable rule keeps content free of per-link markup noise; it is implemented once in the `Link` atom (`^https?://` → `target="_blank" rel="noopener noreferrer"`, otherwise `next/link`). Authors may override per link with `{target="…"}` directly after the link (`_blank`, `_self`, `_parent`, `_top` — see D09).
+- **D09 Kramdown/Pandoc attribute syntax for markdown extensions: `## T {#id}` for heading anchors, `[t](u){target="…"}` for link target overrides** (alternatives: HTML in markdown; custom shortcodes; auto-slugged heading ids). Explicit ids stay stable when heading text is edited (umlauts, „und", punctuation) — a slugger's output would not; one attribute idiom keeps authored links readable and learnable. The `markdownToContent` hook stamps anchors as `id` on heading nodes and targets as `fields.target` on link nodes; the JSX converters render them. Only `{target="_blank|_self|_parent|_top"}` is consumed — invalid values stay visible so typos surface in the draft preview.
+
 ## Backlog (not decided, parked)
 
 - `<idea discussed but deliberately not decided>`.

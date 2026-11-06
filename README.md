@@ -38,6 +38,16 @@ work.
   per-site styling as data, pushed via `POST /api/globals/theme`.
 - markdown → Lexical: the `pages` `beforeValidate` hook converts `markdownRaw`
   server-side; clients send plain markdown and `![media:<id>]()` placeholders.
+  A heading may carry an explicit anchor id in kramdown/Pandoc attribute
+  syntax — `## Title {#some-id}` renders as `<h2 id="some-id">Title</h2>` —
+  for stable fragment links (`/faq/glossar#some-id`). Ids match
+  `[a-z0-9][a-z0-9-]*`; headings without `{#id}` render without an `id`
+  (no slugger fallback — explicit ids only, by design). A link may carry
+  a target override in the same syntax — `[text](url){target="_blank"}` —
+  to override the link-target policy (decision D08): absolute `http(s)`
+  URLs open in a new tab, everything else in the same tab. Allowed
+  values: `_blank`, `_self`, `_parent`, `_top`; invalid values stay
+  visible as literal text so typos surface in the draft preview.
 - D04 review gate: only `editor` may set `_status: 'published'`; the
   `content-bot` can create/update drafts but cannot publish or delete.
 - Frontend: a site shell (header with `theme.meta.siteName` + `navigation`

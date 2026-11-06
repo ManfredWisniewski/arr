@@ -33,6 +33,12 @@ h4 {
   line-height: var(--line-height-tight, 1.25);
 }
 
+/* anchored headings ({#id} markdown anchors) keep clearance on fragment
+   jumps — covers a future sticky header too */
+:is(h1, h2, h3, h4, h5, h6)[id] {
+  scroll-margin-top: var(--space-lg, 2rem);
+}
+
 a {
   color: var(--brand, inherit);
 

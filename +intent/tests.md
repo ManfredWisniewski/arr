@@ -22,6 +22,12 @@ types:  npx payload generate:types && npx tsc
 
 - `POST /api/pages?draft=true` with `markdownRaw` produces a draft whose
   `content` is Lexical JSON (markdown converted server-side).
+- `## Title {#some-id}` in `markdownRaw` produces a heading node with an
+  `id` key and the suffix stripped from its text; the frontend renders it
+  as the element `id` (fragment links). Headings without `{#id}` get none.
+- `[t](u){target="_blank|_self|_parent|_top"}` stamps `fields.target` on
+  the link node and strips the markup; the frontend uses it over the
+  URL-based target rule (D08). Invalid values stay literal.
 - Re-sync of an unchanged `sourcePath` is a no-op; `sourcePath` is unique.
 - `POST /api/media` deduplicates on `sourceHash`; `![media:<id>]()` in markdown
   becomes a Lexical upload node.

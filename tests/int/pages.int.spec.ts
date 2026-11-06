@@ -64,6 +64,74 @@ describe('Pages', () => {
     expect(children[0]?.type).toBe('heading')
   })
 
+  it('strips {#id} heading anchors and stamps them on heading nodes', async () => {
+    const page = await payload.create({
+      collection: 'pages',
+      data: {
+        title: 'Anchors',
+        slug: 'anchors',
+        path: '/anchors',
+        markdownRaw:
+          '## Headless CMS {#headless-cms}\n\nBody.\n\n## Plain heading\n\n```markdown\n## fenced {#nope}\n```\n',
+        sourcePath: 'anchors_webtext.md',
+      },
+    })
+    createdIds.push(page.id)
+
+    const children = page.content?.root?.children ?? []
+    const headings = children.filter(
+      (n) => n.type === 'heading',
+    ) as (Record<string, unknown> & {
+      children?: { text?: string }[]
+      id?: string
+    })[]
+
+    expect(headings).toHaveLength(2)
+    expect(headings[0]?.id).toBe('headless-cms')
+    expect(headings[0]?.children?.[0]?.text).toBe('Headless CMS')
+    expect(headings[1]?.id).toBeUndefined()
+    // fenced `## … {#nope}` stays literal code, never a heading anchor
+    expect(JSON.stringify(children)).toContain('## fenced {#nope}')
+  })
+
+  it('applies {target} link overrides and strips the markup', async () => {
+    const page = await payload.create({
+      collection: 'pages',
+      data: {
+        title: 'Link targets',
+        slug: 'link-targets',
+        path: '/link-targets',
+        markdownRaw:
+          '[ext](https://example.com){target="_self"} and ' +
+          '[rel](/p){target="_blank"} and [plain](/x) and ' +
+          '`code {target="_blank"}`.\n\n' +
+          '[bad](/y){target="banana"} stays literal.\n',
+        sourcePath: 'link-targets_webtext.md',
+      },
+    })
+    createdIds.push(page.id)
+
+    const children = page.content?.root?.children ?? []
+    const paragraph = children[0] as
+      | { children?: { fields?: { target?: string }; type?: string }[] }
+      | undefined
+    const links = (paragraph?.children ?? []).filter(
+      (n) => n.type === 'link',
+    )
+
+    expect(links).toHaveLength(3)
+    expect(links[0]?.fields?.target).toBe('_self')
+    expect(links[1]?.fields?.target).toBe('_blank')
+    expect(links[2]?.fields?.target).toBeUndefined()
+
+    const serialized = JSON.stringify(children)
+    // consumed attributes are gone; inline-code and invalid values stay
+    expect(serialized).not.toContain('{target="_self"}')
+    expect(serialized).not.toContain('and [rel')
+    expect(serialized).toContain('code {target="_blank"}')
+    expect(serialized).toContain('{target="banana"}')
+  })
+
   it('regenerates content when markdownRaw changes', async () => {
     const page = await payload.create({
       collection: 'pages',

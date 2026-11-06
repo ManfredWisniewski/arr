@@ -2,6 +2,7 @@ import type {
   DefaultNodeTypes,
   SerializedAutoLinkNode,
   SerializedBlockNode,
+  SerializedHeadingNode,
   SerializedLinkNode,
   SerializedUploadNode,
 } from '@payloadcms/richtext-lexical'
@@ -18,6 +19,21 @@ import { Link } from '@/components/atoms/link'
 import { Figure } from '@/components/molecules/figure'
 import { WitSpace, type WitSpaceAuthor } from '@/components/organisms/wit-space'
 import { getAgents, getMediaUrl } from '@/lib/blog'
+
+// Heading nodes may carry an explicit anchor id (markdown `{#some-id}`,
+// stamped by the markdownToContent hook — see lib/markdownAttributes.ts);
+// rendered as the element id so /path#id fragment links can target it.
+const HEADING_TAGS = new Set(['h1', 'h2', 'h3', 'h4', 'h5', 'h6'])
+
+const heading = ({
+  node,
+  nodesToJSX,
+}: JSXConverterArgs<SerializedHeadingNode>) => {
+  const children = nodesToJSX({ nodes: node.children })
+  const Tag = HEADING_TAGS.has(node.tag) ? node.tag : 'h1'
+  const { id } = node as SerializedHeadingNode & { id?: unknown }
+  return <Tag {...(typeof id === 'string' && id ? { id } : {})}>{children}</Tag>
+}
 
 // Upload nodes hold the populated media document when depth > 0 (default).
 const upload = ({ node }: { node: SerializedUploadNode }) => {
@@ -90,9 +106,11 @@ const WitSpaceScene = async ({
   )
 }
 
-// Rich-text links go through the Link atom: external URLs open in a new
-// tab by default, internal paths through next/link. The editor's newTab
-// flag is still honored for internal links.
+// Rich-text links go through the Link atom, which implements the target
+// policy (D08): absolute http(s) URLs open in a new tab, everything else
+// in the same tab. `fields.target` (markdown `{target="…"}` override —
+// lib/markdownAttributes.ts) beats both the atom's URL rule and the
+// editor's newTab flag.
 const link = ({
   node,
   nodesToJSX,
@@ -108,13 +126,18 @@ const link = ({
   if (!href) {
     return children
   }
-  return (
-    <Link
-      href={href}
-      {...(node.fields.newTab
+  const explicit = (node.fields as { target?: unknown }).target
+  const targetProps =
+    typeof explicit === 'string' && explicit
+      ? {
+          target: explicit,
+          ...(explicit === '_blank' ? { rel: 'noopener noreferrer' } : {}),
+        }
+      : node.fields.newTab
         ? { rel: 'noopener noreferrer', target: '_blank' }
-        : {})}
-    >
+        : {}
+  return (
+    <Link href={href} {...targetProps}>
       {children}
     </Link>
   )
@@ -124,6 +147,7 @@ export const jsxConverters: JSXConvertersFunction<DefaultNodeTypes> = ({
   defaultConverters,
 }) => ({
   ...defaultConverters,
+  heading,
   upload,
   autolink: link,
   link,

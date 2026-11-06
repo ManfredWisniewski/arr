@@ -12,6 +12,21 @@ release.
 
 ### Added
 
+- Markdown attribute syntax (`lib/markdownAttributes.ts`): `## Title
+  {#some-id}` renders as `<h2 id="some-id">` and
+  `[text](url){target="_blank"}` overrides the link-target policy
+  (absolute `http(s)` → new tab, otherwise same tab — D08). The
+  `markdownToContent` hook stamps anchors as `id` on heading nodes and
+  targets as `fields.target` on link nodes; the JSX converters emit the
+  attributes, and anchored headings get `scroll-margin-top`. Headings
+  without `{#id}` render without an `id` (no slugger fallback); links
+  without `{target}` follow the URL rule. Rollout note: an unchanged
+  `markdownRaw` is a sync no-op and does not regenerate `content`, so
+  already-synced pages like `/faq/glossar` need a touched source file
+  (or forced push) to pick up anchors; saving `content` in `/admin`
+  also drops the extra `id`/`target` keys until the next markdown sync
+  (read model — consistent with synced-field doctrine).
+
 - Slide presentations: a `slide` template renders HedgeDoc slide-mode
   markdown as an embedded reveal.js deck (`---`/`----` separators,
   `Note:` speaker notes, `<!-- .slide: -->` attributes, mermaid blocks,

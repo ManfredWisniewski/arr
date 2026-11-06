@@ -9,6 +9,7 @@ import {
   originalPostPath,
   parentPath,
 } from '@/lib/blog'
+import { stripMarkdownAttributes } from '@/lib/markdownAttributes'
 import { jsxConverters } from '@/lib/jsx-converters'
 
 import { asSlideOptions } from '@/lib/slides'
@@ -178,7 +179,7 @@ export const PostArticle = ({
       {notice}
       {doc.template === 'slide' ? (
         <SlideDeck
-          markdown={doc.markdownRaw ?? ''}
+          markdown={stripMarkdownAttributes(doc.markdownRaw ?? '')}
           options={asSlideOptions(doc.slideOptions)}
         />
       ) : (

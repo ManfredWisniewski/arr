@@ -1,5 +1,6 @@
 import React from 'react'
 
+import { stripMarkdownAttributes } from '@/lib/markdownAttributes'
 import { asSlideOptions } from '@/lib/slides'
 
 import { SlideDeck } from '@/components/organisms/slide-deck'
@@ -12,7 +13,7 @@ import type { TemplateProps } from './default'
 export const SlideTemplate = ({ page }: TemplateProps) => (
   <article className="page" data-template="slide">
     <SlideDeck
-      markdown={page.markdownRaw ?? ''}
+      markdown={stripMarkdownAttributes(page.markdownRaw ?? '')}
       options={asSlideOptions(page.slideOptions)}
     />
   </article>

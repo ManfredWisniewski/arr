@@ -7,6 +7,12 @@ import {
   editorConfigFactory,
 } from '@payloadcms/richtext-lexical'
 
+import {
+  applyHeadingAnchors,
+  applyLinkTargets,
+  extractHeadingAnchors,
+} from '../lib/markdownAttributes'
+
 // Regenerates `content` (Lexical) from `markdownRaw` whenever markdown is sent
 // and differs from the stored value. Updates without `markdownRaw` (or with an
 // unchanged one) leave `content` untouched, so manual admin edits are kept.
@@ -38,9 +44,13 @@ export const markdownToContent: CollectionBeforeValidateHook = ({
     return data
   }
   const editorConfig = editorConfigFactory.fromField({ field: contentField })
-  ;(data as { content?: unknown }).content = convertMarkdownToLexical({
+  const { anchors, markdown: stripped } = extractHeadingAnchors(markdown)
+  const content = convertMarkdownToLexical({
     editorConfig,
-    markdown,
+    markdown: stripped,
   })
+  applyHeadingAnchors(content, anchors)
+  applyLinkTargets(content)
+  ;(data as { content?: unknown }).content = content
   return data
 }

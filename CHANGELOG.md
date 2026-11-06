@@ -95,6 +95,10 @@ release.
   `.site-footer-legal-links`, `.site-footer-copy`) — needs a token
   rebuild + theme repush to render styled.
 
+- `WitSpace` slowed and softened — pointer-tilt easing `0.12 → 0.035`,
+  shear gain/spring/damping reduced (`w * 32 → w * 24`, `0.09 → 0.2`,
+  `0.86 → 0.4`). Synced from biti.
+
 ### Fixed
 
 - Media uploads via `POST /api/media` failed with `413 Payload Too

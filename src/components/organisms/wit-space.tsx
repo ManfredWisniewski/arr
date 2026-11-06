@@ -318,8 +318,8 @@ const WitSpace: React.FC<WitSpaceProps> = ({
     const tick = () => {
       const prx = cur.rx
       const pry = cur.ry
-      cur.rx += (target.rx - cur.rx) * 0.12
-      cur.ry += (target.ry - cur.ry) * 0.12
+      cur.rx += (target.rx - cur.rx) * 0.035
+      cur.ry += (target.ry - cur.ry) * 0.035
       cube.style.setProperty('--wit-space-rx', `${cur.rx}deg`)
       cube.style.setProperty('--wit-space-ry', `${cur.ry}deg`)
 
@@ -329,13 +329,13 @@ const WitSpace: React.FC<WitSpaceProps> = ({
       const wx = -(cur.ry - pry)
       const wy = cur.rx - prx
       const w = Math.hypot(wx, wy)
-      const t = Math.min(w * 32, 128)
+      const t = Math.min(w * 24, 128)
       const tx = w > 0 ? (wx / w) * t : 0
       const ty = w > 0 ? (wy / w) * t : 0
-      lag.vx += (tx - lag.x) * 0.09
-      lag.vy += (ty - lag.y) * 0.09
-      lag.vx = lag.vx * 0.86 + (Math.random() - 0.5) * w * 0.5
-      lag.vy = lag.vy * 0.86 + (Math.random() - 0.5) * w * 0.5
+      lag.vx += (tx - lag.x) * 0.2
+      lag.vy += (ty - lag.y) * 0.2
+      lag.vx = lag.vx * 0.4 + (Math.random() - 0.5) * w * 0.5
+      lag.vy = lag.vy * 0.4 + (Math.random() - 0.5) * w * 0.5
       lag.x += lag.vx
       lag.y += lag.vy
       for (const l of layers) {

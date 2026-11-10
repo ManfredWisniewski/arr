@@ -15,13 +15,21 @@ const touchesPublished = (
   previousDoc: { _status?: string } | undefined,
 ) => doc?._status === 'published' || previousDoc?._status === 'published'
 
+// The submitted URL must be the public sitemap — the container's
+// request origin can be an internal listen address.
+const publicOrigin = (req: { origin?: string }) =>
+  process.env.NEXT_PUBLIC_SERVER_URL ??
+  process.env.SITE_URL ??
+  req.origin ??
+  ''
+
 export const resubmitSitemapAfterChange: CollectionAfterChangeHook = ({
   doc,
   previousDoc,
   req,
 }) => {
   if (touchesPublished(doc, previousDoc)) {
-    scheduleSitemapSubmit(process.env.SITE_URL ?? req.origin ?? '')
+    scheduleSitemapSubmit(publicOrigin(req))
   }
   return doc
 }
@@ -31,7 +39,7 @@ export const resubmitSitemapAfterDelete: CollectionAfterDeleteHook = ({
   req,
 }) => {
   if (touchesPublished(doc, undefined)) {
-    scheduleSitemapSubmit(process.env.SITE_URL ?? req.origin ?? '')
+    scheduleSitemapSubmit(publicOrigin(req))
   }
   return doc
 }

@@ -51,6 +51,11 @@ feature silently). Values belong in the Ansible vault /
 | `GSC_CLIENT_EMAIL` | The service account e-mail (`client_email` in the JSON key) |
 | `GSC_PRIVATE_KEY` | The `private_key` PEM from the JSON key, with real newlines escaped as `\n` — the app unescapes them |
 
+The submitted sitemap URL is built from the public origin —
+`NEXT_PUBLIC_SERVER_URL` (already set per instance by the role), then
+`SITE_URL`, then the request origin, with a `GSC_SITE`-derived URL as
+last resort. It must never be the container's internal listen address.
+
 ```yaml
 # wit.docker_apps host vars (vault)
 GSC_SITE: "sc-domain:example.com"

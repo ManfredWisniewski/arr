@@ -65,6 +65,14 @@ async function accessToken(clientEmail: string, privateKey: string) {
   return access_token
 }
 
+// Fallback origin derived from GSC_SITE when no request/env origin is
+// available: 'sc-domain:example.com' → 'https://example.com/sitemap.xml',
+// 'https://example.com/' → 'https://example.com/sitemap.xml'.
+const siteSitemapUrl = (site: string) =>
+  site.startsWith('sc-domain:')
+    ? `https://${site.slice('sc-domain:'.length)}/sitemap.xml`
+    : `${site.replace(/\/+$/, '')}/sitemap.xml`
+
 let timer: NodeJS.Timeout | undefined
 let pending = ''
 
@@ -87,15 +95,19 @@ async function resubmit() {
 }
 
 // Schedule a debounced, fire-and-forget sitemap resubmission. `base` is
-// the public origin of the site (SITE_URL or the request origin); the
-// sitemap URL never changes, so only the latest one matters. Failures
-// are logged, never propagated — a Google outage must not break writes.
+// the public origin of the site (NEXT_PUBLIC_SERVER_URL, SITE_URL or the
+// request origin — resolved by the caller); empty falls back to the
+// GSC_SITE-derived URL. The sitemap URL never changes, so only the
+// latest one matters. Failures are logged, never propagated — a Google
+// outage must not break writes.
 export function scheduleSitemapSubmit(base: string) {
-  const origin = base.replace(/\/+$/, '')
-  if (!config() || !origin) {
+  const cfg = config()
+  if (!cfg) {
     return
   }
-  pending = `${origin}/sitemap.xml`
+  pending = base
+    ? `${base.replace(/\/+$/, '')}/sitemap.xml`
+    : siteSitemapUrl(cfg.site)
   clearTimeout(timer)
   timer = setTimeout(() => {
     resubmit().catch((err: unknown) =>

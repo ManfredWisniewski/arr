@@ -19,10 +19,13 @@ release.
   dependency) whenever a write touches a document that is or was
   published; draft-only writes are skipped. Enabled only when
   `GSC_SITE`, `GSC_CLIENT_EMAIL` and `GSC_PRIVATE_KEY` are all set — the
-  service
-  account e-mail must be a user on the SC property. robots.txt
-  discovery + `<lastmod>` remain the baseline; resubmission only brings
-  Google's sitemap refetch forward, it does not guarantee indexing.
+  service account e-mail must be a user on the SC property. The
+  submitted sitemap URL uses the public origin
+  (`NEXT_PUBLIC_SERVER_URL`, then `SITE_URL`, then the request origin;
+  `GSC_SITE`-derived as last resort) — never the container listen
+  address. robots.txt discovery + `<lastmod>` remain the baseline;
+  resubmission only brings Google's sitemap refetch forward, it does
+  not guarantee indexing.
 
 - Markdown attribute syntax (`lib/markdownAttributes.ts`): `## Title
   {#some-id}` renders as `<h2 id="some-id">` and

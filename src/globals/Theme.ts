@@ -42,6 +42,19 @@ export const Theme: GlobalConfig = {
       relationTo: 'media',
     },
     {
+      // analytics ids pushed from site.yml `tracking:` — the frontend
+      // injects the matching vendor script per key when set
+      name: 'tracking',
+      type: 'group',
+      fields: [
+        {
+          // GA4/Google-Tag id (G-…, GT-…); loads gtag.js
+          name: 'google',
+          type: 'text',
+        },
+      ],
+    },
+    {
       name: 'cssLight',
       type: 'code',
       admin: {

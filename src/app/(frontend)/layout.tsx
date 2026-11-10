@@ -89,6 +89,14 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
     getFooter(isEnabled),
   ])
   const siteName = theme?.meta?.siteName ?? 'witconsult'
+  // gtag.js targets (GA4 G-…, Google Tag GT-…, Ads AW-…, Floodlight
+  // DC-…) — the stored value reaches a <script src>, so validate before
+  // emitting rather than trusting the synced field verbatim
+  const gaId =
+    typeof theme?.tracking?.google === 'string' &&
+    /^(G|GT|AW|DC)-[A-Z0-9]+$/i.test(theme.tracking.google)
+      ? theme.tracking.google
+      : undefined
   // dev-only theme variants (empty in production / without biti build)
   const variants = getThemeVariants()
 
@@ -101,6 +109,17 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
         {theme?.favicon && typeof theme.favicon === 'object'
           ? <link href={(theme.favicon as Media).url ?? ''} rel="icon" />
           : null}
+        {gaId ? (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
+              strategy="afterInteractive"
+            />
+            <Script id="gtag-init" strategy="afterInteractive">
+              {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','${gaId}')`}
+            </Script>
+          </>
+        ) : null}
         {theme?.cssLight ? (
           <style dangerouslySetInnerHTML={{ __html: theme.cssLight }} />
         ) : null}

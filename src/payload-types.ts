@@ -646,6 +646,9 @@ export interface Theme {
   id: number;
   logo?: (number | null) | Media;
   favicon?: (number | null) | Media;
+  tracking?: {
+    google?: string | null;
+  };
   cssLight?: string | null;
   cssDark?: string | null;
   meta?: {
@@ -662,6 +665,11 @@ export interface Theme {
 export interface ThemeSelect<T extends boolean = true> {
   logo?: T;
   favicon?: T;
+  tracking?:
+    | T
+    | {
+        google?: T;
+      };
   cssLight?: T;
   cssDark?: T;
   meta?:

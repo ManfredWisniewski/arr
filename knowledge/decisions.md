@@ -45,6 +45,10 @@
 
 - **D10 Publish events resubmit the sitemap via the Search Console API `sitemaps.submit`** (alternatives: robots.txt `Sitemap:` + `<lastmod>` alone — already the baseline, but silent and on Google's cadence; the retired unauthenticated ping endpoint, dead since 2023). A service account registered as a user on the SC property PUTs `<base>/sitemap.xml`, debounced on writes that touch a document which is or was published; env-gated (`GSC_*`) so the image stays site-agnostic (D02). Reason: owner decision — faster pickup of published changes on the arr sites, and the submission makes the sitemap visible in the GSC report.
 
+## Analytics & tracking
+
+- **D11 Analytics ids are site config on the `theme` global (`tracking` group), pushed from `site.yml` `tracking:`** (alternatives: a dedicated `site` global — duplicates the site-config role `theme` already serves for siteName/logo/favicon; a `structures` doc — works but bypasses the established site.yml → theme contract; env vars — would bake per-site ids into deployment config). The frontend injects `gtag.js` only when `tracking.google` validates as a tag id; a consent layer (TDDDG/DSGVO) is deliberately not part of the mechanism — whether and when tracking loads is a per-site owner decision. Reason: owner decision — one config channel for all per-site ids, extensible to further providers as `tracking.<vendor>` keys.
+
 ## Backlog (not decided, parked)
 
 - `<idea discussed but deliberately not decided>`.

@@ -12,6 +12,15 @@ release.
 
 ### Added
 
+- Google Tag (GA4) tracking per site: `theme.tracking.google` holds a
+  gtag.js id (`G-…`, `GT-…`, `AW-…`, `DC-…`), pushed from `site.yml`
+  `tracking:` via `payloadtools site` (merged — admin-set ids survive).
+  The frontend loads `gtag.js` + `gtag('config', <id>)` only when a
+  valid id is set (validated before emit — the stored value reaches a
+  `<script src>`). Note: loading it unconditionally is a consent
+  question under TDDDG/DSGVO — whether an id is configured is a
+  per-site owner decision.
+
 - Google Search Console sitemap resubmission: debounced `afterChange`/
   `afterDelete` hooks on `pages`/`posts` (`hooks/resubmitSitemap.ts`)
   call the Search Console API `sitemaps.submit`

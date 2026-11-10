@@ -9,6 +9,10 @@ import { pagesEditor } from '../editor'
 import { clampPublicFind } from '../hooks/clampPublicFind'
 import { enforceEditorPublish } from '../hooks/enforceEditorPublish'
 import { markdownToContent } from '../hooks/markdownToContent'
+import {
+  resubmitSitemapAfterChange,
+  resubmitSitemapAfterDelete,
+} from '../hooks/resubmitSitemap'
 
 // Blog posts synced from <site>/blog/<agent>/*_webtext*.md. Taxonomy
 // (author, categories, tags) is plain data owned by the content repo;
@@ -31,6 +35,8 @@ export const Posts: CollectionConfig = {
     delete: editorOnly,
   },
   hooks: {
+    afterChange: [resubmitSitemapAfterChange],
+    afterDelete: [resubmitSitemapAfterDelete],
     beforeOperation: [clampPublicFind],
     beforeValidate: [markdownToContent],
     beforeChange: [enforceEditorPublish],

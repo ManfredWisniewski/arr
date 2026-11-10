@@ -140,4 +140,4 @@ never a source of truth.
 - Smoke-test field-level access on `_status`; fall back to `beforeChange`.
 - Content-side open questions (marker spec, meta mapping, WordPress URL
   inventory/redirects) are tracked in the plan's "Open questions".
-- Unresolved decisions: `decisions.md`, section "Backlog".
+- Unresolved decisions: `knowledge/decisions.md`, section "Backlog".

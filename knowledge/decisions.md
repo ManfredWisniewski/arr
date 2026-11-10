@@ -39,6 +39,12 @@
 - **D08 Link target policy — absolute `http(s)` URLs open in a new tab, everything else (relative paths, fragments, other schemes) stays in the same tab** (alternatives: all links in the same tab; every link decided individually via the editor's `newTab` flag; all external domains except own-domain absolutes). A single predictable rule keeps content free of per-link markup noise; it is implemented once in the `Link` atom (`^https?://` → `target="_blank" rel="noopener noreferrer"`, otherwise `next/link`). Authors may override per link with `{target="…"}` directly after the link (`_blank`, `_self`, `_parent`, `_top` — see D09).
 - **D09 Kramdown/Pandoc attribute syntax for markdown extensions: `## T {#id}` for heading anchors, `[t](u){target="…"}` for link target overrides** (alternatives: HTML in markdown; custom shortcodes; auto-slugged heading ids). Explicit ids stay stable when heading text is edited (umlauts, „und", punctuation) — a slugger's output would not; one attribute idiom keeps authored links readable and learnable. The `markdownToContent` hook stamps anchors as `id` on heading nodes and targets as `fields.target` on link nodes; the JSX converters render them. Only `{target="_blank|_self|_parent|_top"}` is consumed — invalid values stay visible so typos surface in the draft preview.
 
+## SEO
+
+*Session 2026-11-10.*
+
+- **D10 Publish events resubmit the sitemap via the Search Console API `sitemaps.submit`** (alternatives: robots.txt `Sitemap:` + `<lastmod>` alone — already the baseline, but silent and on Google's cadence; the retired unauthenticated ping endpoint, dead since 2023). A service account registered as a user on the SC property PUTs `<base>/sitemap.xml`, debounced on writes that touch a document which is or was published; env-gated (`GSC_*`) so the image stays site-agnostic (D02). Reason: owner decision — faster pickup of published changes on the arr sites, and the submission makes the sitemap visible in the GSC report.
+
 ## Backlog (not decided, parked)
 
 - `<idea discussed but deliberately not decided>`.

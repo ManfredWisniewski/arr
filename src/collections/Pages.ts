@@ -9,6 +9,10 @@ import { pagesEditor } from '../editor'
 import { clampPublicFind } from '../hooks/clampPublicFind'
 import { enforceEditorPublish } from '../hooks/enforceEditorPublish'
 import { markdownToContent } from '../hooks/markdownToContent'
+import {
+  resubmitSitemapAfterChange,
+  resubmitSitemapAfterDelete,
+} from '../hooks/resubmitSitemap'
 
 export const Pages: CollectionConfig = {
   slug: 'pages',
@@ -28,6 +32,8 @@ export const Pages: CollectionConfig = {
     delete: editorOnly,
   },
   hooks: {
+    afterChange: [resubmitSitemapAfterChange],
+    afterDelete: [resubmitSitemapAfterDelete],
     beforeOperation: [clampPublicFind],
     beforeValidate: [markdownToContent],
     beforeChange: [enforceEditorPublish],

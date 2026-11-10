@@ -183,7 +183,9 @@ The Ansible integration expects:
 - `PAYLOAD_SEED_ADMIN_EMAIL` and `PAYLOAD_SEED_ADMIN_PASSWORD` for the seed
   command (`PAYLOAD_SEED_ADMIN_API_KEY` optionally sets an API key); and
 - `PAYLOAD_SECRET` to be supplied through the Ansible vault; and
-- `PREVIEW_SECRET` for the admin draft-preview link, also through the vault.
+- `PREVIEW_SECRET` for the admin draft-preview link, also through the vault;
+- optionally `GSC_SITE`, `GSC_CLIENT_EMAIL` and `GSC_PRIVATE_KEY` for
+  Search Console sitemap resubmission (setup: `README_setup.md`).
 
 The content sync contract (fields, endpoints, draft-only writes) is documented
 in `wit_pytools/payloadtools/+intent/INTENT.md`; the content repository holds

@@ -12,6 +12,18 @@ release.
 
 ### Added
 
+- Google Search Console sitemap resubmission: debounced `afterChange`/
+  `afterDelete` hooks on `pages`/`posts` (`hooks/resubmitSitemap.ts`)
+  call the Search Console API `sitemaps.submit`
+  (`lib/searchConsole.ts` — service-account JWT per RFC 7523, no extra
+  dependency) whenever a write touches a document that is or was
+  published; draft-only writes are skipped. Enabled only when
+  `GSC_SITE`, `GSC_CLIENT_EMAIL` and `GSC_PRIVATE_KEY` are all set — the
+  service
+  account e-mail must be a user on the SC property. robots.txt
+  discovery + `<lastmod>` remain the baseline; resubmission only brings
+  Google's sitemap refetch forward, it does not guarantee indexing.
+
 - Markdown attribute syntax (`lib/markdownAttributes.ts`): `## Title
   {#some-id}` renders as `<h2 id="some-id">` and
   `[text](url){target="_blank"}` overrides the link-target policy

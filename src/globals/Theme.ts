@@ -55,6 +55,21 @@ export const Theme: GlobalConfig = {
       ],
     },
     {
+      // consent-banner config pushed from site.yml `consent:` — the
+      // banner only renders when a consent-gated service is configured
+      // (tracking.google today); see knowledge/decisions.md D12
+      name: 'consent',
+      type: 'group',
+      fields: [
+        {
+          // path of the site's privacy page linked from the banner
+          name: 'privacyPath',
+          type: 'text',
+          defaultValue: '/datenschutz',
+        },
+      ],
+    },
+    {
       name: 'cssLight',
       type: 'code',
       admin: {

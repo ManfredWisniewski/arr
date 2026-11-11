@@ -60,6 +60,20 @@ types:  npx payload generate:types && npx tsc
 - Adding a display context means adding an `imageSizes` entry plus a
   migration, not serving the original.
 
+### A07 Consent gating (D12)
+
+- With no gated service configured (no `tracking.google`): no consent
+  banner, no `cc_cookie`, no third-party script in the SSR HTML.
+- With `tracking.google` set and no prior consent: no gtag.js tag or
+  request to `googletagmanager.com` is emitted.
+- Accepting `analytics` in the banner injects gtag without reload; a
+  fresh page load serves it directly (SSR reads `cc_cookie`).
+- "Cookie-Einstellungen" in the footer reopens the preferences modal;
+  deselecting `analytics` reloads the page and the tag cookies are gone.
+- Banner renders the bundled German texts; the modal passes WCAG 2.2
+  spot checks (focus trap, keyboard operability, contrast in light and
+  dark theme).
+
 ## Not tested
 
 - REST-level publish denial by the bot key — covered by the `beforeChange`

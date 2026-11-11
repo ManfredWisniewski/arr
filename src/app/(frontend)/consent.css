@@ -1,0 +1,52 @@
+/* vanilla-cookieconsent theme mapped onto the site's token vars —
+   light/dark flips automatically with [data-theme] like the rest of
+   the shell (D12). Contract class for the footer settings button:
+   `.consent-settings` (unstyled button rendered as a legal link). */
+
+:root {
+  --cc-font-family: var(--font-family-sans);
+  --cc-bg: var(--bg);
+  --cc-primary-color: var(--fg);
+  --cc-secondary-color: var(--fg-muted);
+  --cc-link-color: var(--brand);
+  --cc-btn-border-radius: var(--radius-sm);
+  --cc-modal-border-radius: var(--radius-md);
+  --cc-separator-border-color: var(--border);
+  --cc-footer-bg: var(--bg-muted);
+  --cc-footer-color: var(--fg-muted);
+  --cc-footer-border-color: var(--border);
+  --cc-overlay-bg: rgb(0 0 0 / 0.7);
+  --cc-btn-primary-bg: var(--brand);
+  --cc-btn-primary-color: var(--bg);
+  --cc-btn-primary-border-color: var(--brand);
+  --cc-btn-primary-hover-bg: var(--brand-hover);
+  --cc-btn-primary-hover-border-color: var(--brand-hover);
+  --cc-btn-primary-hover-color: var(--bg);
+  --cc-btn-secondary-bg: transparent;
+  --cc-btn-secondary-color: var(--fg);
+  --cc-btn-secondary-border-color: var(--border);
+  --cc-btn-secondary-hover-bg: var(--bg-muted);
+  --cc-btn-secondary-hover-border-color: var(--border);
+  --cc-btn-secondary-hover-color: var(--fg);
+  --cc-cookie-category-block-bg: var(--bg-muted);
+  --cc-cookie-category-block-border: var(--border);
+  --cc-cookie-category-block-hover-bg: var(--bg-muted);
+  --cc-cookie-category-block-hover-border: var(--border);
+  --cc-cookie-category-expanded-block-bg: var(--bg);
+  --cc-cookie-category-expanded-block-hover-bg: var(--bg-muted);
+  --cc-toggle-on-bg: var(--brand);
+  --cc-toggle-on-knob-bg: var(--bg);
+  --cc-toggle-off-bg: var(--fg-muted);
+  --cc-toggle-off-knob-bg: var(--bg);
+  --cc-toggle-readonly-bg: var(--border);
+}
+
+button.consent-settings {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  padding: 0;
+  text-decoration: underline;
+}

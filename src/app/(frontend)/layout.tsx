@@ -6,13 +6,17 @@ import React from 'react'
 import type { Media, Theme } from '@/payload-types'
 import config from '@/payload.config'
 
+import { ConsentManager } from '@/components/organisms/consent-manager'
 import { mapNavItems, type NavItem } from '@/components/molecules/nav-item'
 import {
   type FooterData,
   SiteFooter,
 } from '@/components/organisms/site-footer'
 import { SiteHeader } from '@/components/organisms/site-header'
+import { ANALYTICS_CATEGORY, hasConsent } from '@/lib/consent'
 
+import 'vanilla-cookieconsent/dist/cookieconsent.css'
+import './consent.css'
 import './styles.css'
 import { ThemeSwitcher } from './theme-switcher'
 import { getThemeVariants } from './theme-variants'
@@ -97,6 +101,13 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
     /^(G|GT|AW|DC)-[A-Z0-9]+$/i.test(theme.tracking.google)
       ? theme.tracking.google
       : undefined
+  // D12 hard gate: gtag is emitted only when the visitor's consent
+  // cookie already grants `analytics`; first accept injects the tag
+  // live via ConsentManager, withdrawal reloads
+  const analyticsConsented = gaId
+    ? await hasConsent(ANALYTICS_CATEGORY)
+    : false
+  const privacyPath = theme?.consent?.privacyPath ?? '/datenschutz'
   // dev-only theme variants (empty in production / without biti build)
   const variants = getThemeVariants()
 
@@ -109,9 +120,10 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
         {theme?.favicon && typeof theme.favicon === 'object'
           ? <link href={(theme.favicon as Media).url ?? ''} rel="icon" />
           : null}
-        {gaId ? (
+        {gaId && analyticsConsented ? (
           <>
             <Script
+              id="gtag-src"
               src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
               strategy="afterInteractive"
             />
@@ -140,7 +152,14 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
           siteName={siteName}
         />
         <main>{children}</main>
-        <SiteFooter footer={footer} navItems={navItems} />
+        <SiteFooter
+          consentSettings={Boolean(gaId)}
+          footer={footer}
+          navItems={navItems}
+        />
+        {gaId ? (
+          <ConsentManager gaId={gaId} privacyPath={privacyPath} />
+        ) : null}
         {variants.length ? (
           <ThemeSwitcher variants={variants.map((v) => v.name)} />
         ) : null}

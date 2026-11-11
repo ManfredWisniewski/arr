@@ -1,6 +1,7 @@
 import React from 'react'
 
 import { Link } from '../atoms/link'
+import { ConsentSettingsButton } from '../molecules/consent-settings-button'
 import type { NavItem } from '../molecules/nav-item'
 
 // `structures` doc "footer" — { links: [{ label, path }], copyright }
@@ -15,9 +16,14 @@ export type FooterData = {
 // Biti-WIT 20072:2562). Legal links and copyright come from the
 // `footer` structure doc; the row is omitted when it is absent.
 export const SiteFooter = ({
+  consentSettings = false,
   footer,
   navItems,
 }: {
+  // renders the "Cookie-Einstellungen" withdrawal entry even when the
+  // footer structure doc is absent — the opt-out path must exist
+  // whenever the consent banner can appear (D12)
+  consentSettings?: boolean
   footer?: FooterData | null
   navItems: NavItem[]
 }) => (
@@ -50,11 +56,12 @@ export const SiteFooter = ({
         ))}
       </nav>
     ) : null}
-    {footer && (footer.links.length > 0 || footer.copyright) ? (
+    {(footer && (footer.links.length > 0 || footer.copyright)) ||
+    consentSettings ? (
       <div className="site-footer-legal">
-        {footer.links.length ? (
+        {(footer?.links.length ?? 0) > 0 || consentSettings ? (
           <nav aria-label="Legal" className="site-footer-legal-links">
-            {footer.links.map((link, i) => (
+            {(footer?.links ?? []).map((link, i) => (
               <React.Fragment key={link.label}>
                 {i > 0 ? ' | ' : null}
                 {link.path ? (
@@ -64,9 +71,15 @@ export const SiteFooter = ({
                 )}
               </React.Fragment>
             ))}
+            {consentSettings ? (
+              <React.Fragment>
+                {(footer?.links.length ?? 0) > 0 ? ' | ' : null}
+                <ConsentSettingsButton />
+              </React.Fragment>
+            ) : null}
           </nav>
         ) : null}
-        {footer.copyright ? (
+        {footer?.copyright ? (
           <p className="site-footer-copy">{footer.copyright}</p>
         ) : null}
       </div>

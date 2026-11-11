@@ -12,6 +12,21 @@ release.
 
 ### Added
 
+- Cookie consent banner (D12): TDDDG opt-in gating via
+  `vanilla-cookieconsent` v3 (`organisms/consent-manager.tsx`,
+  `molecules/consent-settings-button.tsx`). The banner + preferences
+  modal render only when a consent-gated service is configured —
+  `tracking.google` in v1. gtag.js is emitted only after `analytics`
+  consent: SSR reads `cc_cookie` (`lib/consent.ts`); live accept
+  injects the tag without reload; withdrawal reloads the page and the
+  lib's auto-clear strips `_ga*` cookies. Texts ship bundled de/en
+  (`autoDetect: 'document'`); styling maps the lib's `--cc-*` vars onto
+  site tokens (`app/(frontend)/consent.css`). "Cookie-Einstellungen" is
+  auto-appended to the footer legal row — rendered even when no footer
+  structure doc exists. `site.yml` gains `consent.privacy_path` →
+  `theme.consent.privacyPath` (payloadtools `site`, merged); migration
+  `add_theme_consent`.
+
 - Google Tag (GA4) tracking per site: `theme.tracking.google` holds a
   gtag.js id (`G-…`, `GT-…`, `AW-…`, `DC-…`), pushed from `site.yml`
   `tracking:` via `payloadtools site` (merged — admin-set ids survive).

@@ -649,6 +649,9 @@ export interface Theme {
   tracking?: {
     google?: string | null;
   };
+  consent?: {
+    privacyPath?: string | null;
+  };
   cssLight?: string | null;
   cssDark?: string | null;
   meta?: {
@@ -669,6 +672,11 @@ export interface ThemeSelect<T extends boolean = true> {
     | T
     | {
         google?: T;
+      };
+  consent?:
+    | T
+    | {
+        privacyPath?: T;
       };
   cssLight?: T;
   cssDark?: T;

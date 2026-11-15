@@ -73,6 +73,20 @@ const siteSitemapUrl = (site: string) =>
     ? `https://${site.slice('sc-domain:'.length)}/sitemap.xml`
     : `${site.replace(/\/+$/, '')}/sitemap.xml`
 
+// A listen/bind or loopback origin must never reach Google — observed
+// failure mode: req.origin resolving to 'https://0.0.0.0:3000' inside
+// the container. Non-public hosts fall back to the GSC_SITE-derived URL.
+const isPublicOrigin = (base: string) => {
+  try {
+    const { hostname } = new URL(base)
+    return !/^(0\.0\.0\.0|localhost|127\.|\[?::1\]?|::|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)/.test(
+      hostname,
+    )
+  } catch {
+    return false
+  }
+}
+
 let timer: NodeJS.Timeout | undefined
 let pending = ''
 
@@ -105,7 +119,7 @@ export function scheduleSitemapSubmit(base: string) {
   if (!cfg) {
     return
   }
-  pending = base
+  pending = base && isPublicOrigin(base)
     ? `${base.replace(/\/+$/, '')}/sitemap.xml`
     : siteSitemapUrl(cfg.site)
   clearTimeout(timer)

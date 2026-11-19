@@ -1,10 +1,10 @@
-import { draftMode } from 'next/headers'
 import { notFound } from 'next/navigation.js'
 import React from 'react'
 
 import { getAgentMap, getPostsPage, getTaxonomyTerm,
   parsePageParam,
 } from '@/lib/blog'
+import { getRequestDraft } from '@/lib/review'
 
 import { TaxonomyArchive } from '../../taxonomy-archive'
 
@@ -15,8 +15,8 @@ type Props = {
 
 export async function generateMetadata({ params }: Props) {
   const { tag } = await params
-  const { isEnabled } = await draftMode()
-  const term = await getTaxonomyTerm('tags', tag, isEnabled)
+  const draft = await getRequestDraft()
+  const term = await getTaxonomyTerm('tags', tag, draft)
   return {
     description: term?.description,
     title: term?.label ?? `Tag: ${tag}`,
@@ -26,12 +26,12 @@ export async function generateMetadata({ params }: Props) {
 export default async function TagArchive({ params, searchParams }: Props) {
   const { tag } = await params
   const { page } = await searchParams
-  const { isEnabled } = await draftMode()
+  const draft = await getRequestDraft()
   const current = parsePageParam(page)
   const [term, result] = await Promise.all([
-    getTaxonomyTerm('tags', tag, isEnabled),
+    getTaxonomyTerm('tags', tag, draft),
     getPostsPage({
-      draft: isEnabled,
+      draft: draft,
       page: current,
       pathPrefix: '/blog',
       tag,
@@ -39,9 +39,9 @@ export default async function TagArchive({ params, searchParams }: Props) {
   ])
   const agents = await getAgentMap(
     result.docs.map((post) => post.author),
-    isEnabled,
+    draft,
   )
-  if (!result.docs.length && !term && !isEnabled) {
+  if (!result.docs.length && !term && !draft) {
     notFound()
   }
 

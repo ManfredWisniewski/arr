@@ -1,8 +1,8 @@
-import { draftMode } from 'next/headers'
 import { getPayload } from 'payload'
 import React from 'react'
 
 import config from '@/payload.config'
+import { getRequestDraft } from '@/lib/review'
 
 import { TextBlock } from '../molecules/text-block'
 import { CardGrid } from '../organisms/card'
@@ -33,15 +33,15 @@ type DashboardData = {
 
 async function getDashboard(): Promise<DashboardData> {
   try {
-    const { isEnabled } = await draftMode()
+    const draft = await getRequestDraft()
     const payload = await getPayload({ config: await config })
     const { docs } = await payload.find({
       collection: 'structures',
-      draft: isEnabled,
+      draft: draft,
       limit: 1,
       where: {
         name: { equals: 'dashboard' },
-        ...(isEnabled ? {} : { _status: { equals: 'published' } }),
+        ...(draft ? {} : { _status: { equals: 'published' } }),
       },
     })
     return (docs[0]?.data as DashboardData | undefined) ?? {}

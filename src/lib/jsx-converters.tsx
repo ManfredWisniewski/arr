@@ -12,7 +12,7 @@ import type {
 } from '@payloadcms/richtext-lexical/react'
 import React from 'react'
 
-import { draftMode } from 'next/headers'
+import { getRequestDraft } from '@/lib/review'
 
 import type { Media } from '@/payload-types'
 import { Link } from '@/components/atoms/link'
@@ -75,7 +75,7 @@ const WitSpaceScene = async ({
   const rows = node.fields?.authors ?? []
   let authors: WitSpaceAuthor[] = []
   if (rows.length) {
-    const draft = (await draftMode()).isEnabled
+    const draft = await getRequestDraft()
     const agents = await getAgents(draft)
     authors = (
       await Promise.all(

@@ -1,4 +1,3 @@
-import { draftMode } from 'next/headers'
 import { notFound } from 'next/navigation.js'
 import { RichText } from '@payloadcms/richtext-lexical/react'
 import { getPayload } from 'payload'
@@ -7,14 +6,16 @@ import React from 'react'
 import type { Page } from '@/payload-types'
 import config from '@/payload.config'
 
+import { DraftBanner } from '@/components/draft-banner'
 import { renderTemplate } from '@/components/templates/registry'
 import { jsxConverters } from '@/lib/jsx-converters'
+import { getRequestDraft } from '@/lib/review'
 
 import { LangBlog, isLangBlogPath, langBlogMetadata } from './lang-blog'
 
 type Props = {
   params: Promise<{ path?: string[] }>
-  searchParams: Promise<{ page?: string }>
+  searchParams: Promise<{ from?: string; page?: string }>
 }
 
 async function findPage(route: string, draft: boolean) {
@@ -33,11 +34,11 @@ async function findPage(route: string, draft: boolean) {
 
 export async function generateMetadata({ params }: Props) {
   const { path = [] } = await params
-  const { isEnabled } = await draftMode()
+  const draft = await getRequestDraft()
   if (isLangBlogPath(path)) {
-    return langBlogMetadata(path, isEnabled)
+    return langBlogMetadata(path, draft)
   }
-  const page = await findPage(`/${path.join('/')}`, isEnabled)
+  const page = await findPage(`/${path.join('/')}`, draft)
   if (!page) {
     return {}
   }
@@ -49,20 +50,27 @@ export async function generateMetadata({ params }: Props) {
 
 export default async function SitePage({ params, searchParams }: Props) {
   const { path = [] } = await params
-  const { page } = await searchParams
-  const { isEnabled } = await draftMode()
+  const { from, page } = await searchParams
+  const draft = await getRequestDraft()
 
   if (isLangBlogPath(path)) {
-    return <LangBlog draft={isEnabled} page={page} segments={path} />
+    return (
+      <LangBlog draft={draft} from={from} page={page} segments={path} />
+    )
   }
 
-  const doc = await findPage(`/${path.join('/')}`, isEnabled)
+  const doc = await findPage(`/${path.join('/')}`, draft)
 
   if (!doc) {
     notFound()
   }
 
-  return renderTemplate(doc, (data) =>
-    data ? <RichText converters={jsxConverters} data={data} /> : null,
+  return (
+    <>
+      {renderTemplate(doc, (data) =>
+        data ? <RichText converters={jsxConverters} data={data} /> : null,
+      )}
+      <DraftBanner collection="pages" doc={doc} from={from} />
+    </>
   )
 }

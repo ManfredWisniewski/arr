@@ -221,3 +221,74 @@ hr {
   border-radius: var(--radius-md, 6px);
   font-size: var(--font-size-sm, 0.875rem);
 }
+
+/* draft-review banner — floats above content for editors on draft pages */
+.draft-banner {
+  position: fixed;
+  right: var(--space-md, 1rem);
+  bottom: var(--space-md, 1rem);
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm, 0.75rem);
+  padding: var(--space-sm, 0.75rem) var(--space-md, 1rem);
+  background: var(--bg-muted, #f0f0f0);
+  color: var(--fg, #111);
+  border: 1px solid var(--border, #ddd);
+  border-radius: var(--radius-md, 6px);
+  box-shadow: 0 2px 12px rgb(0 0 0 / 20%);
+  font-size: var(--font-size-sm, 0.875rem);
+}
+
+.draft-banner button {
+  padding: var(--space-xs, 0.4rem) var(--space-sm, 0.75rem);
+  background: var(--brand, #333);
+  color: var(--bg, #fff);
+  border: 0;
+  border-radius: var(--radius-sm, 3px);
+  font: inherit;
+  cursor: pointer;
+}
+
+/* /review pending index */
+.review-list {
+  list-style: none;
+  margin: var(--space-md, 1rem) 0 0;
+  padding: 0;
+}
+
+.review-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm, 0.75rem);
+  padding: var(--space-sm, 0.75rem) 0;
+  border-bottom: 1px solid var(--border, #ddd);
+}
+
+.review-item time {
+  margin-left: auto;
+  color: var(--fg-muted, #666);
+  font-size: var(--font-size-sm, 0.875rem);
+}
+
+.review-collection {
+  padding: var(--space-xs, 0.25rem) var(--space-xs, 0.5rem);
+  background: var(--bg-muted, #f0f0f0);
+  border: 1px solid var(--border, #ddd);
+  border-radius: var(--radius-sm, 3px);
+  font-size: var(--font-size-sm, 0.875rem);
+}
+
+.review-publish {
+  margin: 0;
+}
+
+.review-publish button {
+  padding: var(--space-xs, 0.4rem) var(--space-sm, 0.75rem);
+  background: var(--brand, #333);
+  color: var(--bg, #fff);
+  border: 0;
+  border-radius: var(--radius-sm, 3px);
+  font: inherit;
+  cursor: pointer;
+}

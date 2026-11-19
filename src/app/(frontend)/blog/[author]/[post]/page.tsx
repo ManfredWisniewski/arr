@@ -1,17 +1,19 @@
-import { draftMode } from 'next/headers'
 import { notFound } from 'next/navigation.js'
 import React from 'react'
 
+import { DraftBanner } from '@/components/draft-banner'
 import {
   getAgent,
   getMediaUrl,
   getPostByPath,
 } from '@/lib/blog'
+import { getRequestDraft } from '@/lib/review'
 
 import { PostArticle } from '../../views'
 
 type Props = {
   params: Promise<{ author: string; post: string }>
+  searchParams: Promise<{ from?: string }>
 }
 
 const findPost = (author: string, post: string, draft: boolean) =>
@@ -19,8 +21,8 @@ const findPost = (author: string, post: string, draft: boolean) =>
 
 export async function generateMetadata({ params }: Props) {
   const { author, post } = await params
-  const { isEnabled } = await draftMode()
-  const doc = await findPost(author, post, isEnabled)
+  const draft = await getRequestDraft()
+  const doc = await findPost(author, post, draft)
   if (!doc) {
     return {}
   }
@@ -30,15 +32,21 @@ export async function generateMetadata({ params }: Props) {
   }
 }
 
-export default async function BlogPost({ params }: Props) {
+export default async function BlogPost({ params, searchParams }: Props) {
   const { author, post } = await params
-  const { isEnabled } = await draftMode()
-  const doc = await findPost(author, post, isEnabled)
+  const { from } = await searchParams
+  const draft = await getRequestDraft()
+  const doc = await findPost(author, post, draft)
   if (!doc) {
     notFound()
   }
-  const agent = doc.author ? await getAgent(doc.author, isEnabled) : undefined
-  const avatarUrl = await getMediaUrl(agent?.avatar, isEnabled)
+  const agent = doc.author ? await getAgent(doc.author, draft) : undefined
+  const avatarUrl = await getMediaUrl(agent?.avatar, draft)
 
-  return <PostArticle agent={agent} avatarUrl={avatarUrl} doc={doc} />
+  return (
+    <>
+      <PostArticle agent={agent} avatarUrl={avatarUrl} doc={doc} />
+      <DraftBanner collection="posts" doc={doc} from={from} />
+    </>
+  )
 }

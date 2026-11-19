@@ -1,8 +1,8 @@
-import { draftMode } from 'next/headers'
 import { getPayload } from 'payload'
 import React from 'react'
 
 import config from '@/payload.config'
+import { getRequestDraft } from '@/lib/review'
 
 import { CardGrid, type CardItem } from '../organisms/card'
 import { LeadSection } from '../organisms/lead-section'
@@ -18,15 +18,15 @@ type FeatureItem = {
 
 async function getFeatures(): Promise<CardItem[]> {
   try {
-    const { isEnabled } = await draftMode()
+    const draft = await getRequestDraft()
     const payload = await getPayload({ config: await config })
     const { docs } = await payload.find({
       collection: 'structures',
-      draft: isEnabled,
+      draft: draft,
       limit: 1,
       where: {
         name: { equals: 'features' },
-        ...(isEnabled ? {} : { _status: { equals: 'published' } }),
+        ...(draft ? {} : { _status: { equals: 'published' } }),
       },
     })
     const items = (docs[0]?.data as { items?: FeatureItem[] } | undefined)

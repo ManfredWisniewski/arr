@@ -1,4 +1,3 @@
-import { draftMode } from 'next/headers'
 import Script from 'next/script'
 import { getPayload } from 'payload'
 import React from 'react'
@@ -14,6 +13,7 @@ import {
 } from '@/components/organisms/site-footer'
 import { SiteHeader } from '@/components/organisms/site-header'
 import { ANALYTICS_CATEGORY, hasConsent } from '@/lib/consent'
+import { getRequestDraft } from '@/lib/review'
 
 import 'vanilla-cookieconsent/dist/cookieconsent.css'
 import './consent.css'
@@ -86,11 +86,11 @@ const THEME_INIT = `(function(){try{var v=localStorage.getItem('theme-variant');
 
 export default async function RootLayout(props: { children: React.ReactNode }) {
   const { children } = props
-  const { isEnabled } = await draftMode()
+  const draft = await getRequestDraft()
   const [theme, navItems, footer] = await Promise.all([
     getTheme(),
-    getNavigation(isEnabled),
-    getFooter(isEnabled),
+    getNavigation(draft),
+    getFooter(draft),
   ])
   const siteName = theme?.meta?.siteName ?? 'witconsult'
   // gtag.js targets (GA4 G-…, Google Tag GT-…, Ads AW-…, Floodlight

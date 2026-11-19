@@ -12,6 +12,27 @@ release.
 
 ### Added
 
+- Preview-confirm flow (spec `+wit/specs/arr/preview-confirm/`): an
+  `editor` session (the `/admin` login — the `payload-token` cookie is
+  domain-scoped) now sees the latest draft version everywhere on the
+  frontend, not only under Draft Mode. Any page/post whose latest
+  version is a draft shows a floating "Entwurf — noch nicht
+  veröffentlicht" banner with a publish button (`DraftBanner`), and
+  `/review` lists every pending document across `pages`, `posts` and
+  `structures` with a link to its draft view plus a per-row publish
+  form. `POST /publish` requires an editor session and runs the normal
+  server-side update path (`enforceEditorPublish` + `afterChange`
+  hooks); from review context it advances to the next pending document.
+  No batch publish, no new role, no schema change.
+
+- Admin nav "Review new" entry (`admin.components.Nav` →
+  `components/admin/review-nav.tsx`): vendored `DefaultNav` that inserts
+  an editor-only link to the frontend `/review` index directly after the
+  Media entry. `getNavPrefs`/`SettingsMenuButton` are reimplemented
+  locally because they are not in the `@payloadcms/next` exports — keep
+  in step with Payload upgrades. `/review` is not linked anywhere on the
+  public frontend.
+
 - Cookie consent banner (D12): TDDDG opt-in gating via
   `vanilla-cookieconsent` v3 (`organisms/consent-manager.tsx`,
   `molecules/consent-settings-button.tsx`). The banner + preferences

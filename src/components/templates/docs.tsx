@@ -1,8 +1,8 @@
-import { draftMode } from 'next/headers'
 import { getPayload } from 'payload'
 import React from 'react'
 
 import config from '@/payload.config'
+import { getRequestDraft } from '@/lib/review'
 
 import { Breadcrumb } from '../molecules/breadcrumb'
 import { mapNavItems, type NavItem } from '../molecules/nav-item'
@@ -14,15 +14,15 @@ import type { TemplateProps } from './default'
 
 async function getNavigation(): Promise<NavItem[]> {
   try {
-    const { isEnabled } = await draftMode()
+    const draft = await getRequestDraft()
     const payload = await getPayload({ config: await config })
     const { docs } = await payload.find({
       collection: 'structures',
-      draft: isEnabled,
+      draft: draft,
       limit: 1,
       where: {
         name: { equals: 'navigation' },
-        ...(isEnabled ? {} : { _status: { equals: 'published' } }),
+        ...(draft ? {} : { _status: { equals: 'published' } }),
       },
     })
     return mapNavItems(

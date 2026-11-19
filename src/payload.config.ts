@@ -17,6 +17,14 @@ const dirname = path.dirname(filename)
 export default buildConfig({
   admin: {
     user: Users.slug,
+    components: {
+      // vendored nav: adds "Review new" (/review) after the Media entry —
+      // spec +wit/specs/arr/preview-confirm/
+      Nav: {
+        exportName: 'ReviewNav',
+        path: '/components/admin/review-nav',
+      },
+    },
     importMap: {
       baseDir: path.resolve(dirname),
     },

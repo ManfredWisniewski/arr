@@ -1,4 +1,3 @@
-import { draftMode } from 'next/headers'
 import { notFound } from 'next/navigation.js'
 import React from 'react'
 
@@ -8,6 +7,7 @@ import {
   getPostsPage,
   parsePageParam,
 } from '@/lib/blog'
+import { getRequestDraft } from '@/lib/review'
 
 import { AuthorArchiveView } from '../views'
 
@@ -18,8 +18,8 @@ type Props = {
 
 export async function generateMetadata({ params }: Props) {
   const { author } = await params
-  const { isEnabled } = await draftMode()
-  const agent = await getAgent(author, isEnabled)
+  const draft = await getRequestDraft()
+  const agent = await getAgent(author, draft)
   if (!agent) {
     return {}
   }
@@ -32,17 +32,17 @@ export async function generateMetadata({ params }: Props) {
 export default async function AuthorBlog({ params, searchParams }: Props) {
   const { author } = await params
   const { page } = await searchParams
-  const { isEnabled } = await draftMode()
-  const agent = await getAgent(author, isEnabled)
+  const draft = await getRequestDraft()
+  const agent = await getAgent(author, draft)
   if (!agent) {
     notFound()
   }
   const current = parsePageParam(page)
   const [avatarUrl, result] = await Promise.all([
-    getMediaUrl(agent.avatar, isEnabled),
+    getMediaUrl(agent.avatar, draft),
     getPostsPage({
       author: agent.slug,
-      draft: isEnabled,
+      draft: draft,
       page: current,
       pathPrefix: '/blog',
     }),

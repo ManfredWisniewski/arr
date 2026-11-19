@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation.js'
 import React from 'react'
 
+import { DraftBanner } from '@/components/draft-banner'
 import {
   getAgent,
   getAgentMap,
@@ -74,10 +75,12 @@ export async function langBlogMetadata(segments: string[], draft: boolean) {
 
 export async function LangBlog({
   draft,
+  from,
   page,
   segments,
 }: {
   draft: boolean
+  from?: string
   page?: string
   segments: string[]
 }) {
@@ -181,12 +184,15 @@ export async function LangBlog({
     const agent = doc.author ? await getAgent(doc.author, draft) : undefined
     const avatarUrl = await getMediaUrl(agent?.avatar, draft)
     return (
-      <PostArticle
-        agent={agent}
-        avatarUrl={avatarUrl}
-        doc={doc}
-        notice={<TranslationNotice path={doc.path} />}
-      />
+      <>
+        <PostArticle
+          agent={agent}
+          avatarUrl={avatarUrl}
+          doc={doc}
+          notice={<TranslationNotice path={doc.path} />}
+        />
+        <DraftBanner collection="posts" doc={doc} from={from} />
+      </>
     )
   }
 

@@ -1,8 +1,8 @@
-import { draftMode } from 'next/headers'
 import { getPayload } from 'payload'
 import React from 'react'
 
 import config from '@/payload.config'
+import { getRequestDraft } from '@/lib/review'
 
 import { Accordion } from '../molecules/accordion'
 import { CardGrid } from '../organisms/card'
@@ -27,15 +27,15 @@ type PricingData = {
 
 async function getPricing(): Promise<PricingData> {
   try {
-    const { isEnabled } = await draftMode()
+    const draft = await getRequestDraft()
     const payload = await getPayload({ config: await config })
     const { docs } = await payload.find({
       collection: 'structures',
-      draft: isEnabled,
+      draft: draft,
       limit: 1,
       where: {
         name: { equals: 'pricing' },
-        ...(isEnabled ? {} : { _status: { equals: 'published' } }),
+        ...(draft ? {} : { _status: { equals: 'published' } }),
       },
     })
     return (docs[0]?.data as PricingData | undefined) ?? {}

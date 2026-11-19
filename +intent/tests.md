@@ -74,6 +74,21 @@ types:  npx payload generate:types && npx tsc
   spot checks (focus trap, keyboard operability, contrast in light and
   dark theme).
 
+### A08 Preview-confirm flow (spec `+wit/specs/arr/preview-confirm/`)
+
+- An `editor` session sees the draft banner on any page/post whose latest
+  version is a draft; publishing there promotes only that document — the
+  next anonymous request serves the new published version with no banner.
+- `/review` lists exactly the docs whose latest version is a draft across
+  `pages`, `posts` and `structures`; publishing removes the entry.
+- `POST` to the publish route without a session returns 401/403; with a
+  `content-bot` key 403; anonymous page HTML contains no review markup.
+- After confirming a document from the review flow the next pending
+  document (or `/review` when none remain) is reached; outside that flow
+  the published page itself is shown.
+- A frontend publish fires the same `afterChange` effects as an admin
+  publish (sitemap resubmit when `GSC_*` is configured).
+
 ## Not tested
 
 - REST-level publish denial by the bot key — covered by the `beforeChange`

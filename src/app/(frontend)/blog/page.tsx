@@ -1,9 +1,9 @@
-import { draftMode } from 'next/headers'
 import React from 'react'
 
 import { getAgentMap, getIntroPage, getPostsPage,
   parsePageParam,
 } from '@/lib/blog'
+import { getRequestDraft } from '@/lib/review'
 
 import { BlogIndexView } from './views'
 
@@ -12,8 +12,8 @@ type Props = {
 }
 
 export async function generateMetadata() {
-  const { isEnabled } = await draftMode()
-  const intro = await getIntroPage('/blog', isEnabled)
+  const draft = await getRequestDraft()
+  const intro = await getIntroPage('/blog', draft)
   return {
     description: intro?.meta?.description ?? undefined,
     title: intro?.meta?.title ?? intro?.title ?? 'Blog',
@@ -21,16 +21,16 @@ export async function generateMetadata() {
 }
 
 export default async function BlogIndex({ searchParams }: Props) {
-  const { isEnabled } = await draftMode()
+  const draft = await getRequestDraft()
   const { page } = await searchParams
   const current = parsePageParam(page)
   const [intro, result] = await Promise.all([
-    getIntroPage('/blog', isEnabled),
-    getPostsPage({ draft: isEnabled, page: current, pathPrefix: '/blog' }),
+    getIntroPage('/blog', draft),
+    getPostsPage({ draft: draft, page: current, pathPrefix: '/blog' }),
   ])
   const agents = await getAgentMap(
     result.docs.map((post) => post.author),
-    isEnabled,
+    draft,
   )
 
   return (

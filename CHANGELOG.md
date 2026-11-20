@@ -10,6 +10,8 @@ release.
 
 ## Unreleased
 
+## [0.3.0] - 2026-11-20
+
 ### Added
 
 - Docs-as-code documentation site (spec `+wit/specs/arr/docusaurus/`): a

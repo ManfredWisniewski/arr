@@ -1,9 +1,18 @@
 import type { CollectionConfig } from 'payload'
 
-import { authenticated, editorOnly } from '../access/roles'
+import {
+  authenticated,
+  editorOnly,
+  publishedOrAuthenticated,
+} from '../access/roles'
 import { pagesEditor } from '../editor'
+import { clampPublicFind } from '../hooks/clampPublicFind'
 import { enforceEditorPublish } from '../hooks/enforceEditorPublish'
 import { markdownToContent } from '../hooks/markdownToContent'
+import {
+  resubmitSitemapAfterChange,
+  resubmitSitemapAfterDelete,
+} from '../hooks/resubmitSitemap'
 
 // Blog posts synced from <site>/blog/<agent>/*_webtext*.md. Taxonomy
 // (author, categories, tags) is plain data owned by the content repo;
@@ -23,12 +32,15 @@ export const Posts: CollectionConfig = {
     },
   },
   access: {
-    read: () => true,
+    read: publishedOrAuthenticated,
     create: authenticated,
     update: authenticated,
     delete: editorOnly,
   },
   hooks: {
+    afterChange: [resubmitSitemapAfterChange],
+    afterDelete: [resubmitSitemapAfterDelete],
+    beforeOperation: [clampPublicFind],
     beforeValidate: [markdownToContent],
     beforeChange: [enforceEditorPublish],
   },
@@ -50,6 +62,10 @@ export const Posts: CollectionConfig = {
       type: 'text',
       required: true,
       unique: true,
+      validate: (value: unknown) =>
+        typeof value === 'string' && /^[^\s<>&"']+$/.test(value)
+          ? true
+          : 'Path must not contain whitespace or markup characters',
     },
     {
       name: 'excerpt',
@@ -84,21 +100,53 @@ export const Posts: CollectionConfig = {
       name: 'author',
       type: 'text',
       index: true,
+      validate: (value: unknown) =>
+        value == null ||
+        (typeof value === 'string' && /^[^\s<>&"']+$/.test(value))
+          ? true
+          : 'Author must not contain whitespace or markup characters',
     },
     {
       name: 'categories',
       type: 'text',
       hasMany: true,
+      validate: (value: unknown) =>
+        value == null ||
+        (Array.isArray(value) &&
+          value.every(
+            (v) => typeof v === 'string' && /^[^\s<>&"']+$/.test(v),
+          ))
+          ? true
+          : 'Categories must not contain whitespace or markup characters',
     },
     {
       name: 'tags',
       type: 'text',
       hasMany: true,
+      validate: (value: unknown) =>
+        value == null ||
+        (Array.isArray(value) &&
+          value.every(
+            (v) => typeof v === 'string' && /^[^\s<>&"']+$/.test(v),
+          ))
+          ? true
+          : 'Tags must not contain whitespace or markup characters',
     },
     {
       name: 'cover',
       type: 'upload',
       relationTo: 'media',
+    },
+    {
+      // render template name resolved by the frontend registry; empty = default
+      name: 'template',
+      type: 'text',
+    },
+    {
+      // HedgeDoc `slideOptions` front matter, verbatim — reveal.js config
+      // consumed by the `slide` template (theme, transition, width, ...)
+      name: 'slideOptions',
+      type: 'json',
     },
     {
       // repository-relative path of the source file; upsert idempotency key

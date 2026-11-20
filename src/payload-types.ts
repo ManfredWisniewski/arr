@@ -168,6 +168,7 @@ export interface Media {
   caption?: string | null;
   sourceHash?: string | null;
   sourcePath?: string | null;
+  sourceRepo?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -250,6 +251,15 @@ export interface Page {
   sourcePath?: string | null;
   sourceRepo?: string | null;
   template?: string | null;
+  slideOptions?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   meta?: {
     title?: string | null;
     description?: string | null;
@@ -289,6 +299,16 @@ export interface Post {
   categories?: string[] | null;
   tags?: string[] | null;
   cover?: (number | null) | Media;
+  template?: string | null;
+  slideOptions?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   sourcePath?: string | null;
   sourceRepo?: string | null;
   meta?: {
@@ -444,6 +464,7 @@ export interface MediaSelect<T extends boolean = true> {
   caption?: T;
   sourceHash?: T;
   sourcePath?: T;
+  sourceRepo?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -523,6 +544,7 @@ export interface PagesSelect<T extends boolean = true> {
   sourcePath?: T;
   sourceRepo?: T;
   template?: T;
+  slideOptions?: T;
   meta?:
     | T
     | {
@@ -549,6 +571,8 @@ export interface PostsSelect<T extends boolean = true> {
   categories?: T;
   tags?: T;
   cover?: T;
+  template?: T;
+  slideOptions?: T;
   sourcePath?: T;
   sourceRepo?: T;
   meta?:
@@ -622,6 +646,12 @@ export interface Theme {
   id: number;
   logo?: (number | null) | Media;
   favicon?: (number | null) | Media;
+  tracking?: {
+    google?: string | null;
+  };
+  consent?: {
+    privacyPath?: string | null;
+  };
   cssLight?: string | null;
   cssDark?: string | null;
   meta?: {
@@ -638,6 +668,16 @@ export interface Theme {
 export interface ThemeSelect<T extends boolean = true> {
   logo?: T;
   favicon?: T;
+  tracking?:
+    | T
+    | {
+        google?: T;
+      };
+  consent?:
+    | T
+    | {
+        privacyPath?: T;
+      };
   cssLight?: T;
   cssDark?: T;
   meta?:

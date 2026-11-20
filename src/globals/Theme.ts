@@ -1,6 +1,14 @@
-import type { GlobalConfig } from 'payload'
+import { APIError, type GlobalConfig } from 'payload'
 
 import { editorOrBot } from '../access/roles'
+
+// CSS never legitimately contains a closing tag; rejecting `</` here blocks
+// the </style><script> breakout on the public render path.
+const rejectMarkup = (value: unknown, name: string) => {
+  if (typeof value === 'string' && value.includes('</')) {
+    throw new APIError(`${name} must not contain markup`, 400)
+  }
+}
 
 // Site styling as data: the compiled CSS from wit-tokens is pushed here via
 // the API; the frontend injects it verbatim (selectors like `:root` and
@@ -10,6 +18,15 @@ export const Theme: GlobalConfig = {
   access: {
     read: () => true,
     update: editorOrBot,
+  },
+  hooks: {
+    beforeValidate: [
+      ({ data }) => {
+        rejectMarkup(data?.cssLight, 'cssLight')
+        rejectMarkup(data?.cssDark, 'cssDark')
+        return data
+      },
+    ],
   },
   fields: [
     {
@@ -23,6 +40,34 @@ export const Theme: GlobalConfig = {
       name: 'favicon',
       type: 'upload',
       relationTo: 'media',
+    },
+    {
+      // analytics ids pushed from site.yml `tracking:` — the frontend
+      // injects the matching vendor script per key when set
+      name: 'tracking',
+      type: 'group',
+      fields: [
+        {
+          // GA4/Google-Tag id (G-…, GT-…); loads gtag.js
+          name: 'google',
+          type: 'text',
+        },
+      ],
+    },
+    {
+      // consent-banner config pushed from site.yml `consent:` — the
+      // banner only renders when a consent-gated service is configured
+      // (tracking.google today); see knowledge/decisions.md D12
+      name: 'consent',
+      type: 'group',
+      fields: [
+        {
+          // path of the site's privacy page linked from the banner
+          name: 'privacyPath',
+          type: 'text',
+          defaultValue: '/datenschutz',
+        },
+      ],
     },
     {
       name: 'cssLight',

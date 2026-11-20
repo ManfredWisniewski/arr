@@ -131,7 +131,7 @@ Naming contract (single source of mapping, keep in this doc):
   vendored per app.
 - Optional automation: Figma MCP server + AI scaffolding for component
   stubs (needs Dev Mode/paid seat — defer until plan tier exists).
-- Governance note in `+intent/decisions.md`: Figma owns token values;
+- Governance note in `knowledge/decisions.md`: Figma owns token values;
   biti owns token ids/format (ids remain the published API — add or
   deprecate, never rename in place).
 

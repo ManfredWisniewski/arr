@@ -1,5 +1,7 @@
 import React from 'react'
 
+import { cx } from '@/lib/cx'
+
 import { Link } from '../atoms/link'
 import { NavCaret } from './nav-caret'
 
@@ -24,34 +26,92 @@ export function mapNavItems(items: unknown): NavItem[] {
     .filter((item) => item.label && (item.path || item.children.length > 0))
 }
 
-// shell.css navbar contract (biti +intent/components/navbar_prompt.md):
-// li > .nav-item cell; a nested ul opens as the full-width submenu band
-// anchored to .navbar. First band child is a .nav-brand--spacer aligning
-// the band items under .site-nav.
-function NavItemEntry({
-  brand,
+function NavItemCell({
+  className,
   item,
 }: {
-  brand?: React.ReactNode
+  className?: string
   item: NavItem
 }) {
   return (
-    <li>
-      <div className="nav-item">
-        {item.path ? <Link href={item.path}>{item.label}</Link> : item.label}
-        {item.children.length > 0 ? <NavCaret label={item.label} /> : null}
-      </div>
-      {item.children.length > 0 ? (
-        <ul>
-          {brand ? (
-            <li aria-hidden="true" className="nav-brand nav-brand--spacer">
-              {brand}
-            </li>
+    <div className={cx('nav-item', className)}>
+      {item.path ? <Link href={item.path}>{item.label}</Link> : item.label}
+      {item.children.length > 0 ? <NavCaret label={item.label} /> : null}
+    </div>
+  )
+}
+
+// shell.css navbar contract (biti +intent/components/navbar_prompt.md):
+// li > .nav-item cell; a nested ul opens as the full-width submenu band
+// anchored to .navbar. The band's first child is a .band-spacer li whose
+// .band-ghosts invisibly replicates the bar up to but not including the
+// parent item; .band-anchor then sizes to an invisible clone of the
+// parent while the first band cell overlays it — same left edge, same
+// width. Only top-level bands get ghosts; nested bands render plain.
+function NavBand({
+  ghosts,
+  items,
+  parent,
+  parentEdge,
+}: {
+  ghosts?: React.ReactNode
+  items: NavItem[]
+  parent?: NavItem
+  parentEdge?: boolean
+}) {
+  const [first, ...rest] = items
+  if (!first) return null
+  return (
+    <ul>
+      {ghosts ? (
+        <li className="band-spacer">
+          <div aria-hidden="true" className="band-ghosts">
+            {ghosts}
+          </div>
+          <div className="band-anchor">
+            <div aria-hidden="true" className="band-ghosts">
+              {parent ? (
+                <NavItemCell
+                  className={parentEdge ? 'nav-item--edge' : undefined}
+                  item={parent}
+                />
+              ) : null}
+            </div>
+            <NavItemCell item={first} />
+          </div>
+          {first.children.length > 0 ? (
+            <NavBand items={first.children} />
           ) : null}
-          {item.children.map((child) => (
-            <NavItemEntry key={child.label} item={child} />
-          ))}
-        </ul>
+        </li>
+      ) : (
+        <NavItemEntry item={first} />
+      )}
+      {rest.map((child) => (
+        <NavItemEntry item={child} key={child.label} />
+      ))}
+    </ul>
+  )
+}
+
+function NavItemEntry({
+  ghosts,
+  item,
+  parentEdge,
+}: {
+  ghosts?: React.ReactNode
+  item: NavItem
+  parentEdge?: boolean
+}) {
+  return (
+    <li>
+      <NavItemCell item={item} />
+      {item.children.length > 0 ? (
+        <NavBand
+          ghosts={ghosts}
+          items={item.children}
+          parent={item}
+          parentEdge={parentEdge}
+        />
       ) : null}
     </li>
   )
@@ -93,8 +153,24 @@ export function NavList({
   }
   return (
     <ul className="primary-nav">
-      {items.map((item) => (
-        <NavItemEntry brand={brand} item={item} key={item.label} />
+      {items.map((item, i) => (
+        <NavItemEntry
+          ghosts={
+            <>
+              <span className="nav-brand nav-brand--spacer">{brand}</span>
+              {items.slice(0, i).map((ghost, j) => (
+                <NavItemCell
+                  className={j === 0 ? 'nav-item--edge' : undefined}
+                  item={ghost}
+                  key={ghost.label}
+                />
+              ))}
+            </>
+          }
+          item={item}
+          key={item.label}
+          parentEdge={i === 0}
+        />
       ))}
     </ul>
   )

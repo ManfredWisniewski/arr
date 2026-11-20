@@ -10,7 +10,8 @@ export function optimizeMediaUrl(
   width: number,
   quality = 75,
 ): string | undefined {
-  if (!url || !url.startsWith('/api/media/file/')) {
+  // SVGs are vectors — the raster optimizer refuses them (400) anyway.
+  if (!url || !url.startsWith('/api/media/file/') || url.endsWith('.svg')) {
     return url
   }
   return `/_next/image?url=${encodeURIComponent(url)}&w=${width}&q=${quality}`

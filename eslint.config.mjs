@@ -28,6 +28,12 @@ const eslintConfig = [
       '.next/',
       'src/payload-types.ts',
       'src/payload-generated-schema.ts',
+      // generated skill copies — canonical sources live in +wit/agents/skills/
+      '.agents/',
+      // the Docusaurus docs site has its own toolchain
+      'docs/',
+      // static assets incl. the generated docs export (public/docs)
+      'public/',
       // submodules are separate repos with their own linting
       '+wit/',
       'biti/',

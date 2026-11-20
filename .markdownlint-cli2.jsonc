@@ -8,12 +8,16 @@
     "MD060": false
   },
   "ignores": [
-    "node_modules/**",
+    "**/node_modules/**",
     ".next/**",
     "+wit/**",
     "+wit-*/**",
     "biti/**",
     "wit_pytools/**",
-    "__*/**"
+    "__*/**",
+    "docs/build/**",
+    "docs/.docusaurus/**",
+    "docs/styles/**",
+    "public/docs/**" 
   ]
 }

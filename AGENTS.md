@@ -8,7 +8,9 @@ The shared rules in `+wit/AGENTS.md` apply. Additionally:
 
 - The Payload database is a derived read model — never treat it as a source of truth; content and theme are pushed via the REST API.
 - Do not store credentials, customer data, conversation logs or runtime state.
+- Never use `>nul`, `2>nul` or other `nul` redirects in shell commands — under Git Bash they create a literal `nul` file in the working directory. Use `>/dev/null` / `2>/dev/null` instead.
 - `CHANGELOG.md` tracks changes that ship in the image (`src/`, config, schema). If a change requires an image rebuild + redeploy to go live, add an entry under `## Unreleased`.
+- Versioning is automated: every push to `main` bumps `package.json`/lock per conventional-commit level (`.github/workflows/version-bump.yml`), tags `vX.Y.Z` and rotates the changelog — write `feat:`/`fix:`/`perf:`/`BREAKING:` subjects accordingly. Docs version snapshots are cut manually on minor/major releases (`docs/README.md`).
 
 ## Commands
 
@@ -26,3 +28,12 @@ native-binding cache ACLs — profile dirs that grant other accounts
 replacement rights fail with `ERR_SWC_NATIVE_CACHE`. Workaround: create a
 dir with a tight ACL (e.g. `C:\swc-cache`, grant only the current
 user/SYSTEM/Admins) and set `SWC_NATIVE_BINDING_CACHE` to it.
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

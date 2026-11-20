@@ -1,0 +1,28 @@
+# Repository structure compliance check (wit-common inventory). Runs on push
+# to protected branches and on demand; fails on missing required structure.
+name: structure-check
+
+on:
+  push:
+    branches: [main, work, wip]
+  schedule:
+    - cron: '0 5 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      # submodules intentionally off: +wit (ssh://git.w1t.org) and biti
+      # (private) can't be cloned in CI — the check uses the vendored
+      # inventory at common/repo-inventory.json instead.
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Check repository structure
+        # no --skills-check: it diffs .agents/skills against
+        # +wit/agents/skills, which isn't cloned here
+        run: python3 scripts/check-repo-structure.py . --remote

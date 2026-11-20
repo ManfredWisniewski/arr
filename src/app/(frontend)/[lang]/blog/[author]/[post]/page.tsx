@@ -1,4 +1,4 @@
-import { draftMode } from 'next/headers'
+import { getRequestDraft } from '@/lib/review'
 import { notFound } from 'next/navigation.js'
 import { RichText } from '@payloadcms/richtext-lexical/react'
 import { hasLocale } from 'next-intl'
@@ -31,8 +31,8 @@ export async function generateMetadata({ params }: Props) {
   if (!hasLocale(routing.locales, lang)) {
     return {}
   }
-  const { isEnabled } = await draftMode()
-  const doc = await findPost(author, post, isEnabled, lang)
+  const draft = await getRequestDraft()
+  const doc = await findPost(author, post, draft, lang)
   if (!doc) {
     return {}
   }
@@ -52,18 +52,18 @@ export default async function BlogPost({ params }: Props) {
   if (!hasLocale(routing.locales, lang)) {
     notFound()
   }
-  const { isEnabled } = await draftMode()
+  const draft = await getRequestDraft()
   const [doc, format] = await Promise.all([
-    findPost(author, post, isEnabled, lang),
+    findPost(author, post, draft, lang),
     getFormatter({ locale: lang }),
   ])
   if (!doc) {
     notFound()
   }
   const agent = doc.author
-    ? await getAgent(doc.author, isEnabled, lang)
+    ? await getAgent(doc.author, draft, lang)
     : undefined
-  const avatarUrl = await getMediaUrl(agent?.avatar, isEnabled, 'avatar', lang)
+  const avatarUrl = await getMediaUrl(agent?.avatar, draft, 'avatar', lang)
   const cover =
     doc.cover && typeof doc.cover === 'object' ? doc.cover : undefined
 

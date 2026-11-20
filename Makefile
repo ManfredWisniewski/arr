@@ -6,12 +6,12 @@
 # SITE unset → `make publish` pushes every site in SITES, one sub-make
 # each (so each site gets its own sites/<site>/.env + site.mk).
 # `make publish SITE=x` (or sync/theme/site) still targets one site.
-SITES ?= w1t.org witconsult.de
+SITES ?= w1t.org w1s.org witsolutions.de witconsult.de manni.info
 -include sites/$(SITE)/.env
 -include sites/$(SITE)/site.mk
 export PAYLOAD_BASE_URL PAYLOAD_API_KEY
 
-CONTENT_REPO ?= ../../../clients/seo-wit/$(SITE)
+CONTENT_REPO ?= P:/clients/seo-wit/$(SITE)
 THEME ?= wit
 BITI_DIR ?= biti
 CSS_DIR ?= $(BITI_DIR)/tokens/build/css
@@ -40,11 +40,12 @@ FONT_VARS_arr := \
 FONT_ARGS_wit := \
 	$(call font_arg,Inter,inter-v*.woff2) \
 	$(call font_arg,Inter Tight,inter-tight-*.woff2) \
-	$(call font_arg,Roboto,roboto-*.woff2)
+	$(call font_arg,Roboto,roboto-*.woff2) \
+	$(call font_arg,Roboto Serif,roboto-serif-*.woff2)
 FONT_VARS_wit := \
-	--font-var "typography-typeface-change-font-here-body=Inter" \
-	--font-var "typography-typeface-change-font-here-display=Roboto" \
-	--font-var "typography-typeface-change-font-here-heading=Roboto"
+	--font-var "typography-typeface-change-font-here-body=Roboto Serif" \
+	--font-var "typography-typeface-change-font-here-display=Inter" \
+	--font-var "typography-typeface-change-font-here-heading=Inter"
 
 FONT_ARGS := $(FONT_ARGS_$(THEME)) $(FONT_VARS_$(THEME))
 
@@ -66,7 +67,7 @@ ifneq ($(IMAGE_DIRTY),)
 endif
 
 tokens:
-	npm --prefix $(BITI_DIR)/tokens run build
+	npm --prefix $(BITI_DIR)/tokens run preview
 
 theme: tokens
 	$(PT) theme --css-light $(CSS_DIR)/$(THEME)-light.css --css-dark $(CSS_DIR)/$(THEME)-dark.css $(FONT_ARGS)
@@ -92,13 +93,16 @@ biti-port:
 dev:
 	powershell -NoProfile -ExecutionPolicy Bypass -File scripts/dev.ps1
 
-# Same push pipeline against the local stack. Defaults to the dev-only
-# key seeded by `make dev`; set $env:PAYLOAD_API_KEY to override.
-publish-local: export PAYLOAD_BASE_URL := http://127.0.0.1:3000
-publish-local: export PAYLOAD_API_KEY ?= 6927128c-70b0-4e85-a455-835e4d184afa
+# Same push pipeline against the local stack. localhost, not 127.0.0.1:
+# another process (e.g. an IDE preview) may squat the v4 loopback while
+# next dev binds [::1]. Site .env credentials are ignored deliberately —
+# origin filter keeps only command-line/environment overrides, so a
+# `publish-local SITE=x` can never push to production by accident.
+publish-local: export PAYLOAD_BASE_URL := $(if $(filter command line environment,$(origin PAYLOAD_BASE_URL)),$(PAYLOAD_BASE_URL),http://localhost:3000)
+publish-local: export PAYLOAD_API_KEY := $(if $(filter command line environment,$(origin PAYLOAD_API_KEY)),$(PAYLOAD_API_KEY),6927128c-70b0-4e85-a455-835e4d184afa)
 publish-local: theme site sync
-	$(info published to http://127.0.0.1:3000)
+	$(info published to $(PAYLOAD_BASE_URL))
 
 # Push the mockup demo site (all templates/elements) to the local stack.
-demo: CONTENT_REPO := ../obs-seo-witconsult/demo
+demo: CONTENT_REPO := P:/clients/seo-wit/@demo
 demo: publish-local

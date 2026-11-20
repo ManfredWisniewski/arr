@@ -23,6 +23,7 @@
   },
   "nav": {
     "footer": "Fußzeilen-Navigation",
+    "legal": "Rechtliches",
     "menu": "Menü",
     "primary": "Hauptnavigation"
   },
@@ -30,13 +31,13 @@
     "message": "Seite nicht gefunden.",
     "title": "404"
   },
-  "pricing": {
-    "faqHeading": "Häufige Fragen"
-  },
   "pagination": {
     "ariaLabel": "Seitennavigation",
     "next": "Weiter",
     "previous": "Zurück"
+  },
+  "pricing": {
+    "faqHeading": "Häufige Fragen"
   },
   "theme": {
     "dark": "Dunkel",

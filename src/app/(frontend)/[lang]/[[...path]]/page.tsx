@@ -1,4 +1,4 @@
-import { draftMode } from 'next/headers'
+import { getRequestDraft } from '@/lib/review'
 import { notFound } from 'next/navigation.js'
 import { RichText } from '@payloadcms/richtext-lexical/react'
 import { hasLocale } from 'next-intl'
@@ -42,8 +42,8 @@ export async function generateMetadata({ params }: Props) {
   if (!hasLocale(routing.locales, lang)) {
     return {}
   }
-  const { isEnabled } = await draftMode()
-  const page = await findPage(`/${path.join('/')}`, isEnabled, lang)
+  const draft = await getRequestDraft()
+  const page = await findPage(`/${path.join('/')}`, draft, lang)
   if (!page) {
     return {}
   }
@@ -63,8 +63,8 @@ export default async function SitePage({ params }: Props) {
   if (!hasLocale(routing.locales, lang)) {
     notFound()
   }
-  const { isEnabled } = await draftMode()
-  const page = await findPage(`/${path.join('/')}`, isEnabled, lang)
+  const draft = await getRequestDraft()
+  const page = await findPage(`/${path.join('/')}`, draft, lang)
 
   if (!page) {
     notFound()

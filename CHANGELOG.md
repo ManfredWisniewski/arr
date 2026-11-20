@@ -10,6 +10,26 @@ release.
 
 ## Unreleased
 
+## [0.8.0] - 2026-11-20
+
+## [0.7.0] - 2026-11-20
+
+### Fixed
+
+- `src/lib/review.ts`: `getViewer()` now awaits `headers()` before
+  initializing Payload — during `next build` static generation the
+  headers promise suspends (route marked dynamic), so Payload init is
+  never reached without env. Fixes the image build failing on
+  `missing secret key` while prerendering `/blog`.
+
+## [0.6.0] - 2026-11-20
+
+## [0.5.0] - 2026-11-20
+
+## [0.4.0] - 2026-11-20
+
+## [0.3.0] - 2026-11-20
+
 ### Added
 
 - Internationalization, German (default) + English: Payload field-level
@@ -28,7 +48,7 @@ release.
   with `hreflang` alternates + `x-default`), canonical/hreflang metadata
   on every page. Migration `20261013_211826_i18n` copies existing rows
   into the `de` locale tables before dropping the old columns. See
-  `+intent/decisions.md` D08–D11.
+  `knowledge/decisions.md` D13–D16.
 - Visitor chat widget: `ChatWidget` client component
   (`app/(frontend)/[lang]/chat-widget.tsx`) rendered by the frontend
   layout when `CHAT_WEBHOOK_URL` is set — fixed bubble → panel, AI
@@ -40,6 +60,281 @@ release.
   never reach the browser. Labels via `CHAT_TITLE`, `CHAT_GREETING`,
   `CHAT_DISCLOSURE`. Plan:
   `+wit/development/plans/chat/2026-10-13_plan-website-chat-claudia.md`.
+- Docs-as-code documentation site (spec `+wit/specs/arr/docusaurus/`): a
+  Docusaurus project in `docs/` whose static export is built inside the
+  image (`docs-builder` Dockerfile stage) into `public/docs/` and served
+  anonymously at `/docs/` on every instance via `next.config.ts` rewrites
+  (`/docs*` directory URLs → `index.html`). Content areas: developer
+  docs (`/docs/dev/`), editor docs (`/docs/editor/`, English + German via
+  `docs/i18n/`) and a release-notes blog (`/docs/blog`, RSS/Atom).
+  Offline full-text search (`@easyops-cn/docusaurus-search-local`),
+  per-release doc versioning (`npm run docusaurus docs:version`), biti
+  token branding via `docs/src/css/custom.css`, Vale prose linting +
+  docs build in `.github/workflows/docs.yml`. Local:
+  `npm run docs:dev` / `npm run docs:build`.
+
+- Preview-confirm flow (spec `+wit/specs/arr/preview-confirm/`): an
+  `editor` session (the `/admin` login — the `payload-token` cookie is
+  domain-scoped) now sees the latest draft version everywhere on the
+  frontend, not only under Draft Mode. Any page/post whose latest
+  version is a draft shows a floating "Entwurf — noch nicht
+  veröffentlicht" banner with a publish button (`DraftBanner`), and
+  `/review` lists every pending document across `pages`, `posts` and
+  `structures` with a link to its draft view plus a per-row publish
+  form. `POST /publish` requires an editor session and runs the normal
+  server-side update path (`enforceEditorPublish` + `afterChange`
+  hooks); from review context it advances to the next pending document.
+  No batch publish, no new role, no schema change.
+
+- Admin nav "Review new" entry (`admin.components.Nav` →
+  `components/admin/review-nav.tsx`): vendored `DefaultNav` that inserts
+  an editor-only link to the frontend `/review` index directly after the
+  Media entry. `getNavPrefs`/`SettingsMenuButton` are reimplemented
+  locally because they are not in the `@payloadcms/next` exports — keep
+  in step with Payload upgrades. `/review` is not linked anywhere on the
+  public frontend.
+
+- Cookie consent banner (D12): TDDDG opt-in gating via
+  `vanilla-cookieconsent` v3 (`organisms/consent-manager.tsx`,
+  `molecules/consent-settings-button.tsx`). The banner + preferences
+  modal render only when a consent-gated service is configured —
+  `tracking.google` in v1. gtag.js is emitted only after `analytics`
+  consent: SSR reads `cc_cookie` (`lib/consent.ts`); live accept
+  injects the tag without reload; withdrawal reloads the page and the
+  lib's auto-clear strips `_ga*` cookies. Texts ship bundled de/en
+  (`autoDetect: 'document'`); styling maps the lib's `--cc-*` vars onto
+  site tokens (`app/(frontend)/consent.css`). "Cookie-Einstellungen" is
+  auto-appended to the footer legal row — rendered even when no footer
+  structure doc exists. `site.yml` gains `consent.privacy_path` →
+  `theme.consent.privacyPath` (payloadtools `site`, merged); migration
+  `add_theme_consent`.
+
+- Google Tag (GA4) tracking per site: `theme.tracking.google` holds a
+  gtag.js id (`G-…`, `GT-…`, `AW-…`, `DC-…`), pushed from `site.yml`
+  `tracking:` via `payloadtools site` (merged — admin-set ids survive).
+  The frontend loads `gtag.js` + `gtag('config', <id>)` only when a
+  valid id is set (validated before emit — the stored value reaches a
+  `<script src>`). Note: loading it unconditionally is a consent
+  question under TDDDG/DSGVO — whether an id is configured is a
+  per-site owner decision.
+
+- Google Search Console sitemap resubmission: debounced `afterChange`/
+  `afterDelete` hooks on `pages`/`posts` (`hooks/resubmitSitemap.ts`)
+  call the Search Console API `sitemaps.submit`
+  (`lib/searchConsole.ts` — service-account JWT per RFC 7523, no extra
+  dependency) whenever a write touches a document that is or was
+  published; draft-only writes are skipped. Enabled only when
+  `GSC_SITE`, `GSC_CLIENT_EMAIL` and `GSC_PRIVATE_KEY` are all set — the
+  service account e-mail must be a user on the SC property. The
+  submitted sitemap URL uses the public origin
+  (`NEXT_PUBLIC_SERVER_URL`, then `SITE_URL`, then the request origin;
+  `GSC_SITE`-derived as last resort) — never the container listen
+  address. robots.txt discovery + `<lastmod>` remain the baseline;
+  resubmission only brings Google's sitemap refetch forward, it does
+  not guarantee indexing.
+
+- Markdown attribute syntax (`lib/markdownAttributes.ts`): `## Title
+  {#some-id}` renders as `<h2 id="some-id">` and
+  `[text](url){target="_blank"}` overrides the link-target policy
+  (absolute `http(s)` → new tab, otherwise same tab — D08). The
+  `markdownToContent` hook stamps anchors as `id` on heading nodes and
+  targets as `fields.target` on link nodes; the JSX converters emit the
+  attributes, and anchored headings get `scroll-margin-top`. Headings
+  without `{#id}` render without an `id` (no slugger fallback); links
+  without `{target}` follow the URL rule. Rollout note: an unchanged
+  `markdownRaw` is a sync no-op and does not regenerate `content`, so
+  already-synced pages like `/faq/glossar` need a touched source file
+  (or forced push) to pick up anchors; saving `content` in `/admin`
+  also drops the extra `id`/`target` keys until the next markdown sync
+  (read model — consistent with synced-field doctrine).
+
+- Slide presentations: a `slide` template renders HedgeDoc slide-mode
+  markdown as an embedded reveal.js deck (`---`/`----` separators,
+  `Note:` speaker notes, `<!-- .slide: -->` attributes, mermaid blocks,
+  raw HTML; fullscreen toggle included). `posts` gains `template` +
+  `slideOptions`, `pages` gains `slideOptions` — the sync tool maps
+  front matter `type: slide` to `template: slide` and pushes
+  `slideOptions` verbatim.
+
+- `/<name>.vcf` at the domain root serves vCards synced from the
+  content repo (`media/<name>.vcf`) as `text/vcard` attachments.
+  `next.config` rewrites `*.vcf` to `/vcf/<name>` where a route handler
+  resolves the media doc by `sourcePath` — re-uploads are picked up
+  even when Payload dedupes the stored filename (`name-1.vcf`, …).
+
+- M3 component parity with the biti `src/components/ui` catalog,
+  re-implemented as contract-class components (no Radix/Tailwind —
+  native `<dialog>`/`<details>`/`<input type="range">` + shell.css
+  hooks). New atoms: `Ripple`, `Fab`, `IconButton` (icon-only, M3
+  variant — distinct from the labeled molecule of the same name),
+  `Slider` + `RangeSlider`; `Progress` gains `variant="circular"` +
+  `indeterminate`. New molecules: `Chip` + `ChipSet`,
+  `SegmentedButton`/`Set` (single + multi), `SplitButton`, `Toolbar`,
+  `FabMenu`; `Tabs` gains `variant="secondary"`, `Checkbox` gains
+  `indeterminate`. New organisms: `Carousel`, `DatePicker` (own
+  `Calendar` grid, single + range), `TimePicker` (input + clock dial),
+  `SearchBar`/`SearchView`, `NavigationRail`, `NavigationBar`,
+  `RichTooltip`; `Drawer` gains `side` (`left`/`bottom`) and
+  `modal={false}` (standard sheet). Theme signature components ported
+  from biti: `WitCube`, `WitSpaceSmall` (wit) and `BlueprintPanel`,
+  `PressureGauge`, `Gear` (trurl) — recorded in
+  `scripts/biti-ports.json`. Styling lives in biti `tokens/shell.css`
+  (new contract classes: `.fab`, `.iconbtn`, `.slider`, `.range-slider`,
+  `.chip(s)`, `.segmented`, `.splitbtn`, `.toolbar`, `.fabmenu`,
+  `.drawer-*` side variants, `.carousel`, `.navrail`, `.bottomnav`,
+  `.rich-tooltip`, `.searchbar`/`.searchview`, `.datepicker`/`.calendar`,
+  `.timepicker`/`.tp-*`, `.blueprint`, `.gauge`, `.gear`,
+  `.tabs-secondary`, `.showcase-themes`) — needs a token rebuild +
+  theme repush to render styled.
+
+- `/components` showcase: covers the new components and now embeds the
+  theme controls (`ThemeToggle` + `ThemeSwitcher`) at the top via a
+  `themeControls` prop; the floating `ThemeSwitcher` stays in sync via
+  an `arr:theme-variant` event.
+
+### Changed
+
+- `PageHero` redesigned after the Biti-WIT Figma `Hero`: with hero
+  media present it now renders as a full-bleed band capped at 35vh
+  (`.page-hero--media`) — cover image + tint/readability scrim +
+  `page-hero-message` block (title + lead in light heading type) with
+  the open-frame corner accent; without media it keeps the plain text
+  header. The accent is `public/open-frame.svg` — the Dockerfile now
+  copies `public/` into the image (was commented out) so root-level
+  static assets are served. Styling lives in biti `tokens/shell.css`
+  (`.page-hero-media`, `.page-hero-message`, `.page-hero-frame`) —
+  needs a token rebuild + theme repush to render styled.
+
+- `SiteFooter` redesigned after the Biti-WIT Figma `Footer-Nav`:
+  top-level `navigation` items now render as centered link columns
+  (label = heading, children = links) instead of a flat expanded list,
+  and a legal row appears below when a `structures` doc `footer`
+  (`{ links: [{ label, path }], copyright }` from
+  `<site>/+structure/footer.yml`) exists — it is omitted otherwise.
+  Styling lives in biti `tokens/shell.css` (`.site-footer-group`,
+  `.site-footer-heading`, `.site-footer-links`, `.site-footer-legal`,
+  `.site-footer-legal-links`, `.site-footer-copy`) — needs a token
+  rebuild + theme repush to render styled.
+
+- `WitSpace` slowed and softened — pointer-tilt easing `0.12 → 0.035`,
+  shear gain/spring/damping reduced (`w * 32 → w * 24`, `0.09 → 0.2`,
+  `0.86 → 0.4`). Synced from biti.
+
+### Fixed
+
+- Media uploads via `POST /api/media` failed with `413 Payload Too
+  Large` above 1 MB: `src/proxy.ts` applied the JSON body cap to every
+  API request. Multipart uploads now get an 8 MB ceiling (images are
+  downscaled into `imageSizes` at upload anyway); JSON bodies stay at
+  1 MB, and `proxyClientMaxBodySize` in `next.config.ts` is raised to
+  `8mb` to match. `/api/media/file/*` responses also gain
+  `Cache-Control: public, max-age=31536000, immutable` — Payload sends
+  none, so browsers re-downloaded media on every page load (content
+  changes get fresh deduped filenames, so immutable is safe).
+
+- Production image crash-loop on boot: `findMigrationDir` prefers
+  `src/migrations` — which `withPayload` file-tracing ships into the
+  image as `.ts` sources — over the esbuild-bundled `/app/migrations`,
+  so plain node died with `ERR_UNKNOWN_FILE_EXTENSION`. The adapter's
+  `migrationDir` is now pinned (`src/migrations` in dev,
+  `/app/migrations` in the bundled `migrate.js`).
+
+- Theme-init inline script in the root layout now uses `next/script`
+  with `strategy="beforeInteractive"` — silences React's "script tag
+  while rendering" console error; still injected into `<head>` and run
+  before hydration, but at bootstrap rather than during HTML parse.
+
+- Dev hydration dead on `127.0.0.1` — Next 16 blocked `/_next` chunks as
+  cross-origin (`allowedDevOrigins` only had `[::1]` + LAN IP), leaving
+  every client component inert. Added `127.0.0.1` + `localhost` to the
+  allowlist.
+
+- `formatDate` hardcoded `en-GB` — post dates on the German default tree
+  showed English month names. It now derives the locale from the post
+  path (`/<lang>/blog/…` → that lang, `en` keeps `en-GB`, default `de`).
+
+- Missing migration for `media.source_repo` (field added with the
+  security-audit commit but never migrated — every media query 500'd
+  with `column "source_repo" does not exist`). Generated
+  `20261024_201751_add_media_source_repo`.
+
+- Code block `language` options now cover the markdown fence tags used
+  by the content repos (`bash`, `text`, `json`, `sh`, `yml`, `mermaid`,
+  …) — pages with such fences failed validation on publish ("Content >
+  Language"). `src/editor.ts` now passes a curated `languages` map to
+  `CodeBlock` with `defaultLanguage: 'plaintext'`.
+
+### Changed
+
+- `NavList` submenu band markup follows the updated shell.css navbar
+  contract: each top-level band now starts with a `.band-spacer` li
+  holding `.band-ghosts` (invisible `.nav-brand--spacer` + `.nav-item`
+  clones of the bar up to but not including the parent item) plus a
+  `.band-anchor` slot that stacks the first band cell on an invisible
+  clone of the parent, so it matches the parent's left edge and width.
+
+### Added
+
+- Localized blog trees: `/<lang>/blog/…` routes (index, author, post,
+  `kategorie`/`tag` archives — same shape as `/blog`) served through the
+  `[[...path]]` catch-all (`src/app/(frontend)/[[...path]]/lang-blog.tsx`).
+  `getPostsPage` gained a `pathPrefix` filter; `/blog` and the feeds
+  (`src/lib/feed.ts`) now list English `/blog/…` posts only, `/<lang>/blog`
+  lists that language's posts. Localized post pages show a machine-
+  translation notice (`TranslationNotice`) linking to the English original.
+  Shared views extracted to `blog/views.tsx`; sitemap archives derive the
+  language root from `post.path`.
+
+### Fixed
+
+- Security audit remediations (`src/`, `wit_pytools/`, CI):
+  - `users` collection: explicit `access` block (`editorOnly` incl.
+    `unlock`) — Payload defaults previously allowed any authenticated
+    principal (incl. the content-bot API key) full users CRUD and unlock.
+  - `enforceEditorPublish` now also blocks non-editor `_status: 'draft'`
+    demotion of published documents (bot could unpublish live pages).
+  - Anonymous reads on `pages`/`posts`/`structures` now constrained to
+    `_status: 'published'` (`publishedOrAuthenticated`); `clampPublicFind`
+    caps anonymous `find` at `limit ≤ 50`, forces pagination, drops
+    `draft=true`.
+  - `theme` global: `cssLight`/`cssDark` reject values containing `</`
+    (stored `</style><script>` breakout into every page `<head>`).
+  - `path`/`author`/`categories`/`tags` reject whitespace/markup chars;
+    `sitemap.ts` XML-escapes stored values before emitting `<loc>`.
+  - `admin.meta.defaultOGImageType: 'off'` — disables the anonymous
+    per-request satori/sharp renderer at `/api/og`.
+  - `src/proxy.ts` + `proxyClientMaxBodySize` cap API request bodies
+    (Payload buffered JSON unbounded before access checks).
+  - `/preview` canonicalizes `path` before the `//` check (backslash/tab
+    protocol-relative smuggling); `getSiteUrl` validates the forwarded
+    host before emitting it into sitemap/robots/feeds.
+  - Blog `?page=` uses `parsePageParam` (integer/finite) — `Infinity`
+    and fractions no longer reach the Postgres OFFSET.
+  - `users` login `LockedAuth` is rewritten to the generic auth error
+    (registered-email oracle removed).
+  - `Media` gained `sourceRepo`; `payloadtools` media mirror delete is
+    now scoped to the syncing repo, pages/posts upserts refuse docs
+    owned by another repo, and all repo scans skip symlinks.
+  - `payloadtools site` logo/favicon paths are contained to the repo
+    (no `..`/absolute exfil, no symlink upload); markdown/cover image
+    resolution checks containment before any filesystem probe;
+    `load_dotenv` is pinned to the working directory.
+  - `publish-ghcr.sh` tests the pushed digest image instead of a
+    separate local build; `build.yml` gains a lint/typecheck test gate
+    and a `release` environment before GHCR push.
+- SVG media (e.g. the site logo) no longer routed through `/_next/image` —
+  the raster optimizer rejects SVG, so `optimizeMediaUrl` now returns the
+  raw `/api/media/file/` URL, fixing the broken logo on production.
+
+### Added
+
+- `journey` page template (`src/components/templates/journey.tsx`):
+  scroll-scrubbed SVG parallax after the isladjan demo — the body splits
+  at every `h2` into `.journey-stage` cards presented over a pinned
+  `.journey-scene` backdrop (`src/components/organisms/journey-scene.tsx`,
+  client driver writes `--jp`; all motion lives in the new `.journey-*`
+  shell.css contract). No JS or reduced motion renders plain stacked
+  cards. Select via `template: journey` page front matter.
 - SEO plumbing: `/robots.txt` (`app/(frontend)/robots.ts` — allows all,
   disallows `/admin`, `/api`, `/preview`, advertises the sitemap),
   `/sitemap.xml` (`app/(frontend)/sitemap.ts` — published `pages` +
@@ -195,6 +490,15 @@ release.
 - Code blocks render on the frontend: JSX converter for the `Code` block
   (`pre`/`code` + `data-language`) was missing
   (`src/app/(frontend)/[[...path]]/converters.tsx`)
+- Dev server now serves `/_next` assets (client chunks, HMR websocket)
+  to `[::1]` and the LAN IP: `allowedDevOrigins` in `next.config.ts`.
+  Without it Next 16's dev cross-origin guard 403s the client runtime
+  for non-`localhost` origins and hydration silently never happens
+  (all client components inert, no console hint on the page itself)
+- Dev showcase hydration error: `SearchField`, `InputGroup` and
+  `Dropdown` are `<div>`-rooted and may not nest in `Paragraph` (`<p>`)
+  — now wrapped in `.page-actions` rows instead
+  (`src/components/component-showcase.tsx`)
 
 ### Changed
 

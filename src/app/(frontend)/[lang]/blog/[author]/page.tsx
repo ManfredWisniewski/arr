@@ -1,4 +1,4 @@
-import { draftMode } from 'next/headers'
+import { getRequestDraft } from '@/lib/review'
 import { notFound } from 'next/navigation.js'
 import { hasLocale } from 'next-intl'
 import { getTranslations } from 'next-intl/server'
@@ -23,9 +23,9 @@ export async function generateMetadata({ params }: Props) {
   if (!hasLocale(routing.locales, lang)) {
     return {}
   }
-  const { isEnabled } = await draftMode()
+  const draft = await getRequestDraft()
   const [agent, base] = await Promise.all([
-    getAgent(author, isEnabled, lang),
+    getAgent(author, draft, lang),
     getSiteUrl(),
   ])
   if (!agent) {
@@ -48,9 +48,9 @@ export default async function AuthorBlog({ params, searchParams }: Props) {
     notFound()
   }
   const { page } = await searchParams
-  const { isEnabled } = await draftMode()
+  const draft = await getRequestDraft()
   const [agent, t] = await Promise.all([
-    getAgent(author, isEnabled, lang),
+    getAgent(author, draft, lang),
     getTranslations({ locale: lang, namespace: 'blog' }),
   ])
   if (!agent) {
@@ -58,8 +58,8 @@ export default async function AuthorBlog({ params, searchParams }: Props) {
   }
   const current = Math.max(1, Number(page) || 1)
   const [avatarUrl, result] = await Promise.all([
-    getMediaUrl(agent.avatar, isEnabled, 'avatar', lang),
-    getPostsPage({ author: agent.slug, draft: isEnabled, locale: lang, page: current }),
+    getMediaUrl(agent.avatar, draft, 'avatar', lang),
+    getPostsPage({ author: agent.slug, draft: draft, locale: lang, page: current }),
   ])
   const basePath = `/blog/${agent.slug}`
 

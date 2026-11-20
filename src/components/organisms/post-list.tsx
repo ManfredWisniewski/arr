@@ -3,7 +3,7 @@ import React from 'react'
 
 import type { Post } from '@/payload-types'
 import type { AgentRef } from '@/lib/blog'
-import { formatDate } from '@/lib/blog'
+import { formatDate, parentPath } from '@/lib/blog'
 import type { Locale } from '@/i18n/routing'
 import { mediaUrl } from '@/lib/media'
 
@@ -26,8 +26,12 @@ export const postToCardItem = (
   const author = post.author ? agents?.[post.author] : undefined
   const name = author?.name ?? post.author ?? ''
   return {
-    badge: formatDate(post.publishedAt, locale) || undefined,
-    description: post.excerpt ?? undefined,
+    // front-matter `date`, falling back to the doc's creation time
+    badge:
+      formatDate(post.publishedAt || post.createdAt, locale) ||
+      undefined,
+    // slide decks and other excerpt-less posts show the meta description
+    description: post.excerpt || post.meta?.description || undefined,
     href: post.path,
     lead: post.author ? (
       <Avatar name={name} size="lg" src={author?.avatarUrl} />
@@ -36,7 +40,7 @@ export const postToCardItem = (
     mediaAlt: media?.alt ?? post.title,
     mediaSrc: mediaUrl(media, 'card', 640),
     subtitle: post.author ? (
-      <Link href={`/blog/${post.author}`}>{name}</Link>
+      <Link href={parentPath(post.path)}>{name}</Link>
     ) : undefined,
     title: post.title,
   }

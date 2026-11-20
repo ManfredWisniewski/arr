@@ -30,6 +30,11 @@ export type TaxonomyTerm = {
 const publishedOnly = (draft: boolean): Where =>
   draft ? {} : { _status: { equals: 'published' } }
 
+// parentPath('/blog/a/b' → '/blog/a') — the Link atom adds the locale
+// prefix, so stored paths stay locale-free (D14).
+export const parentPath = (path: string) =>
+  path.slice(0, path.lastIndexOf('/'))
+
 const localizedRead = (draft: boolean, locale: Locale) => ({
   draft,
   fallbackLocale: (draft ? 'de' : false) as 'de' | false,

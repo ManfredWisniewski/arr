@@ -4,6 +4,7 @@ import React from 'react'
 
 import config from '@/payload.config'
 import type { Locale } from '@/i18n/routing'
+import { getRequestDraft } from '@/lib/review'
 
 import { Accordion } from '../molecules/accordion'
 import { CardGrid } from '../organisms/card'
@@ -28,13 +29,18 @@ type PricingData = {
 
 async function getPricing(locale: Locale): Promise<PricingData> {
   try {
+    const draft = await getRequestDraft()
     const payload = await getPayload({ config: await config })
     const { docs } = await payload.find({
       collection: 'structures',
+      draft,
       fallbackLocale: false,
       limit: 1,
       locale,
-      where: { name: { equals: 'pricing' } },
+      where: {
+        name: { equals: 'pricing' },
+        ...(draft ? {} : { _status: { equals: 'published' } }),
+      },
     })
     return (docs[0]?.data as PricingData | undefined) ?? {}
   } catch {

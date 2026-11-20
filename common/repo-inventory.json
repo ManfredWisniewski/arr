@@ -1,0 +1,68 @@
+{
+  "version": 1,
+  "repositories": [
+    {
+      "name": "wit-common",
+      "path": "+wit",
+      "type": "knowledge",
+      "wit_submodule": false,
+      "agents_md_nul_rule": true,
+      "check_remote_branches": true,
+      "skills_check": false,
+      "required": [
+        "README.md",
+        "AGENTS.md",
+        "+intent/intent.md",
+        "+intent/tests.md",
+        "knowledge/README.md",
+        "knowledge/decisions.md",
+        "common/conventions/repo-setup.md",
+        "agents/skills",
+        "common/repo-inventory.json",
+        "common/templates/common/scripts/persona-branch-janitor.sh",
+        "common/templates/common/scripts/sync-agent-skills.sh",
+        "common/templates/common/scripts/check-repo-structure.py"
+      ],
+      "any_of": [
+        [".gitlab-ci.yml", ".github/workflows/persona-to-wip.yml"]
+      ]
+    },
+    {
+      "name": "standard",
+      "type": "project",
+      "default": true,
+      "profile": "standard",
+      "required": [
+        "README.md",
+        "AGENTS.md",
+        "+intent/intent.md",
+        "+intent/tests.md",
+        "knowledge/README.md",
+        "knowledge/decisions.md",
+        ".gitmodules",
+        ".gitignore",
+        ".markdownlint-cli2.jsonc",
+        "scripts/persona-branch-janitor.sh",
+        "scripts/sync-agent-skills.sh",
+        "scripts/check-repo-structure.py",
+        "structure/README.md",
+        "structure/taxonomies"
+      ],
+      "any_of": [
+        [".gitlab-ci.yml", ".github/workflows/persona-to-wip.yml"]
+      ],
+      "skills_check": false
+    },
+    {
+      "name": "business-intake",
+      "project_type": "business",
+      "required": [
+        "client",
+        "+INBOX",
+        "+OUTBOX",
+        "documents",
+        "documents/abläufe"
+      ]
+    }
+  ]
+}

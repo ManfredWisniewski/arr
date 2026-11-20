@@ -1,9 +1,18 @@
 import type { CollectionConfig } from 'payload'
 
-import { authenticated, editorOnly } from '../access/roles'
+import {
+  authenticated,
+  editorOnly,
+  publishedOrAuthenticated,
+} from '../access/roles'
 import { pagesEditor } from '../editor'
+import { clampPublicFind } from '../hooks/clampPublicFind'
 import { enforceEditorPublish } from '../hooks/enforceEditorPublish'
 import { markdownToContent } from '../hooks/markdownToContent'
+import {
+  resubmitSitemapAfterChange,
+  resubmitSitemapAfterDelete,
+} from '../hooks/resubmitSitemap'
 
 export const Pages: CollectionConfig = {
   slug: 'pages',
@@ -22,12 +31,15 @@ export const Pages: CollectionConfig = {
     },
   },
   access: {
-    read: () => true,
+    read: publishedOrAuthenticated,
     create: authenticated,
     update: authenticated,
     delete: editorOnly,
   },
   hooks: {
+    afterChange: [resubmitSitemapAfterChange],
+    afterDelete: [resubmitSitemapAfterDelete],
+    beforeOperation: [clampPublicFind],
     beforeValidate: [markdownToContent],
     beforeChange: [enforceEditorPublish],
   },
@@ -49,6 +61,10 @@ export const Pages: CollectionConfig = {
       type: 'text',
       required: true,
       unique: true,
+      validate: (value: unknown) =>
+        typeof value === 'string' && /^[^\s<>&"']+$/.test(value)
+          ? true
+          : 'Path must not contain whitespace or markup characters',
     },
     {
       // markdown as pushed by the sync tool; converted to `content` on write
@@ -77,6 +93,12 @@ export const Pages: CollectionConfig = {
       // render template name resolved by the frontend registry; empty = default
       name: 'template',
       type: 'text',
+    },
+    {
+      // HedgeDoc `slideOptions` front matter, verbatim — reveal.js config
+      // consumed by the `slide` template (theme, transition, width, ...)
+      name: 'slideOptions',
+      type: 'json',
     },
     {
       name: 'meta',

@@ -1,4 +1,4 @@
-import { draftMode } from 'next/headers'
+import { getRequestDraft } from '@/lib/review'
 import { notFound } from 'next/navigation'
 import { RichText } from '@payloadcms/richtext-lexical/react'
 import { hasLocale } from 'next-intl'
@@ -45,9 +45,9 @@ export async function generateMetadata({ params }: Props) {
   if (!hasLocale(routing.locales, lang)) {
     return {}
   }
-  const { isEnabled } = await draftMode()
+  const draft = await getRequestDraft()
   const [intro, t, base] = await Promise.all([
-    findIntro(isEnabled, lang),
+    findIntro(draft, lang),
     getTranslations({ locale: lang, namespace: 'blog' }),
     getSiteUrl(),
   ])
@@ -66,17 +66,17 @@ export default async function BlogIndex({ params, searchParams }: Props) {
   if (!hasLocale(routing.locales, lang)) {
     notFound()
   }
-  const { isEnabled } = await draftMode()
+  const draft = await getRequestDraft()
   const { page } = await searchParams
   const current = Math.max(1, Number(page) || 1)
   const [intro, result, t] = await Promise.all([
-    findIntro(isEnabled, lang),
-    getPostsPage({ draft: isEnabled, locale: lang, page: current }),
+    findIntro(draft, lang),
+    getPostsPage({ draft: draft, locale: lang, page: current }),
     getTranslations({ locale: lang, namespace: 'blog' }),
   ])
   const agents = await getAgentMap(
     result.docs.map((post) => post.author),
-    isEnabled,
+    draft,
     lang,
   )
 

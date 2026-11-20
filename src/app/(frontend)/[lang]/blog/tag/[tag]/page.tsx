@@ -1,4 +1,4 @@
-import { draftMode } from 'next/headers'
+import { getRequestDraft } from '@/lib/review'
 import { notFound } from 'next/navigation.js'
 import { hasLocale } from 'next-intl'
 import { getTranslations } from 'next-intl/server'
@@ -22,9 +22,9 @@ export async function generateMetadata({ params }: Props) {
   if (!hasLocale(routing.locales, lang)) {
     return {}
   }
-  const { isEnabled } = await draftMode()
+  const draft = await getRequestDraft()
   const [term, t, base] = await Promise.all([
-    getTaxonomyTerm('tags', tag, isEnabled, lang),
+    getTaxonomyTerm('tags', tag, draft, lang),
     getTranslations({ locale: lang, namespace: 'blog' }),
     getSiteUrl(),
   ])
@@ -45,19 +45,19 @@ export default async function TagArchive({ params, searchParams }: Props) {
     notFound()
   }
   const { page } = await searchParams
-  const { isEnabled } = await draftMode()
+  const draft = await getRequestDraft()
   const current = Math.max(1, Number(page) || 1)
   const [term, result, t] = await Promise.all([
-    getTaxonomyTerm('tags', tag, isEnabled, lang),
-    getPostsPage({ draft: isEnabled, locale: lang, page: current, tag }),
+    getTaxonomyTerm('tags', tag, draft, lang),
+    getPostsPage({ draft: draft, locale: lang, page: current, tag }),
     getTranslations({ locale: lang, namespace: 'blog' }),
   ])
   const agents = await getAgentMap(
     result.docs.map((post) => post.author),
-    isEnabled,
+    draft,
     lang,
   )
-  if (!result.docs.length && !term && !isEnabled) {
+  if (!result.docs.length && !term && !draft) {
     notFound()
   }
 

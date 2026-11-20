@@ -5,5 +5,18 @@ coverage
 test-results
 playwright-report
 .env
+**/.env
 *.log
 media/
+sites/
+# submodules/test assets not needed for `next build`
+wit_pytools
++*
+tests
+
+# docs site build outputs (regenerated in the docs-builder stage;
+# src/css/tokens is a vendored biti snapshot and must stay in context)
+docs/node_modules
+docs/build
+docs/.docusaurus
+public/docs

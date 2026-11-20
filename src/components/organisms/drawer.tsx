@@ -7,19 +7,26 @@ import { cx } from '@/lib/cx'
 import { Icon } from '../atoms/icon'
 import { Heading } from '../atoms/text'
 
-// Slide-in side panel — <dialog> anchored to the right edge
-// (.drawer* contract classes). Same control model as Modal.
+// Sheet / slide-in panel — <dialog> anchored to an edge (.drawer*
+// contract classes). `side` picks right (default), left or bottom;
+// `modal={false}` opens it as a standard (non-modal) sheet — no
+// backdrop, rest of the page stays interactive. Same control model
+// as Modal.
 export const Drawer = ({
   children,
   label,
+  modal = true,
   onClose,
   open,
+  side = 'right',
   title,
 }: {
   children: React.ReactNode
   label: string
+  modal?: boolean
   onClose: () => void
   open: boolean
+  side?: 'bottom' | 'left' | 'right'
   title?: string
 }) => {
   const ref = useRef<HTMLDialogElement>(null)
@@ -30,24 +37,29 @@ export const Drawer = ({
       return
     }
     if (open && !el.open) {
-      el.showModal()
+      if (modal) {
+        el.showModal()
+      } else {
+        el.show()
+      }
     } else if (!open && el.open) {
       el.close()
     }
-  }, [open])
+  }, [modal, open])
 
   return (
     <dialog
       aria-label={label}
-      className="drawer"
+      className={cx('drawer', side !== 'right' && `drawer-${side}`)}
       onClose={onClose}
       onClick={(event) => {
-        if (event.target === ref.current) {
+        if (modal && event.target === ref.current) {
           ref.current?.close()
         }
       }}
       ref={ref}
     >
+      {side === 'bottom' ? <span aria-hidden className="drawer-handle" /> : null}
       <header className={cx('drawer-header')}>
         {title ? (
           <Heading className="drawer-title" level={2}>

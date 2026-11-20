@@ -15,12 +15,24 @@
       "dst": "src/components/organisms/wit-space.tsx",
       "sha256": "de8140d420cf9f62caa4cc5e4a19ec612d826f28c30657ff1ecf9a05048bb6f7",
       "regex": [
-        ["import localFont from 'next/font/local'\\n", ""],
-        ["\\n?const authorFont = localFont\\(\\{.*?\\}\\)\\n", ""]
+        [
+          "import localFont from 'next/font/local'\\n",
+          ""
+        ],
+        [
+          "\\n?const authorFont = localFont\\(\\{.*?\\}\\)\\n",
+          ""
+        ]
       ],
       "strings": [
-        ["import { cn } from '@/utilities/ui'", "import { cx } from '@/lib/cx'"],
-        ["cn('wit-space-author', authorFont.className)", "'wit-space-author'"],
+        [
+          "import { cn } from '@/utilities/ui'",
+          "import { cx } from '@/lib/cx'"
+        ],
+        [
+          "cn('wit-space-author', authorFont.className)",
+          "'wit-space-author'"
+        ],
         [
           "cn('relative inline-flex items-center justify-center', className)",
           "cx('wit-space', className)"
@@ -32,6 +44,81 @@
         [
           "        .wit-space-cube { transform-style: preserve-3d; }",
           "        .wit-space {\n          position: relative; display: inline-flex;\n          align-items: center; justify-content: center;\n        }\n        .wit-space-cube {\n          position: relative; width: 100%; height: 100%;\n          transform-style: preserve-3d;\n        }"
+        ]
+      ]
+    },
+    {
+      "src": "biti/src/components/ui/wit/wit-cube.tsx",
+      "dst": "src/components/organisms/wit-cube.tsx",
+      "sha256": "3243169b1488cc4808be649ad551d07e476ca7400aae96b826cb5971e82ab211",
+      "strings": [
+        [
+          "import { cn } from '@/utilities/ui'",
+          "import { cx } from '@/lib/cx'"
+        ],
+        [
+          "cn(",
+          "cx("
+        ]
+      ]
+    },
+    {
+      "src": "biti/src/components/ui/wit/wit-space--small.tsx",
+      "dst": "src/components/organisms/wit-space-small.tsx",
+      "sha256": "0b80a8f0965cae3a74ac0a98012b256f2e93c21d1c4dfb865605b9e130b3d464",
+      "strings": [
+        [
+          "import { cn } from '@/utilities/ui'",
+          "import { cx } from '@/lib/cx'"
+        ],
+        [
+          "cn(",
+          "cx("
+        ]
+      ]
+    },
+    {
+      "src": "biti/src/components/ui/trurl/blueprint.tsx",
+      "dst": "src/components/organisms/blueprint-panel.tsx",
+      "sha256": "21b305067854afe1aa1d1d67bc5489c307392adecbef0d0f47b0b4a89cde5c88",
+      "strings": [
+        [
+          "import { cn } from '@/utilities/ui'",
+          "import { cx } from '@/lib/cx'"
+        ],
+        [
+          "cn(",
+          "cx("
+        ]
+      ]
+    },
+    {
+      "src": "biti/src/components/ui/trurl/gauge.tsx",
+      "dst": "src/components/organisms/pressure-gauge.tsx",
+      "sha256": "82cf8f2be5a985cc46c5fef463e225abee8105963e8bfa5164a93e1c4baf42f0",
+      "strings": [
+        [
+          "import { cn } from '@/utilities/ui'",
+          "import { cx } from '@/lib/cx'"
+        ],
+        [
+          "cn(",
+          "cx("
+        ]
+      ]
+    },
+    {
+      "src": "biti/src/components/ui/trurl/gear.tsx",
+      "dst": "src/components/organisms/gear.tsx",
+      "sha256": "bc4e916435d38709518cd4fc2e24064aadb0cf36d36440958d86828a8735db13",
+      "strings": [
+        [
+          "import { cn } from '@/utilities/ui'",
+          "import { cx } from '@/lib/cx'"
+        ],
+        [
+          "cn(",
+          "cx("
         ]
       ]
     }

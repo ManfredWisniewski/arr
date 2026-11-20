@@ -9,9 +9,11 @@ import { DashboardTemplate } from './dashboard'
 import { DefaultTemplate, type TemplateProps } from './default'
 import { DocsTemplate } from './docs'
 import { FeaturesTemplate } from './features'
+import { JourneyTemplate } from './journey'
 import { LandingTemplate } from './landing'
 import { PricingTemplate } from './pricing'
 import { ShowcaseTemplate } from './showcase'
+import { SlideTemplate } from './slide'
 
 // Template name -> renderer. Names come from pages.template (webtext front
 // matter); unknown/absent names fall back to the default article render.
@@ -22,9 +24,11 @@ const registry: Record<string, React.ComponentType<TemplateProps>> = {
   dashboard: DashboardTemplate,
   docs: DocsTemplate,
   features: FeaturesTemplate,
+  journey: JourneyTemplate,
   landing: LandingTemplate,
   pricing: PricingTemplate,
   showcase: ShowcaseTemplate,
+  slide: SlideTemplate,
 }
 
 export const resolveTemplate = (name?: null | string) =>

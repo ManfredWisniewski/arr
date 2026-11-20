@@ -22,6 +22,12 @@ types:  npx payload generate:types && npx tsc
 
 - `POST /api/pages?draft=true` with `markdownRaw` produces a draft whose
   `content` is Lexical JSON (markdown converted server-side).
+- `## Title {#some-id}` in `markdownRaw` produces a heading node with an
+  `id` key and the suffix stripped from its text; the frontend renders it
+  as the element `id` (fragment links). Headings without `{#id}` get none.
+- `[t](u){target="_blank|_self|_parent|_top"}` stamps `fields.target` on
+  the link node and strips the markup; the frontend uses it over the
+  URL-based target rule (D08). Invalid values stay literal.
 - Re-sync of an unchanged `sourcePath` is a no-op; `sourcePath` is unique.
 - `POST /api/media` deduplicates on `sourceHash`; `![media:<id>]()` in markdown
   becomes a Lexical upload node.
@@ -54,7 +60,80 @@ types:  npx payload generate:types && npx tsc
 - Adding a display context means adding an `imageSizes` entry plus a
   migration, not serving the original.
 
-### A07 Localization (D08–D12)
+### A07 Consent gating (D12)
+
+- With no gated service configured (no `tracking.google`): no consent
+  banner, no `cc_cookie`, no third-party script in the SSR HTML.
+- With `tracking.google` set and no prior consent: no gtag.js tag or
+  request to `googletagmanager.com` is emitted.
+- Accepting `analytics` in the banner injects gtag without reload; a
+  fresh page load serves it directly (SSR reads `cc_cookie`).
+- "Cookie-Einstellungen" in the footer reopens the preferences modal;
+  deselecting `analytics` reloads the page and the tag cookies are gone.
+- Banner renders the bundled German texts; the modal passes WCAG 2.2
+  spot checks (focus trap, keyboard operability, contrast in light and
+  dark theme).
+
+### A08 Preview-confirm flow (spec `+wit/specs/arr/preview-confirm/`)
+
+- An `editor` session sees the draft banner on any page/post whose latest
+  version is a draft; publishing there promotes only that document — the
+  next anonymous request serves the new published version with no banner.
+- `/review` lists exactly the docs whose latest version is a draft across
+  `pages`, `posts` and `structures`; publishing removes the entry.
+- `POST` to the publish route without a session returns 401/403; with a
+  `content-bot` key 403; anonymous page HTML contains no review markup.
+- After confirming a document from the review flow the next pending
+  document (or `/review` when none remain) is reached; outside that flow
+  the published page itself is shown.
+- A frontend publish fires the same `afterChange` effects as an admin
+  publish (sitemap resubmit when `GSC_*` is configured).
+
+### A09 Docs site served (spec `+wit/specs/arr/docusaurus/`)
+
+- Anonymous `GET /docs/` returns the documentation site (HTTP 200) on a
+  running instance; no authentication or session is required.
+
+### A10 Docs content areas (spec `+wit/specs/arr/docusaurus/`)
+
+- The docs site has three areas with seed content: developer/operator docs
+  (setup, architecture, content-sync contract, deployment), editor docs
+  (publish and `/review` flow, roles), and a blog with at least one post.
+
+### A11 Docs search (spec `+wit/specs/arr/docusaurus/`)
+
+- Searching a term that appears in a document returns that document with a
+  working link; during browsing and searching no request leaves the
+  instance (search index and all assets are self-hosted).
+
+### A12 Docs i18n (spec `+wit/specs/arr/docusaurus/`)
+
+- The site is available in English (default at `/docs/`) and German
+  (`/docs/de/`); a page without a German translation falls back to English.
+
+### A13 Docs versioning (spec `+wit/specs/arr/docusaurus/`)
+
+- With at least one released docs version, the version selector lists every
+  released version plus "Next"; a selected version shows only that
+  snapshot's docs.
+
+### A14 Docs quality gate (spec `+wit/specs/arr/docusaurus/`)
+
+- A Vale style violation in an English doc source or a doc source that
+  fails to build makes the CI docs check fail; a broken internal link fails
+  the build (`onBrokenLinks`).
+
+### A15 Docs-in-image version parity (spec `+wit/specs/arr/docusaurus/`)
+
+- The `/docs` content of a deployed image corresponds to the repository
+  state at that image's tag — docs are built inside the image build.
+
+### A16 Docs theme (spec `+wit/specs/arr/docusaurus/`)
+
+- The docs theme renders biti token branding in light and dark mode — no
+  unbranded default values.
+
+### A17 Localization (D13–D17)
 
 - `GET /de/<path>` and `GET /en/<path>` render the page in that locale;
   `<html lang>` follows the route; `GET /` redirects to `/de`.

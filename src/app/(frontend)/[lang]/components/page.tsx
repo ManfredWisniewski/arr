@@ -5,8 +5,12 @@ import React from 'react'
 import type { Media } from '@/payload-types'
 import config from '@/payload.config'
 
+import { ThemeToggle } from '@/components/atoms'
 import { Heading, Lead } from '@/components/atoms'
 import { ComponentShowcase } from '@/components/component-showcase'
+
+import { ThemeSwitcher } from '../theme-switcher'
+import { getThemeVariants } from '../theme-variants'
 
 // Dev-only component showcase — every atom/molecule/organism rendered with
 // fixture props under the pushed theme. Static segment wins over the
@@ -29,6 +33,8 @@ export default async function ComponentsPage() {
     media = null
   }
 
+  const variants = getThemeVariants()
+
   return (
     <article className="page">
       <Heading level={1}>Component showcase</Heading>
@@ -36,7 +42,17 @@ export default async function ComponentsPage() {
         Every atom, molecule and organism under the currently pushed theme —
         use the theme widgets to check variants.
       </Lead>
-      <ComponentShowcase media={media} />
+      <ComponentShowcase
+        media={media}
+        themeControls={
+          <>
+            <ThemeToggle />
+            {variants.length ? (
+              <ThemeSwitcher variants={variants.map((v) => v.name)} />
+            ) : null}
+          </>
+        }
+      />
     </article>
   )
 }

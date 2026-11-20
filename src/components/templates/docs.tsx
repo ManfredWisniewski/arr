@@ -4,6 +4,7 @@ import React from 'react'
 
 import config from '@/payload.config'
 import type { Locale } from '@/i18n/routing'
+import { getRequestDraft } from '@/lib/review'
 
 import { Breadcrumb } from '../molecules/breadcrumb'
 import { mapNavItems, type NavItem } from '../molecules/nav-item'
@@ -15,13 +16,18 @@ import type { TemplateProps } from './default'
 
 async function getNavigation(locale: Locale): Promise<NavItem[]> {
   try {
+    const draft = await getRequestDraft()
     const payload = await getPayload({ config: await config })
     const { docs } = await payload.find({
       collection: 'structures',
+      draft,
       fallbackLocale: false,
       limit: 1,
       locale,
-      where: { name: { equals: 'navigation' } },
+      where: {
+        name: { equals: 'navigation' },
+        ...(draft ? {} : { _status: { equals: 'published' } }),
+      },
     })
     return mapNavItems(
       (docs[0]?.data as { items?: unknown } | undefined)?.items,

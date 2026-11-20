@@ -3,6 +3,7 @@ import React from 'react'
 
 import config from '@/payload.config'
 import type { Locale } from '@/i18n/routing'
+import { getRequestDraft } from '@/lib/review'
 
 import { CardGrid, type CardItem } from '../organisms/card'
 import { LeadSection } from '../organisms/lead-section'
@@ -18,13 +19,18 @@ type FeatureItem = {
 
 async function getFeatures(locale: Locale): Promise<CardItem[]> {
   try {
+    const draft = await getRequestDraft()
     const payload = await getPayload({ config: await config })
     const { docs } = await payload.find({
       collection: 'structures',
+      draft,
       fallbackLocale: false,
       limit: 1,
       locale,
-      where: { name: { equals: 'features' } },
+      where: {
+        name: { equals: 'features' },
+        ...(draft ? {} : { _status: { equals: 'published' } }),
+      },
     })
     const items = (docs[0]?.data as { items?: FeatureItem[] } | undefined)
       ?.items

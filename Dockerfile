@@ -18,16 +18,26 @@ RUN \
   fi
 
 
+# Build the Docusaurus docs site into a static export (served at /docs).
+# Branding uses the vendored biti token snapshot in docs/src/css/tokens/
+# — the biti submodule is not needed in the image build.
+FROM base AS docs-builder
+WORKDIR /app
+COPY docs/package.json docs/package-lock.json docs/
+RUN cd docs && npm ci --legacy-peer-deps --ignore-scripts
+COPY docs docs
+RUN cd docs && npm run build
+
 # Rebuild the source code only when needed
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+COPY --from=docs-builder /app/docs/build ./public/docs
 
 # Next.js collects completely anonymous telemetry data about general usage.
 # Learn more here: https://nextjs.org/telemetry
-# Uncomment the following line in case you want to disable telemetry during the build.
-# ENV NEXT_TELEMETRY_DISABLED 1
+ENV NEXT_TELEMETRY_DISABLED 1
 
 RUN \
   if [ -f yarn.lock ]; then yarn run build; \
@@ -65,14 +75,13 @@ FROM base AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
-# Uncomment the following line in case you want to disable telemetry during runtime.
-# ENV NEXT_TELEMETRY_DISABLED 1
+ENV NEXT_TELEMETRY_DISABLED 1
 
 # The official Node image already provides the non-root node user (UID/GID 1000).
 
 
-# Remove this line if you do not have this folder
-# COPY --from=builder /app/public ./public
+# Static assets served at the site root (e.g. /open-frame.svg)
+COPY --from=builder /app/public ./public
 
 # Set the correct permission for prerender cache
 RUN mkdir .next

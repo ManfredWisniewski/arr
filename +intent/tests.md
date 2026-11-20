@@ -89,6 +89,50 @@ types:  npx payload generate:types && npx tsc
 - A frontend publish fires the same `afterChange` effects as an admin
   publish (sitemap resubmit when `GSC_*` is configured).
 
+### A09 Docs site served (spec `+wit/specs/arr/docusaurus/`)
+
+- Anonymous `GET /docs/` returns the documentation site (HTTP 200) on a
+  running instance; no authentication or session is required.
+
+### A10 Docs content areas (spec `+wit/specs/arr/docusaurus/`)
+
+- The docs site has three areas with seed content: developer/operator docs
+  (setup, architecture, content-sync contract, deployment), editor docs
+  (publish and `/review` flow, roles), and a blog with at least one post.
+
+### A11 Docs search (spec `+wit/specs/arr/docusaurus/`)
+
+- Searching a term that appears in a document returns that document with a
+  working link; during browsing and searching no request leaves the
+  instance (search index and all assets are self-hosted).
+
+### A12 Docs i18n (spec `+wit/specs/arr/docusaurus/`)
+
+- The site is available in English (default at `/docs/`) and German
+  (`/docs/de/`); a page without a German translation falls back to English.
+
+### A13 Docs versioning (spec `+wit/specs/arr/docusaurus/`)
+
+- With at least one released docs version, the version selector lists every
+  released version plus "Next"; a selected version shows only that
+  snapshot's docs.
+
+### A14 Docs quality gate (spec `+wit/specs/arr/docusaurus/`)
+
+- A Vale style violation in an English doc source or a doc source that
+  fails to build makes the CI docs check fail; a broken internal link fails
+  the build (`onBrokenLinks`).
+
+### A15 Docs-in-image version parity (spec `+wit/specs/arr/docusaurus/`)
+
+- The `/docs` content of a deployed image corresponds to the repository
+  state at that image's tag — docs are built inside the image build.
+
+### A16 Docs theme (spec `+wit/specs/arr/docusaurus/`)
+
+- The docs theme renders biti token branding in light and dark mode — no
+  unbranded default values.
+
 ## Not tested
 
 - REST-level publish denial by the bot key — covered by the `beforeChange`

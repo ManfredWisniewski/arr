@@ -7,5 +7,14 @@
     "MD034": false,
     "MD060": false
   },
-  "ignores": ["node_modules/**", "+wit-*/**", "biti/**", "__*/**"]
+  "ignores": [
+    "**/node_modules/**",
+    "+wit-*/**",
+    "biti/**",
+    "__*/**",
+    "docs/build/**",
+    "docs/.docusaurus/**",
+    "docs/styles/**",
+    "public/docs/**"
+  ]
 }

@@ -18,11 +18,25 @@ RUN \
   fi
 
 
+# Build the Docusaurus docs site into a static export (served at /docs).
+# Needs the biti submodule for the design-token CSS used by custom.css.
+FROM base AS docs-builder
+WORKDIR /app
+COPY docs/package.json docs/package-lock.json docs/
+COPY biti/tokens/package.json biti/tokens/package-lock.json biti/tokens/
+RUN cd docs && npm ci --legacy-peer-deps --ignore-scripts \
+  && cd ../biti/tokens && npm ci --ignore-scripts
+COPY docs docs
+COPY biti/tokens biti/tokens
+RUN cd biti/tokens && npm run build \
+  && cd /app/docs && npm run build
+
 # Rebuild the source code only when needed
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+COPY --from=docs-builder /app/docs/build ./public/docs
 
 # Next.js collects completely anonymous telemetry data about general usage.
 # Learn more here: https://nextjs.org/telemetry

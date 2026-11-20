@@ -26,10 +26,12 @@ export const ReviewNavClient = ({
   canReview,
   groups,
   navPreferences,
+  pendingCount,
 }: {
   canReview: boolean
   groups: NavGroupType[]
   navPreferences?: NavPreferences | null
+  pendingCount: number
 }) => {
   const pathname = usePathname()
   const { config } = useConfig()
@@ -115,7 +117,7 @@ export const ReviewNavClient = ({
                   prefetch={false}
                 >
                   <span className={`${baseClass}__link-label`}>
-                    Review new
+                    Review new ({pendingCount})
                   </span>
                 </NextLink>,
               )

@@ -1,0 +1,47 @@
+/**
+ * biti-token branding for the docs site (FR-010).
+ *
+ * tokens/arr-light.css and tokens/arr-dark.css are generated from
+ * biti/tokens (Terrazzo) by scripts/prepare-tokens.mjs during the docs
+ * build — the dark file already scopes to [data-theme="dark"], which is
+ * the attribute Docusaurus toggles.
+ *
+ * Infima variables map onto the published biti token names — never
+ * invent values here (constitution P5).
+ */
+
+@import './tokens/arr-light.css';
+@import './tokens/arr-dark.css';
+
+:root {
+  --ifm-color-primary: var(--colors-brand-primary-primary-500-main);
+  --ifm-color-primary-dark: var(--colors-brand-primary-primary-600);
+  --ifm-color-primary-darker: var(--colors-brand-primary-primary-700);
+  --ifm-color-primary-darkest: var(--colors-brand-primary-primary-800);
+  --ifm-color-primary-light: var(--colors-brand-primary-primary-400);
+  --ifm-color-primary-lighter: var(--colors-brand-primary-primary-300);
+  --ifm-color-primary-lightest: var(--colors-brand-primary-primary-200);
+
+  --ifm-color-success: var(--colors-feedback-positive-positive-500-main);
+  --ifm-color-info: var(--colors-brand-secondary-secondary-500-main);
+  --ifm-color-warning: var(--colors-feedback-warning-warning-500-main);
+  --ifm-color-danger: var(--colors-feedback-negative-negative-500-main);
+
+  --ifm-font-color-base: var(--typography-body);
+  --ifm-background-color: var(--background-fill-background-fill-inner);
+  --ifm-background-surface-color: var(--background-fill-background-fill-surface);
+
+  --ifm-link-color: var(--ifm-color-primary);
+  --ifm-navbar-background-color: var(--background-fill-background-fill-surface);
+  --ifm-footer-background-color: var(--background-fill-background-fill-outermost);
+}
+
+[data-theme='dark'] {
+  --ifm-color-primary: var(--colors-brand-primary-primary-300);
+  --ifm-color-primary-dark: var(--colors-brand-primary-primary-400);
+  --ifm-color-primary-darker: var(--colors-brand-primary-primary-500-main);
+  --ifm-color-primary-darkest: var(--colors-brand-primary-primary-600);
+  --ifm-color-primary-light: var(--colors-brand-primary-primary-200);
+  --ifm-color-primary-lighter: var(--colors-brand-primary-primary-100);
+  --ifm-color-primary-lightest: var(--colors-brand-primary-primary-50);
+}

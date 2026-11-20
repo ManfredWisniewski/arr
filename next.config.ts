@@ -27,7 +27,15 @@ const nextConfig: NextConfig = {
   // /<name>.vcf at the domain root serves the matching media/ upload as
   // a vCard download — resolved in src/app/(frontend)/vcf/[file]
   async rewrites() {
-    return [{ source: '/:file([^/]+\\.vcf)', destination: '/vcf/:file' }]
+    return [
+      { source: '/:file([^/]+\\.vcf)', destination: '/vcf/:file' },
+      // public/docs/ is the Docusaurus static export — Next refuses
+      // directory access, so directory URLs resolve to their index.html
+      // (checked before the [[...path]] catch-all page route)
+      { source: '/docs', destination: '/docs/index.html' },
+      { source: '/docs/', destination: '/docs/index.html' },
+      { source: '/docs/:path+/', destination: '/docs/:path+/index.html' },
+    ]
   },
   webpack: (webpackConfig) => {
     webpackConfig.resolve.extensionAlias = {

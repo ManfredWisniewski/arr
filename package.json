@@ -1,6 +1,6 @@
 {
   "name": "arr",
-  "version": "1.0.0",
+  "version": "0.2.7",
   "description": "Payload CMS application image for witconsult.de, deployed via wit.docker_apps",
   "license": "MIT",
   "type": "module",
@@ -8,6 +8,8 @@
     "build": "cross-env NODE_OPTIONS=\"--no-deprecation --max-old-space-size=8000\" next build",
     "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev",
     "devsafe": "rm -rf .next && cross-env NODE_OPTIONS=--no-deprecation next dev",
+    "docs:build": "node scripts/build-docs.mjs",
+    "docs:dev": "npm --prefix docs run start",
     "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",
     "generate:types": "cross-env NODE_OPTIONS=--no-deprecation payload generate:types",
     "lint": "cross-env NODE_OPTIONS=--no-deprecation eslint .",

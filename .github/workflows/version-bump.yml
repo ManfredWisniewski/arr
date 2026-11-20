@@ -1,0 +1,72 @@
+name: version-bump
+
+# Every push to main is a release: bump package.json/-lock per the
+# conventional-commit level since the last tag, rotate CHANGELOG.md,
+# tag vX.Y.Z and push — the v* tag then triggers the image build.
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Skip release commits
+        id: check
+        run: |
+          msg="$(git log -1 --pretty=%s)"
+          if [[ "$msg" == chore\(release\)* ]]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Determine bump level
+        id: level
+        if: steps.check.outputs.skip != 'true'
+        run: |
+          last_tag=$(git describe --tags --abbrev=0 2>/dev/null || true)
+          if [ -n "$last_tag" ]; then
+            msgs=$(git log "${last_tag}..HEAD" --pretty=%s)
+          else
+            msgs=$(git log --pretty=%s)
+          fi
+          if echo "$msgs" | grep -qE 'BREAKING[ -]CHANGE|^[a-zA-Z]+(\([^)]*\))?!:'; then
+            echo "bump=major" >> "$GITHUB_OUTPUT"
+          elif echo "$msgs" | grep -qE '^feat(\([^)]*\))?:'; then
+            echo "bump=minor" >> "$GITHUB_OUTPUT"
+          else
+            echo "bump=patch" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/setup-node@v4
+        if: steps.check.outputs.skip != 'true'
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Bump, rotate changelog, tag, push
+        if: steps.check.outputs.skip != 'true'
+        env:
+          BUMP: ${{ steps.level.outputs.bump }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          npm version "$BUMP" --no-git-tag-version
+          v="$(node -p "require('./package.json').version")"
+          # Move the accumulated Unreleased entries under the new version
+          # heading (convention: common/conventions/changelog.md)
+          if grep -q '^## Unreleased$' CHANGELOG.md; then
+            sed -i "0,/^## Unreleased$/s//## Unreleased\n\n## [${v}] - $(date +%F)/" CHANGELOG.md
+            git add CHANGELOG.md
+          fi
+          git add package.json package-lock.json
+          git commit -m "chore(release): v${v}"
+          git tag "v${v}"
+          git push origin HEAD:main --follow-tags

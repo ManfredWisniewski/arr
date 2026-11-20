@@ -12,6 +12,19 @@ release.
 
 ### Added
 
+- Docs-as-code documentation site (spec `+wit/specs/arr/docusaurus/`): a
+  Docusaurus project in `docs/` whose static export is built inside the
+  image (`docs-builder` Dockerfile stage) into `public/docs/` and served
+  anonymously at `/docs/` on every instance via `next.config.ts` rewrites
+  (`/docs*` directory URLs → `index.html`). Content areas: developer
+  docs (`/docs/dev/`), editor docs (`/docs/editor/`, English + German via
+  `docs/i18n/`) and a release-notes blog (`/docs/blog`, RSS/Atom).
+  Offline full-text search (`@easyops-cn/docusaurus-search-local`),
+  per-release doc versioning (`npm run docusaurus docs:version`), biti
+  token branding via `docs/src/css/custom.css`, Vale prose linting +
+  docs build in `.github/workflows/docs.yml`. Local:
+  `npm run docs:dev` / `npm run docs:build`.
+
 - Preview-confirm flow (spec `+wit/specs/arr/preview-confirm/`): an
   `editor` session (the `/admin` login — the `payload-token` cookie is
   domain-scoped) now sees the latest draft version everywhere on the

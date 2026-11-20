@@ -286,3 +286,9 @@ next-env.d.ts
 /playwright-report/
 /blob-report/
 .env*.local
+
+# Docs site (Docusaurus) — build outputs and generated token CSS
+/docs/build/
+/docs/.docusaurus/
+/docs/src/css/tokens/
+/public/docs/

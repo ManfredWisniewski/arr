@@ -1,0 +1,46 @@
+name: docs
+
+on:
+  push:
+    branches: [main]
+    paths: ['docs/**', '.vale.ini', '.github/workflows/docs.yml']
+  pull_request:
+    paths: ['docs/**', '.vale.ini', '.github/workflows/docs.yml']
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Vale
+        run: |
+          sudo snap install vale
+
+      - name: Fetch style packages
+        run: vale sync
+
+      - name: Vale lint (English sources)
+        run: vale docs/docs docs/blog docs/docs-editor
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: docs/package-lock.json
+
+      - name: Install docs dependencies
+        run: npm --prefix docs ci --legacy-peer-deps --ignore-scripts
+
+      - name: Install token dependencies
+        run: npm --prefix biti/tokens ci --ignore-scripts
+
+      - name: Build docs site
+        run: npm --prefix docs run build

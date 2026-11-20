@@ -13,3 +13,10 @@ sites/
 wit_pytools
 +*
 tests
+
+# docs site build outputs (regenerated in the docs-builder stage)
+docs/node_modules
+docs/build
+docs/.docusaurus
+docs/src/css/tokens
+public/docs

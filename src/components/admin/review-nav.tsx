@@ -102,6 +102,31 @@ export const ReviewNav = async (
         .then((res) => (res?.docs?.[0]?.value as NavPreferences) ?? null)
     : null
 
+  // Pending-review count for the "Review new" label. Queries _versions
+  // (draft: true) — same pending set as the /review index; kept inline
+  // because importing lib/review would pull payload.config into a
+  // circular dependency through the registered Nav component.
+  const canReview =
+    (req?.user ?? (user as { role?: string } | null))?.role === 'editor'
+  let pendingCount = 0
+  if (canReview) {
+    for (const collection of [
+      'pages',
+      'posts',
+      'structures',
+    ] as const) {
+      const { totalDocs } = await payload.find({
+        collection,
+        depth: 0,
+        draft: true,
+        limit: 1,
+        req,
+        where: { _status: { equals: 'draft' } },
+      })
+      pendingCount += totalDocs
+    }
+  }
+
   const serverProps = {
     i18n,
     locale,
@@ -155,12 +180,10 @@ export const ReviewNav = async (
       <nav className={`${baseClass}__wrap`}>
         {renderSlot(beforeNavLinks)}
         <ReviewNavClient
-          canReview={
-            (user as { role?: string } | null | undefined)?.role ===
-            'editor'
-          }
+          canReview={canReview}
           groups={groups}
           navPreferences={navPreferences}
+          pendingCount={pendingCount}
         />
         {renderSlot(afterNavLinks)}
         <div className={`${baseClass}__controls`}>

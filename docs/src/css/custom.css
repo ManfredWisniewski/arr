@@ -123,7 +123,10 @@
   margin-block-end: 0;
 }
 
-.dropdown__menu {
+.dropdown__menu,
+.menu__list,
+.table-of-contents,
+.breadcrumbs {
   margin-block: 0;
 }
 

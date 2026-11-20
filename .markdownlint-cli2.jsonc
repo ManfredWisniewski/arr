@@ -9,12 +9,15 @@
   },
   "ignores": [
     "**/node_modules/**",
+    ".next/**",
+    "+wit/**",
     "+wit-*/**",
     "biti/**",
+    "wit_pytools/**",
     "__*/**",
     "docs/build/**",
     "docs/.docusaurus/**",
     "docs/styles/**",
-    "public/docs/**"
+    "public/docs/**" 
   ]
 }

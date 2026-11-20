@@ -1,7 +1,9 @@
 import { getPayload } from 'payload'
+import { getTranslations } from 'next-intl/server'
 import React from 'react'
 
 import config from '@/payload.config'
+import type { Locale } from '@/i18n/routing'
 import { getRequestDraft } from '@/lib/review'
 
 import { TextBlock } from '../molecules/text-block'
@@ -31,14 +33,16 @@ type DashboardData = {
   widgets?: { footer?: string; title?: string; value?: string }[]
 }
 
-async function getDashboard(): Promise<DashboardData> {
+async function getDashboard(locale: Locale): Promise<DashboardData> {
   try {
     const draft = await getRequestDraft()
     const payload = await getPayload({ config: await config })
     const { docs } = await payload.find({
       collection: 'structures',
-      draft: draft,
+      draft,
+      fallbackLocale: false,
       limit: 1,
+      locale,
       where: {
         name: { equals: 'dashboard' },
         ...(draft ? {} : { _status: { equals: 'published' } }),
@@ -54,11 +58,15 @@ async function getDashboard(): Promise<DashboardData> {
 // table + notifications + timeline, all fed by the `dashboard`
 // structure doc (+structure/dashboard.yml). Demo template.
 export const DashboardTemplate = async ({
+  locale,
   page,
   renderBody,
 }: TemplateProps) => {
-  const { notifications = [], steps = [], table, widgets = [] } =
-    await getDashboard()
+  const [{ notifications = [], steps = [], table, widgets = [] }, t] =
+    await Promise.all([
+      getDashboard(locale),
+      getTranslations({ locale, namespace: 'dashboard' }),
+    ])
   const columns = (table?.columns ?? [])
     .filter((col) => col.key && col.label)
     .map((col) => ({ key: col.key as string, label: col.label as string }))
@@ -69,15 +77,15 @@ export const DashboardTemplate = async ({
         title={page.title}
       />
       <FilterBar
-        buttons={[{ label: 'Zurücksetzen', variant: 'secondary' }]}
+        buttons={[{ label: t('reset'), variant: 'secondary' }]}
         selects={[
           {
             name: 'status',
             options: [
-              { label: 'Aktiv', value: 'aktiv' },
-              { label: 'Entwurf', value: 'entwurf' },
+              { label: t('statusActive'), value: 'aktiv' },
+              { label: t('statusDraft'), value: 'entwurf' },
             ],
-            placeholder: 'Status',
+            placeholder: t('statusPlaceholder'),
           },
         ]}
       />

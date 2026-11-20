@@ -183,6 +183,10 @@ The Ansible integration expects:
 - `PAYLOAD_SEED_ADMIN_EMAIL` and `PAYLOAD_SEED_ADMIN_PASSWORD` for the seed
   command (`PAYLOAD_SEED_ADMIN_API_KEY` optionally sets an API key); and
 - `PAYLOAD_SECRET` to be supplied through the Ansible vault; and
+- `PREVIEW_SECRET` for the admin draft-preview link, also through the vault.
+- Optionally `CHAT_WEBHOOK_URL` (+ `CHAT_WEBHOOK_SECRET`) to enable the
+  visitor chat widget that proxies to an n8n chat workflow; `CHAT_TITLE`,
+  `CHAT_GREETING` and `CHAT_DISCLOSURE` override the widget labels.
 - `PREVIEW_SECRET` for the admin draft-preview link, also through the vault;
 - optionally `GSC_SITE`, `GSC_CLIENT_EMAIL` and `GSC_PRIVATE_KEY` for
   Search Console sitemap resubmission (setup: `README_setup.md`).

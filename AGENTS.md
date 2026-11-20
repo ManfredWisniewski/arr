@@ -23,6 +23,11 @@ lint:   npm run lint && npx markdownlint-cli2 "**/*.md"
 types:  npx payload generate:types
 ```
 
+On Windows, `@swc/core` (pulled in by `next-intl/plugin`) validates its
+native-binding cache ACLs — profile dirs that grant other accounts
+replacement rights fail with `ERR_SWC_NATIVE_CACHE`. Workaround: create a
+dir with a tight ACL (e.g. `C:\swc-cache`, grant only the current
+user/SYSTEM/Admins) and set `SWC_NATIVE_BINDING_CACHE` to it.
 <!-- BEGIN:nextjs-agent-rules -->
 
 # This is NOT the Next.js you know

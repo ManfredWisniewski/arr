@@ -92,14 +92,14 @@ export interface Config {
   db: {
     defaultIDType: number;
   };
-  fallbackLocale: null;
+  fallbackLocale: ('false' | 'none' | 'null') | false | null | ('de' | 'en') | ('de' | 'en')[];
   globals: {
     theme: Theme;
   };
   globalsSelect: {
     theme: ThemeSelect<false> | ThemeSelect<true>;
   };
-  locale: null;
+  locale: 'de' | 'en';
   widgets: {
     collections: CollectionsWidget;
   };

@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl'
 import React from 'react'
 
 import { cx } from '@/lib/cx'
@@ -18,14 +19,15 @@ export const Pagination = ({
   hrefFor: (page: number) => string
   total: number
 }) => {
+  const t = useTranslations('pagination')
   if (total <= 1) {
     return null
   }
   return (
-    <nav aria-label="Pagination" className={cx('pagination', className)}>
+    <nav aria-label={t('ariaLabel')} className={cx('pagination', className)}>
       {current > 1 ? (
         <Link className="pagination-item pagination-prev" href={hrefFor(current - 1)}>
-          <Icon name="chevron-left" /> Back
+          <Icon name="chevron-left" /> {t('previous')}
         </Link>
       ) : null}
       {Array.from({ length: total }, (_, i) => i + 1).map((page) =>
@@ -45,7 +47,7 @@ export const Pagination = ({
       )}
       {current < total ? (
         <Link className="pagination-item pagination-next" href={hrefFor(current + 1)}>
-          Next <Icon name="chevron-right" />
+          {t('next')} <Icon name="chevron-right" />
         </Link>
       ) : null}
     </nav>

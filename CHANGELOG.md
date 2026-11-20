@@ -12,6 +12,18 @@ release.
 
 ## [0.9.0] - 2026-11-20
 
+### Fixed
+
+- `/docs` rewrites now cover non-trailing-slash directory URLs
+  (`/docs/de`, `/docs/dev/intro` → their `index.html`) — they previously
+  fell through to the app catch-all and 404ed.
+- Docs site branding switched from the generic `arr` token set to `wit`
+  (`wit-light/dark.css`, Inter + Roboto Serif webfonts vendored into
+  `docs/src/css/fonts/`); biti `shell.css` leaks into Docusaurus chrome
+  are scoped back (`.navbar` band reservation and the `p, ul, ol` list
+  margin that detached the language dropdown from its hoverable
+  trigger).
+
 ## [0.8.0] - 2026-11-20
 
 ## [0.7.0] - 2026-11-20

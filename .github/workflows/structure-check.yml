@@ -16,9 +16,13 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
+      # submodules intentionally off: +wit (ssh://git.w1t.org) and biti
+      # (private) can't be cloned in CI — the check uses the vendored
+      # inventory at common/repo-inventory.json instead.
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          submodules: true
       - name: Check repository structure
-        run: python3 scripts/check-repo-structure.py . --remote --skills-check
+        # no --skills-check: it diffs .agents/skills against
+        # +wit/agents/skills, which isn't cloned here
+        run: python3 scripts/check-repo-structure.py . --remote

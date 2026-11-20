@@ -16,8 +16,12 @@ const getReviewPayload = async () => getPayload({ config: await config })
 // payload-token cookie is domain-scoped, so an /admin login authenticates
 // frontend requests too.
 export async function getViewer(): Promise<null | TypedUser> {
+  // headers() before getPayload: during `next build` prerender it suspends
+  // the render (bailout → dynamic route), so Payload init is never reached
+  // without env; at request time it resolves instantly.
+  const reqHeaders = await headers()
   const payload = await getReviewPayload()
-  const { user } = await payload.auth({ headers: await headers() })
+  const { user } = await payload.auth({ headers: reqHeaders })
   return user
 }
 

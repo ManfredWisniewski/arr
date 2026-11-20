@@ -22,7 +22,7 @@ code change → PR → GitHub Actions (lint, typecheck, image build)
 
 ## Environment
 
-Per-instance env is supplied by the Ansible role and vault-managed:
+Per-instance environment is supplied by the Ansible role and vault-managed:
 `DATABASE_URI`/`DATABASE_URL`, `PAYLOAD_SECRET`, DB credentials, SMTP,
 seed admin — never in the repository. Optional `GSC_*` vars enable
 sitemap resubmission after publishes (setup: `README_setup.md`).

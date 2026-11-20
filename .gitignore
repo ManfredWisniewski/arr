@@ -292,3 +292,7 @@ next-env.d.ts
 /docs/build/
 /docs/.docusaurus/
 /public/docs/
+
+# Vale style packages (synced by `vale sync`); keep config/ committed
+/docs/styles/Microsoft/
+/docs/styles/write-good/

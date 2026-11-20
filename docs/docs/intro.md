@@ -29,7 +29,7 @@ code.
 | Concern | Location |
 |---|---|
 | App code (collections, hooks, frontend) | `src/` |
-| Content source of truth | the site content repositories (e.g. `obs-seo-witconsult`) |
+| Content source of truth | the site content repositories (for example `obs-seo-witconsult`) |
 | Design tokens / styling source | `biti/tokens` (Terrazzo → CSS) |
 | Sync CLI (`witcontent`) | `wit_pytools/payloadtools` |
 | Deployment | `wit.docker_apps` (Ansible) |

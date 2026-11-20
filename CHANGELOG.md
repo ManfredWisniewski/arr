@@ -12,6 +12,14 @@ release.
 
 ## [0.7.0] - 2026-11-20
 
+### Fixed
+
+- `src/lib/review.ts`: `getViewer()` now awaits `headers()` before
+  initializing Payload — during `next build` static generation the
+  headers promise suspends (route marked dynamic), so Payload init is
+  never reached without env. Fixes the image build failing on
+  `missing secret key` while prerendering `/blog`.
+
 ## [0.6.0] - 2026-11-20
 
 ## [0.5.0] - 2026-11-20

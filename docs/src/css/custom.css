@@ -130,6 +130,15 @@
   margin-block: 0;
 }
 
+/* Nav chrome uses the display/heading typeface (Inter) like the main
+   site — body copy stays Roboto Serif. */
+.navbar,
+.menu,
+.dropdown__menu,
+.footer {
+  font-family: var(--typography-typeface-change-font-here-heading, 'Inter', sans-serif);
+}
+
 [data-theme='dark'] {
   --ifm-color-primary: var(--colors-brand-primary-primary-300);
   --ifm-color-primary-dark: var(--colors-brand-primary-primary-400);

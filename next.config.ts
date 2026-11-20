@@ -36,6 +36,9 @@ const nextConfig: NextConfig = {
       { source: '/docs', destination: '/docs/index.html' },
       { source: '/docs/', destination: '/docs/index.html' },
       { source: '/docs/:path+/', destination: '/docs/:path+/index.html' },
+      // non-trailing-slash URLs (/docs/de) — the catch-all would
+      // otherwise treat them as app pages and 404
+      { source: '/docs/:path+', destination: '/docs/:path+/index.html' },
     ]
   },
   webpack: (webpackConfig) => {

@@ -1,19 +1,98 @@
 /**
  * biti-token branding for the docs site (FR-010).
  *
- * tokens/arr-light.css and tokens/arr-dark.css are a vendored snapshot
+ * tokens/wit-light.css and tokens/wit-dark.css are a vendored snapshot
  * of the biti/tokens build (Terrazzo) — refresh with `npm run tokens`
  * when biti tokens change. The dark file already scopes to
  * [data-theme="dark"], which is the attribute Docusaurus toggles.
+ *
+ * The wit webfonts (Inter + Roboto Serif) are vendored into
+ * src/css/fonts/ by the same script and bundler-emitted with hashed
+ * filenames.
  *
  * Infima variables map onto the published biti token names — never
  * invent values here (constitution P5).
  */
 
-@import './tokens/arr-light.css';
-@import './tokens/arr-dark.css';
+@import './tokens/wit-light.css';
+@import './tokens/wit-dark.css';
+
+@font-face {
+  font-display: swap;
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  src: url('./fonts/inter-v20-latin-regular.woff2') format('woff2');
+}
+@font-face {
+  font-display: swap;
+  font-family: 'Inter';
+  font-style: italic;
+  font-weight: 400;
+  src: url('./fonts/inter-v20-latin-italic.woff2') format('woff2');
+}
+@font-face {
+  font-display: swap;
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  src: url('./fonts/inter-v20-latin-500.woff2') format('woff2');
+}
+@font-face {
+  font-display: swap;
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  src: url('./fonts/inter-v20-latin-600.woff2') format('woff2');
+}
+@font-face {
+  font-display: swap;
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 700;
+  src: url('./fonts/inter-v20-latin-700.woff2') format('woff2');
+}
+@font-face {
+  font-display: swap;
+  font-family: 'Roboto Serif';
+  font-style: normal;
+  font-weight: 400;
+  src: url('./fonts/roboto-serif-v17-latin-regular.woff2') format('woff2');
+}
+@font-face {
+  font-display: swap;
+  font-family: 'Roboto Serif';
+  font-style: italic;
+  font-weight: 400;
+  src: url('./fonts/roboto-serif-v17-latin-italic.woff2') format('woff2');
+}
+@font-face {
+  font-display: swap;
+  font-family: 'Roboto Serif';
+  font-style: normal;
+  font-weight: 500;
+  src: url('./fonts/roboto-serif-v17-latin-500.woff2') format('woff2');
+}
+@font-face {
+  font-display: swap;
+  font-family: 'Roboto Serif';
+  font-style: normal;
+  font-weight: 600;
+  src: url('./fonts/roboto-serif-v17-latin-600.woff2') format('woff2');
+}
+@font-face {
+  font-display: swap;
+  font-family: 'Roboto Serif';
+  font-style: normal;
+  font-weight: 700;
+  src: url('./fonts/roboto-serif-v17-latin-700.woff2') format('woff2');
+}
 
 :root {
+  --ifm-font-family-base: var(--typography-typeface-change-font-here-body, 'Roboto Serif', serif);
+  --ifm-heading-font-family: var(--typography-typeface-change-font-here-heading, 'Inter', sans-serif);
+  --ifm-font-family-monospace: var(--typography-typeface-mono, ui-monospace, monospace);
+
   --ifm-color-primary: var(--colors-brand-primary-primary-500-main);
   --ifm-color-primary-dark: var(--colors-brand-primary-primary-600);
   --ifm-color-primary-darker: var(--colors-brand-primary-primary-700);
@@ -34,6 +113,21 @@
   --ifm-link-color: var(--ifm-color-primary);
   --ifm-navbar-background-color: var(--background-fill-background-fill-surface);
   --ifm-footer-background-color: var(--background-fill-background-fill-outermost);
+}
+
+/* biti shell.css leaks into Docusaurus chrome: .navbar reserves 56px
+   below the bar for biti's submenu band (absent here), and the global
+   `p, ul, ol` rhythm gives .dropdown__menu a 16px top margin — the menu
+   detaches from its hoverable trigger and the hover path breaks. */
+.navbar {
+  margin-block-end: 0;
+}
+
+.dropdown__menu,
+.menu__list,
+.table-of-contents,
+.breadcrumbs {
+  margin-block: 0;
 }
 
 [data-theme='dark'] {

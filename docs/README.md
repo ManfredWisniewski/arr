@@ -14,7 +14,7 @@ whose static export is baked into the arr Docker image and served at
 | `blog/` | Release notes → `/docs/blog` |
 | `i18n/de/` | German translations |
 | `src/css/custom.css` | Infima → biti token mapping |
-| `src/css/tokens/` | generated token CSS (gitignored, built by `prepare-tokens`) |
+| `src/css/tokens/` | vendored biti token snapshot (committed — refresh below) |
 
 ## Commands
 
@@ -25,11 +25,16 @@ npm run docs:dev     # dev server with hot reload
 npm run docs:build   # build export → public/docs/
 ```
 
-The `docs` build first runs `scripts/prepare-tokens.mjs`, which builds
-the biti tokens (`biti/tokens`, Terrazzo) and copies `arr-light.css` /
-`arr-dark.css` into `src/css/tokens/`. Without the biti submodule the
-site falls back to unbranded Infima defaults (dev only — the image build
-always has the submodule).
+Branding comes from the **vendored** biti token snapshot in
+`src/css/tokens/` — committed, so neither local builds nor the image
+build need the biti submodule. Refresh it when biti tokens change
+(requires the `biti` submodule locally):
+
+```sh
+git submodule update --init biti
+npm --prefix docs run tokens     # rebuilds biti/tokens, copies the CSS
+# commit src/css/tokens/ if the files changed
+```
 
 ## Versioning
 

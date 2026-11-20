@@ -287,8 +287,8 @@ next-env.d.ts
 /blob-report/
 .env*.local
 
-# Docs site (Docusaurus) — build outputs and generated token CSS
+# Docs site (Docusaurus) — build outputs (src/css/tokens is a vendored
+# biti snapshot and IS committed)
 /docs/build/
 /docs/.docusaurus/
-/docs/src/css/tokens/
 /public/docs/

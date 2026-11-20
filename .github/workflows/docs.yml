@@ -27,8 +27,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          submodules: true
 
       - uses: actions/setup-node@v4
         with:
@@ -38,9 +36,6 @@ jobs:
 
       - name: Install docs dependencies
         run: npm --prefix docs ci --legacy-peer-deps --ignore-scripts
-
-      - name: Install token dependencies
-        run: npm --prefix biti/tokens ci --ignore-scripts
 
       - name: Build docs site
         run: npm --prefix docs run build

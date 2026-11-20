@@ -19,17 +19,14 @@ RUN \
 
 
 # Build the Docusaurus docs site into a static export (served at /docs).
-# Needs the biti submodule for the design-token CSS used by custom.css.
+# Branding uses the vendored biti token snapshot in docs/src/css/tokens/
+# — the biti submodule is not needed in the image build.
 FROM base AS docs-builder
 WORKDIR /app
 COPY docs/package.json docs/package-lock.json docs/
-COPY biti/tokens/package.json biti/tokens/package-lock.json biti/tokens/
-RUN cd docs && npm ci --legacy-peer-deps --ignore-scripts \
-  && cd ../biti/tokens && npm ci --ignore-scripts
+RUN cd docs && npm ci --legacy-peer-deps --ignore-scripts
 COPY docs docs
-COPY biti/tokens biti/tokens
-RUN cd biti/tokens && npm run build \
-  && cd /app/docs && npm run build
+RUN cd docs && npm run build
 
 # Rebuild the source code only when needed
 FROM base AS builder

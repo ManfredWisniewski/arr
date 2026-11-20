@@ -1,10 +1,10 @@
 /**
  * biti-token branding for the docs site (FR-010).
  *
- * tokens/arr-light.css and tokens/arr-dark.css are generated from
- * biti/tokens (Terrazzo) by scripts/prepare-tokens.mjs during the docs
- * build — the dark file already scopes to [data-theme="dark"], which is
- * the attribute Docusaurus toggles.
+ * tokens/arr-light.css and tokens/arr-dark.css are a vendored snapshot
+ * of the biti/tokens build (Terrazzo) — refresh with `npm run tokens`
+ * when biti tokens change. The dark file already scopes to
+ * [data-theme="dark"], which is the attribute Docusaurus toggles.
  *
  * Infima variables map onto the published biti token names — never
  * invent values here (constitution P5).

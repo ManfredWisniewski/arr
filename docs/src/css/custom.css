@@ -115,6 +115,18 @@
   --ifm-footer-background-color: var(--background-fill-background-fill-outermost);
 }
 
+/* biti shell.css leaks into Docusaurus chrome: .navbar reserves 56px
+   below the bar for biti's submenu band (absent here), and the global
+   `p, ul, ol` rhythm gives .dropdown__menu a 16px top margin — the menu
+   detaches from its hoverable trigger and the hover path breaks. */
+.navbar {
+  margin-block-end: 0;
+}
+
+.dropdown__menu {
+  margin-block: 0;
+}
+
 [data-theme='dark'] {
   --ifm-color-primary: var(--colors-brand-primary-primary-300);
   --ifm-color-primary-dark: var(--colors-brand-primary-primary-400);

@@ -4,7 +4,7 @@ sidebar_position: 2
 
 # Inhalte veröffentlichen
 
-Inhalte einer arr-Website werden außerhalb des CMS geschrieben und
+Inhalte einer ARR-Website werden außerhalb des CMS geschrieben und
 **synchronisiert** — jede synchronisierte Seite kommt als **Entwurf** an.
 Nichts geht live, ohne dass ein Mensch es bestätigt.
 

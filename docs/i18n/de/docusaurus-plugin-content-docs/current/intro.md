@@ -2,7 +2,7 @@
 sidebar_position: 1
 ---
 
-# arr — Überblick
+# ARR — Überblick
 
 `arr` ist die Payload-CMS-Anwendung für witconsult.de: eine
 site-agnostische Next.js-+-Payload-App, die als einzelnes Docker-Image

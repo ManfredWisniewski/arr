@@ -4,7 +4,7 @@ sidebar_position: 2
 
 # Publishing content
 
-Content on an arr site is written outside the CMS and **synced** in —
+Content on an ARR site is written outside the CMS and **synced** in —
 every synced page arrives as a **draft**. Nothing goes live without a
 human confirming it.
 

@@ -5,7 +5,7 @@ slug: /
 
 # Redaktions-Dokumentation
 
-Alles, was du brauchst, um Inhalte auf einer arr-Website zu veröffentlichen
+Alles, was du brauchst, um Inhalte auf einer ARR-Website zu veröffentlichen
 und zu prüfen. Keine Repository- oder Admin-Kenntnisse nötig — nur ein
 `editor`-Konto.
 

@@ -102,7 +102,7 @@ const config: Config = {
           position: 'left',
           label: 'Editor',
         },
-        {to: '/blog', label: 'Blog', position: 'left'},
+        {to: '/blog', label: 'Release-Blog', position: 'left'},
         {
           type: 'docsVersionDropdown',
           position: 'right',
@@ -126,7 +126,7 @@ const config: Config = {
           items: [
             {label: 'Developer', to: '/dev/intro'},
             {label: 'Editor', to: '/editor/'},
-            {label: 'Blog', to: '/blog'},
+            {label: 'Release-Blog', to: '/blog'},
           ],
         },
       ],

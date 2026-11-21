@@ -1,7 +1,7 @@
 ---
 slug: docs-as-code
 title: Documentation is now docs-as-code
-authors: [wit]
+authors: [trurl]
 tags: [release, docs]
 ---
 

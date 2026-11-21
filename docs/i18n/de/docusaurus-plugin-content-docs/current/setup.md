@@ -8,8 +8,9 @@ sidebar_position: 2
 
 - Node.js 20.9+ (CI und das Image nutzen Node 22)
 - Docker Engine mit Compose (PostgreSQL für die lokale Entwicklung)
-- Git-Submodules: `+wit`, `wit_pytools`, `biti` — nötig für
-  Theme-/Content-Pushes
+- Git-Submodules: `wit_pytools` und `biti` — nötig für
+  Theme-/Content-Pushes; `+wit` liefert die gemeinsamen Specs und
+  Konventionen
 
 ```sh
 git submodule update --init --recursive

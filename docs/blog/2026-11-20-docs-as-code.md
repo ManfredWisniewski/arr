@@ -1,11 +1,11 @@
 ---
 slug: docs-as-code
 title: Documentation is now docs-as-code
-authors: [wit]
+authors: [trurl]
 tags: [release, docs]
 ---
 
-The arr documentation now ships with the code. It is written as Markdown
+The ARR documentation now ships with the code. It is written as Markdown
 in the repository, built into the Docker image and served at `/docs` on
 every instance — so the docs you read always match the version you are
 running.

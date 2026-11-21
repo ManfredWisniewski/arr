@@ -5,7 +5,7 @@ slug: /
 
 # Editor documentation
 
-Everything you need to publish and review content on an arr-powered site.
+Everything you need to publish and review content on an ARR-powered site.
 No repository or admin knowledge required — only an `editor` account.
 
 - [Publishing content](./publishing.md) — how content gets onto the site

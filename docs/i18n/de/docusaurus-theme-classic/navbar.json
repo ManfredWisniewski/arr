@@ -1,22 +1,22 @@
 {
-  "title": {
-    "message": "arr docs",
-    "description": "The title in the navbar"
-  },
   "item.label.Developer": {
-    "message": "Entwickler",
-    "description": "Navbar item with label Developer"
+    "description": "Navbar item with label Developer",
+    "message": "Entwickler"
   },
   "item.label.Editor": {
-    "message": "Redaktion",
-    "description": "Navbar item with label Editor"
-  },
-  "item.label.Blog": {
-    "message": "Blog",
-    "description": "Navbar item with label Blog"
+    "description": "Navbar item with label Editor",
+    "message": "Redaktion"
   },
   "item.label.GitHub": {
-    "message": "GitHub",
-    "description": "Navbar item with label GitHub"
+    "description": "Navbar item with label GitHub",
+    "message": "GitHub"
+  },
+  "item.label.Release-Blog": {
+    "description": "Navbar item with label Release-Blog",
+    "message": "Release-Blog"
+  },
+  "title": {
+    "description": "The title in the navbar",
+    "message": "arr docs"
   }
 }

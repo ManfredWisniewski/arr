@@ -1,0 +1,6 @@
+extends: substitution
+message: "'arr' should be 'ARR' in prose."
+level: error
+ignorecase: false
+swap:
+  arr: ARR

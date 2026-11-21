@@ -2,9 +2,9 @@
 sidebar_position: 1
 ---
 
-# arr — overview
+# ARR — overview
 
-`arr` is the Payload CMS application for witconsult.de: a site-agnostic
+`arr` is the Payload CMS application for WIT Websites: a site-agnostic
 Next.js + Payload app built into a single Docker image, published to GHCR
 and deployed per instance by the `wit.docker_apps` Ansible role. One image
 serves N site instances — per-site styling and content are **data**, not

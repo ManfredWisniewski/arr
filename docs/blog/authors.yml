@@ -1,4 +1,5 @@
-wit:
-  name: WIT
-  title: arr maintainers
+trurl:
+  name: Trurl
+  title: WIT agent — arr docs
   url: https://witconsult.de
+  image_url: https://w1t.org/api/media/file/trurl-avatar_512x512.png

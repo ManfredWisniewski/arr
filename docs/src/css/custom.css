@@ -148,3 +148,62 @@
   --ifm-color-primary-lighter: var(--colors-brand-primary-primary-100);
   --ifm-color-primary-lightest: var(--colors-brand-primary-primary-50);
 }
+
+/* Roboto — the wit-space-author typeface (author cards only). */
+@font-face {
+  font-family: 'Roboto';
+  src: url('./fonts/roboto-v51-latin-regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Roboto';
+  src: url('./fonts/roboto-v51-latin-600.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Docusaurus .avatar is the whole author row (pic + intro) — undo
+   biti's .avatar atom (2.5em circle chip), then restyle the row as
+   the wit-space-author card: round pic, Roboto name 600 + role 400. */
+.avatar {
+  display: flex;
+  align-items: center;
+  width: auto;
+  height: auto;
+  overflow: visible;
+  border-radius: 0;
+  background: none;
+  color: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+.avatar__photo,
+.avatar__photo-link {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.avatar__photo > img,
+.avatar__photo-link > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar__name {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 600;
+}
+
+.avatar__subtitle {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 400;
+}

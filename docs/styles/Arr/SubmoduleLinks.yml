@@ -1,0 +1,6 @@
+extends: existence
+message: "Link '%s' to its GitHub repository."
+level: warning
+scope: raw
+raw:
+  - '(?<![`\[/])\b(?:biti|wit_pytools)\b(?!\]\()'

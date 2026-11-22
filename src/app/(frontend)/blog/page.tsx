@@ -4,6 +4,7 @@ import { getAgentMap, getIntroPage, getPostsPage,
   parsePageParam,
 } from '@/lib/blog'
 import { getRequestDraft } from '@/lib/review'
+import { blogAlternates } from '@/lib/seo'
 
 import { BlogIndexView } from './views'
 
@@ -13,9 +14,15 @@ type Props = {
 
 export async function generateMetadata() {
   const draft = await getRequestDraft()
-  const intro = await getIntroPage('/blog', draft)
+  const [intro, alternates] = await Promise.all([
+    getIntroPage('/blog', draft),
+    blogAlternates('/blog', draft),
+  ])
   return {
+    alternates,
     description: intro?.meta?.description ?? undefined,
+    openGraph: { url: alternates.canonical },
+    robots: { index: false },
     title: intro?.meta?.title ?? intro?.title ?? 'Blog',
   }
 }

@@ -8,6 +8,7 @@ import {
   parsePageParam,
 } from '@/lib/blog'
 import { getRequestDraft } from '@/lib/review'
+import { blogAlternates } from '@/lib/seo'
 
 import { AuthorArchiveView } from '../views'
 
@@ -23,8 +24,14 @@ export async function generateMetadata({ params }: Props) {
   if (!agent) {
     return {}
   }
+  const alternates = await blogAlternates(`/blog/${agent.slug}`, draft, {
+    author: { equals: agent.slug },
+  })
   return {
+    alternates,
     description: agent.bio,
+    openGraph: { url: alternates.canonical },
+    robots: { index: false },
     title: agent.name,
   }
 }

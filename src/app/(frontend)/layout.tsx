@@ -84,6 +84,11 @@ export async function generateMetadata() {
 // counterpart to the ThemeToggle atom; key per design-tokens spec.
 const THEME_INIT = `(function(){try{var v=localStorage.getItem('theme-variant');if(v){document.documentElement.dataset.variant=v}var t=localStorage.getItem('arr.theme')||'light';var d=t==='dark'||(t!=='light'&&window.matchMedia('(prefers-color-scheme: dark)').matches);if(d){document.documentElement.dataset.theme='dark'}}catch(e){}})()`
 
+// SSR emits the default lang on <html>; /<lang>/… translation trees
+// override it pre-paint (layouts see no route params, so the path
+// prefix is read client-side — same position as THEME_INIT).
+const LANG_INIT = `(function(){var m=location.pathname.match(/^\\/([a-z]{2})(\\/|$)/);if(m){document.documentElement.lang=m[1]}})()`
+
 export default async function RootLayout(props: { children: React.ReactNode }) {
   const { children } = props
   const draft = await getRequestDraft()
@@ -93,6 +98,11 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
     getFooter(draft),
   ])
   const siteName = theme?.meta?.siteName ?? 'witconsult'
+  const defaultLang =
+    typeof theme?.meta?.lang === 'string' &&
+    /^[a-z]{2}$/.test(theme.meta.lang)
+      ? theme.meta.lang
+      : 'de'
   // gtag.js targets (GA4 G-…, Google Tag GT-…, Ads AW-…, Floodlight
   // DC-…) — the stored value reaches a <script src>, so validate before
   // emitting rather than trusting the synced field verbatim
@@ -112,10 +122,13 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
   const variants = getThemeVariants()
 
   return (
-    <html lang="de" suppressHydrationWarning>
+    <html lang={defaultLang} suppressHydrationWarning>
       <head>
         <Script id="theme-init" strategy="beforeInteractive">
           {THEME_INIT}
+        </Script>
+        <Script id="lang-init" strategy="beforeInteractive">
+          {LANG_INIT}
         </Script>
         {theme?.favicon && typeof theme.favicon === 'object'
           ? <link href={(theme.favicon as Media).url ?? ''} rel="icon" />

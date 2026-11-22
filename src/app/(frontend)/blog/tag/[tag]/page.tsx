@@ -5,6 +5,7 @@ import { getAgentMap, getPostsPage, getTaxonomyTerm,
   parsePageParam,
 } from '@/lib/blog'
 import { getRequestDraft } from '@/lib/review'
+import { blogAlternates } from '@/lib/seo'
 
 import { TaxonomyArchive } from '../../taxonomy-archive'
 
@@ -16,9 +17,17 @@ type Props = {
 export async function generateMetadata({ params }: Props) {
   const { tag } = await params
   const draft = await getRequestDraft()
-  const term = await getTaxonomyTerm('tags', tag, draft)
+  const [term, alternates] = await Promise.all([
+    getTaxonomyTerm('tags', tag, draft),
+    blogAlternates(`/blog/tag/${tag}`, draft, {
+      tags: { contains: tag },
+    }),
+  ])
   return {
+    alternates,
     description: term?.description,
+    openGraph: { url: alternates.canonical },
+    robots: { index: false },
     title: term?.label ?? `Tag: ${tag}`,
   }
 }

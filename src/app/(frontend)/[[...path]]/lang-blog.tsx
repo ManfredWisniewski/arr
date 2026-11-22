@@ -12,6 +12,7 @@ import {
   getTaxonomyTerm,
   parsePageParam,
 } from '@/lib/blog'
+import { blogAlternates, docAlternates } from '@/lib/seo'
 
 import { TaxonomyArchive } from '../blog/taxonomy-archive'
 import {
@@ -35,9 +36,15 @@ export async function langBlogMetadata(segments: string[], draft: boolean) {
   const rest = segments.slice(2)
 
   if (!rest.length) {
-    const intro = await getIntroPage(base, draft)
+    const [intro, alternates] = await Promise.all([
+      getIntroPage(base, draft),
+      blogAlternates(base, draft),
+    ])
     return {
+      alternates,
       description: intro?.meta?.description ?? undefined,
+      openGraph: { url: alternates.canonical },
+      robots: { index: false },
       title: intro?.meta?.title ?? intro?.title ?? 'Blog',
     }
   }
@@ -51,22 +58,50 @@ export async function langBlogMetadata(segments: string[], draft: boolean) {
       draft,
     )
     const label = rest[0] === 'kategorie' ? 'Kategorie' : 'Tag'
+    const alternates = await blogAlternates(
+      `${base}/${rest[0]}/${rest[1]}`,
+      draft,
+      {
+        [rest[0] === 'kategorie' ? 'categories' : 'tags']: {
+          contains: rest[1],
+        },
+      },
+    )
     return {
+      alternates,
       description: term?.description,
+      openGraph: { url: alternates.canonical },
+      robots: { index: false },
       title: term?.label ?? `${label}: ${rest[1]}`,
     }
   }
   if (rest.length === 1) {
     const agent = await getAgent(rest[0], draft)
-    return agent ? { description: agent.bio, title: agent.name } : {}
+    if (!agent) {
+      return {}
+    }
+    const alternates = await blogAlternates(`${base}/${rest[0]}`, draft, {
+      author: { equals: rest[0] },
+    })
+    return {
+      alternates,
+      description: agent.bio,
+      openGraph: { url: alternates.canonical },
+      robots: { index: false },
+      title: agent.name,
+    }
   }
   if (rest.length === 2) {
     const doc = await getPostByPath(`${base}/${rest[0]}/${rest[1]}`, draft)
     if (!doc) {
       return {}
     }
+    const alternates = await docAlternates('posts', doc.path, draft)
     return {
+      alternates,
       description: doc.meta?.description ?? doc.excerpt ?? undefined,
+      openGraph: { url: alternates.canonical },
+      ...(doc.meta?.noindex ? { robots: { index: false } } : {}),
       title: doc.meta?.title ?? doc.title,
     }
   }

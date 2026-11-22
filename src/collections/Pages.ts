@@ -104,6 +104,11 @@ export const Pages: CollectionConfig = {
           name: 'description',
           type: 'textarea',
         },
+        {
+          // front matter `noindex: true` -> robots noindex + sitemap drop
+          name: 'noindex',
+          type: 'checkbox',
+        },
       ],
     },
   ],

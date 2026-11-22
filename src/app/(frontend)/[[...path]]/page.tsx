@@ -10,6 +10,7 @@ import { DraftBanner } from '@/components/draft-banner'
 import { renderTemplate } from '@/components/templates/registry'
 import { jsxConverters } from '@/lib/jsx-converters'
 import { getRequestDraft } from '@/lib/review'
+import { docAlternates } from '@/lib/seo'
 
 import { LangBlog, isLangBlogPath, langBlogMetadata } from './lang-blog'
 
@@ -42,8 +43,12 @@ export async function generateMetadata({ params }: Props) {
   if (!page) {
     return {}
   }
+  const alternates = await docAlternates('pages', page.path, draft)
   return {
+    alternates,
     description: page.meta?.description ?? undefined,
+    openGraph: { url: alternates.canonical },
+    ...(page.meta?.noindex ? { robots: { index: false } } : {}),
     title: page.meta?.title ?? page.title,
   }
 }

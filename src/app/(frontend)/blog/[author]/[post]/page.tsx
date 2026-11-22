@@ -8,6 +8,7 @@ import {
   getPostByPath,
 } from '@/lib/blog'
 import { getRequestDraft } from '@/lib/review'
+import { docAlternates } from '@/lib/seo'
 
 import { PostArticle } from '../../views'
 
@@ -26,8 +27,12 @@ export async function generateMetadata({ params }: Props) {
   if (!doc) {
     return {}
   }
+  const alternates = await docAlternates('posts', doc.path, draft)
   return {
+    alternates,
     description: doc.meta?.description ?? doc.excerpt ?? undefined,
+    openGraph: { url: alternates.canonical },
+    ...(doc.meta?.noindex ? { robots: { index: false } } : {}),
     title: doc.meta?.title ?? doc.title,
   }
 }

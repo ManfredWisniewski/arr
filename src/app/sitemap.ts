@@ -2,7 +2,6 @@ import type { MetadataRoute } from 'next'
 import { getPayload } from 'payload'
 
 import config from '@/payload.config'
-import { blogRoot } from '@/lib/blog'
 import { getSiteUrl } from '@/lib/site'
 
 // Next serialises <loc> verbatim, so stored fields reaching the URL must
@@ -16,8 +15,9 @@ const escapeXml = (value: string) =>
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&apos;')
 
-// Published pages + posts plus the public /blog archive routes. Drafts
-// are never listed; a failing DB yields just the static entries instead
+// Published pages + posts. Drafts, meta.noindex docs and the /blog
+// archive routes (navigation, not search inventory — noindexed) are
+// never listed; a failing DB yields just the static entries instead
 // of a 500 (same fail-open pattern as layout.tsx).
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = await getSiteUrl()
@@ -39,33 +39,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       }),
     ])
 
-    const archives = new Set<string>(['/blog'])
-    for (const post of posts.docs) {
-      const root = blogRoot(post.path)
-      archives.add(`${root}/blog`)
-      if (post.author) {
-        archives.add(`${root}/blog/${escapeXml(post.author)}`)
-      }
-      for (const c of post.categories ?? []) {
-        archives.add(`${root}/blog/kategorie/${escapeXml(c)}`)
-      }
-      for (const t of post.tags ?? []) {
-        archives.add(`${root}/blog/tag/${escapeXml(t)}`)
-      }
-    }
-
     return [
-      ...pages.docs.map((doc) => ({
-        lastModified: doc.updatedAt,
-        url: `${base}${escapeXml(doc.path)}`,
-      })),
-      ...posts.docs.map((doc) => ({
-        lastModified: doc.publishedAt ?? doc.updatedAt,
-        url: `${base}${escapeXml(doc.path)}`,
-      })),
-      ...[...archives].map((path) => ({ url: `${base}${path}` })),
+      ...pages.docs
+        .filter((doc) => !doc.meta?.noindex)
+        .map((doc) => ({
+          lastModified: doc.updatedAt,
+          url: `${base}${escapeXml(doc.path)}`,
+        })),
+      ...posts.docs
+        .filter((doc) => !doc.meta?.noindex)
+        .map((doc) => ({
+          lastModified: doc.publishedAt ?? doc.updatedAt,
+          url: `${base}${escapeXml(doc.path)}`,
+        })),
     ]
   } catch {
-    return [{ url: `${base}/` }, { url: `${base}/blog` }]
+    return [{ url: `${base}/` }]
   }
 }

@@ -10,6 +10,27 @@ release.
 
 ## Unreleased
 
+### Added
+
+- Canonical `rel=canonical`, `og:url` and hreflang `languages`/`x-default`
+  on pages, posts and all blog archive routes — translation siblings are
+  resolved from the `/<lang>/<rest>` path convention and emitted only
+  when a published doc exists (`src/lib/seo.ts`).
+- `theme.meta.lang` (site.yml `lang:` → `payloadtools site`) selects the
+  default content-tree language; `<html lang>` uses it and a
+  `beforeInteractive` script corrects it on `/<lang>/` routes.
+- `meta.noindex` on `pages`/`posts` (front matter `noindex: true` →
+  `payloadtools` sync) serves `robots noindex` and drops the doc from
+  `sitemap.xml`; the `/blog` archive routes (index, author, taxonomy —
+  including `/<lang>/blog` mirrors) serve `robots noindex`
+  unconditionally and leave the sitemap entirely.
+
+### Fixed
+
+- `getSiteUrl` prefers `NEXT_PUBLIC_SERVER_URL` over forwarded-host, so
+  sitemap/robots/feeds and canonicals emit the canonical host even when
+  a request arrives on an alias (e.g. `www.`) host.
+
 ## [0.12.0] - 2026-11-21
 
 ## [0.11.0] - 2026-11-20

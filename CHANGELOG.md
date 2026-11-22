@@ -10,6 +10,8 @@ release.
 
 ## Unreleased
 
+## [0.13.0] - 2026-11-22
+
 ### Added
 
 - Canonical `rel=canonical`, `og:url` and hreflang `languages`/`x-default`

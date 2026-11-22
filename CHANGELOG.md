@@ -31,7 +31,7 @@ release.
 
 - `/blog` and `/<lang>/blog` indexes render a `FilterBar` row of
   category pills (`?hide=<slugs>`) — every category active by default
-  except `daily` and `wp-update`; posts carrying an inactive category
+  except `daily` and `wordpress`; posts carrying an inactive category
   are excluded
   server-side, and `Pill` gained an `active`/`aria-pressed` state.
 - `FilterBar` renders its `SearchField` only when `searchPlaceholder`

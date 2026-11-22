@@ -17,7 +17,7 @@ export const parsePageParam = (page: string | undefined): number => {
 
 // Categories inactive on the blog index filter until a ?hide= parameter
 // overrides the default.
-export const DEFAULT_EXCLUDED_CATEGORIES = ['daily', 'wp-update']
+export const DEFAULT_EXCLUDED_CATEGORIES = ['daily', 'wordpress']
 
 // `?hide=a,b` lists the inactive categories on the blog index filter.
 // Absent param -> undefined ("use the default"); an empty value means

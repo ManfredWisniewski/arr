@@ -600,6 +600,7 @@ export const ComponentShowcase = ({ media, themeControls }: { media?: Media | nu
     <Heading level={3}>FilterBar</Heading>
     <FilterBar
       buttons={[{ label: 'Zurücksetzen', variant: 'secondary' }]}
+      searchPlaceholder="Suchen …"
       selects={[
         {
           name: 'status',

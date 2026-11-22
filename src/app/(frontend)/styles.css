@@ -108,6 +108,13 @@ hr {
   margin: var(--space-lg, 2rem) 0;
 }
 
+/* pressed (active) toggle pills in the blog index filter reuse the
+   link-hover fill from the .pill contract */
+.pill[aria-pressed='true'] {
+  background: var(--component-fill-component-fill-primary, #444);
+  color: var(--component-text-component-text-light-fixed, #fff);
+}
+
 /* embedded HedgeDoc/reveal.js decks (slide template) */
 .page[data-template='slide'] {
   max-width: 90rem;

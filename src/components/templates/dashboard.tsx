@@ -70,6 +70,7 @@ export const DashboardTemplate = async ({
       />
       <FilterBar
         buttons={[{ label: 'Zurücksetzen', variant: 'secondary' }]}
+        searchPlaceholder="Suchen …"
         selects={[
           {
             name: 'status',

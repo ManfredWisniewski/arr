@@ -1,12 +1,10 @@
 import { RichText } from '@payloadcms/richtext-lexical/react'
-import React from 'react'
 
 import type { Page, Post } from '@/payload-types'
 import type { AgentProfile, AgentRef } from '@/lib/blog'
 import {
   blogRoot,
   formatDate,
-  originalPostPath,
   parentPath,
 } from '@/lib/blog'
 import { stripMarkdownAttributes } from '@/lib/markdownAttributes'
@@ -14,13 +12,12 @@ import { jsxConverters } from '@/lib/jsx-converters'
 
 import { asSlideOptions } from '@/lib/slides'
 
-import { Link } from '@/components/atoms/link'
 import { Avatar } from '@/components/atoms/avatar'
-import { Alert } from '@/components/molecules/alert'
 import { AuthorLine } from '@/components/molecules/author-line'
 import { Figure } from '@/components/molecules/figure'
 import { Pagination } from '@/components/molecules/pagination'
 import { Pill } from '@/components/molecules/pill'
+import { FilterBar } from '@/components/organisms/filter-bar'
 import { PostList } from '@/components/organisms/post-list'
 import { SlideDeck } from '@/components/organisms/slide-deck'
 
@@ -28,11 +25,19 @@ import { SlideDeck } from '@/components/organisms/slide-deck'
 // localized trees served through [[...path]] (/<lang>/blog/…) render the
 // same markup with a different basePath/emptyLabel.
 
+// Category filter state for the index: `categories` lists every
+// category in the tree, `inactive` the hidden ones (?hide=…).
+export type BlogFilter = {
+  categories: string[]
+  inactive: string[]
+}
+
 export const BlogIndexView = ({
   agents,
   basePath,
   current,
   emptyLabel = 'No posts found.',
+  filter,
   intro,
   linkLabel,
   posts,
@@ -42,27 +47,58 @@ export const BlogIndexView = ({
   basePath: string
   current: number
   emptyLabel?: string
+  filter?: BlogFilter
   intro?: Page
   linkLabel?: string
   posts: Post[]
   totalPages: number
-}) => (
-  <article className="page blog-index">
-    {intro?.content ? (
-      <RichText converters={jsxConverters} data={intro.content} />
-    ) : null}
-    {posts.length ? (
-      <PostList agents={agents} linkLabel={linkLabel} posts={posts} />
-    ) : (
-      <p className="empty">{emptyLabel}</p>
-    )}
-    <Pagination
-      current={current}
-      hrefFor={(p) => (p > 1 ? `${basePath}?page=${p}` : basePath)}
-      total={totalPages}
-    />
-  </article>
-)
+}) => {
+  // carry the active filter into pagination links; filter changes
+  // always reset to page 1 (pill hrefs carry no page param)
+  const hrefFor = (p: number) => {
+    const params = new URLSearchParams()
+    if (p > 1) {
+      params.set('page', String(p))
+    }
+    if (filter) {
+      params.set('hide', filter.inactive.join(','))
+    }
+    const qs = params.toString()
+    return qs ? `${basePath}?${qs}` : basePath
+  }
+  return (
+    <article className="page blog-index">
+      {intro?.content ? (
+        <RichText converters={jsxConverters} data={intro.content} />
+      ) : null}
+      {filter?.categories.length ? (
+        <FilterBar className="blog-filter">
+          {filter.categories.map((category) => {
+            const active = !filter.inactive.includes(category)
+            const inactive = active
+              ? [...filter.inactive, category]
+              : filter.inactive.filter((c) => c !== category)
+            return (
+              <Pill
+                active={active}
+                href={`${basePath}?hide=${inactive.join(',')}`}
+                key={category}
+              >
+                {category}
+              </Pill>
+            )
+          })}
+        </FilterBar>
+      ) : null}
+      {posts.length ? (
+        <PostList agents={agents} linkLabel={linkLabel} posts={posts} />
+      ) : (
+        <p className="empty">{emptyLabel}</p>
+      )}
+      <Pagination current={current} hrefFor={hrefFor} total={totalPages} />
+    </article>
+  )
+}
 
 export const AuthorArchiveView = ({
   agent,
@@ -115,28 +151,14 @@ export const AuthorArchiveView = ({
   </article>
 )
 
-// Machine-translation disclaimer on localized posts; links back to the
-// English original at /blog/….
-export const TranslationNotice = ({ path }: { path: string }) => (
-  <Alert tone="info">
-    Dieser Beitrag wurde maschinell ins Deutsche übersetzt.{' '}
-    <Link href={originalPostPath(path)}>
-      Zum englischen Original
-    </Link>
-    .
-  </Alert>
-)
-
 export const PostArticle = ({
   agent,
   avatarUrl,
   doc,
-  notice,
 }: {
   agent?: AgentProfile
   avatarUrl?: string
   doc: Post
-  notice?: React.ReactNode
 }) => {
   const root = blogRoot(doc.path)
   const cover =
@@ -176,7 +198,6 @@ export const PostArticle = ({
           </nav>
         ) : null}
       </header>
-      {notice}
       {doc.template === 'slide' ? (
         <SlideDeck
           markdown={stripMarkdownAttributes(doc.markdownRaw ?? '')}

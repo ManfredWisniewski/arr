@@ -16,7 +16,11 @@ import { LangBlog, isLangBlogPath, langBlogMetadata } from './lang-blog'
 
 type Props = {
   params: Promise<{ path?: string[] }>
-  searchParams: Promise<{ from?: string; page?: string }>
+  searchParams: Promise<{
+    from?: string
+    hide?: string | string[]
+    page?: string
+  }>
 }
 
 async function findPage(route: string, draft: boolean) {
@@ -55,12 +59,18 @@ export async function generateMetadata({ params }: Props) {
 
 export default async function SitePage({ params, searchParams }: Props) {
   const { path = [] } = await params
-  const { from, page } = await searchParams
+  const { from, hide, page } = await searchParams
   const draft = await getRequestDraft()
 
   if (isLangBlogPath(path)) {
     return (
-      <LangBlog draft={draft} from={from} page={page} segments={path} />
+      <LangBlog
+          draft={draft}
+          from={from}
+          hide={hide}
+          page={page}
+          segments={path}
+        />
     )
   }
 

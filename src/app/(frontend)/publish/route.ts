@@ -7,6 +7,7 @@ import {
   REVIEW_COLLECTIONS,
   type ReviewCollection,
 } from '@/lib/review'
+import { getRequestSiteUrl } from '@/lib/site'
 
 // POST /publish — confirms the displayed document's latest draft version
 // (spec +wit/specs/arr/preview-confirm/, FR-002/FR-003). Session-only:
@@ -48,7 +49,12 @@ export async function POST(request: Request) {
         ? await nextReviewHref()
         : docViewPath(collection as ReviewCollection, doc)
 
-  return Response.redirect(new URL(target, request.url), 303)
+  // request.url is the container listen origin (0.0.0.0) — resolve the
+  // public host like getSiteUrl does (env → forwarded/host headers).
+  return Response.redirect(
+    new URL(target, getRequestSiteUrl(request)),
+    303,
+  )
 }
 
 // Next pending doc with an own route; structures are confirmed on /review

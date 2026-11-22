@@ -3,13 +3,16 @@ import React from 'react'
 
 import { DraftBanner } from '@/components/draft-banner'
 import {
+  DEFAULT_EXCLUDED_CATEGORIES,
   getAgent,
   getAgentMap,
+  getCategories,
   getIntroPage,
   getMediaUrl,
   getPostByPath,
   getPostsPage,
   getTaxonomyTerm,
+  parseHideParam,
   parsePageParam,
 } from '@/lib/blog'
 import { blogAlternates, docAlternates } from '@/lib/seo'
@@ -19,7 +22,6 @@ import {
   AuthorArchiveView,
   BlogIndexView,
   PostArticle,
-  TranslationNotice,
 } from '../blog/views'
 
 // Localized blog tree: /<lang>/blog/… mirrors the English /blog routes,
@@ -111,11 +113,13 @@ export async function langBlogMetadata(segments: string[], draft: boolean) {
 export async function LangBlog({
   draft,
   from,
+  hide,
   page,
   segments,
 }: {
   draft: boolean
   from?: string
+  hide?: string | string[]
   page?: string
   segments: string[]
 }) {
@@ -124,9 +128,16 @@ export async function LangBlog({
   const current = parsePageParam(page)
 
   if (!rest.length) {
-    const [intro, result] = await Promise.all([
+    const inactive = parseHideParam(hide) ?? DEFAULT_EXCLUDED_CATEGORIES
+    const [categories, intro, result] = await Promise.all([
+      getCategories(base, draft),
       getIntroPage(base, draft),
-      getPostsPage({ draft, page: current, pathPrefix: base }),
+      getPostsPage({
+        draft,
+        excludeCategories: inactive,
+        page: current,
+        pathPrefix: base,
+      }),
     ])
     const agents = await getAgentMap(
       result.docs.map((post) => post.author),
@@ -138,6 +149,7 @@ export async function LangBlog({
         basePath={base}
         current={result.page ?? current}
         emptyLabel={EMPTY_LABEL}
+        filter={{ categories, inactive }}
         intro={intro}
         linkLabel={LINK_LABEL}
         posts={result.docs}
@@ -224,7 +236,6 @@ export async function LangBlog({
           agent={agent}
           avatarUrl={avatarUrl}
           doc={doc}
-          notice={<TranslationNotice path={doc.path} />}
         />
         <DraftBanner collection="posts" doc={doc} from={from} />
       </>

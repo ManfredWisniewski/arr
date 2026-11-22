@@ -25,8 +25,26 @@ release.
   including `/<lang>/blog` mirrors) serve `robots noindex`
   unconditionally and leave the sitemap entirely.
 
+- `/blog` and `/<lang>/blog` indexes render a `FilterBar` row of
+  category pills (`?hide=<slugs>`) — every category active by default
+  except `daily` and `wp-update`; posts carrying an inactive category
+  are excluded
+  server-side, and `Pill` gained an `active`/`aria-pressed` state.
+- `FilterBar` renders its `SearchField` only when `searchPlaceholder`
+  is given.
+
+### Removed
+
+- `TranslationNotice` on `/<lang>/blog/…` posts — the injected
+  machine-translation disclaimer hardcoded the English→German direction,
+  which is wrong on sites whose default content tree is not English.
+
 ### Fixed
 
+- `/publish` redirects resolved against the container listen origin
+  (`http://0.0.0.0:3000/…`) — the Location base now uses the same
+  public-origin resolution as canonical output (`SITE_URL` /
+  `NEXT_PUBLIC_SERVER_URL`, then forwarded/host headers).
 - `getSiteUrl` prefers `NEXT_PUBLIC_SERVER_URL` over forwarded-host, so
   sitemap/robots/feeds and canonicals emit the canonical host even when
   a request arrives on an alias (e.g. `www.`) host.

@@ -15,6 +15,25 @@ export const parsePageParam = (page: string | undefined): number => {
   return Number.isFinite(n) && n >= 1 ? Math.floor(n) : 1
 }
 
+// Categories inactive on the blog index filter until a ?hide= parameter
+// overrides the default.
+export const DEFAULT_EXCLUDED_CATEGORIES = ['daily', 'wp-update']
+
+// `?hide=a,b` lists the inactive categories on the blog index filter.
+// Absent param -> undefined ("use the default"); an empty value means
+// "hide nothing" — every category is active.
+export const parseHideParam = (value?: string | string[]) =>
+  value === undefined
+    ? undefined
+    : [
+        ...new Set(
+          (Array.isArray(value) ? value.join(',') : value)
+            .split(',')
+            .map((v) => v.trim())
+            .filter(Boolean),
+        ),
+      ]
+
 export type AgentProfile = {
   // media sourcePath, resolved to a URL via getMediaUrl()
   avatar?: string
@@ -35,13 +54,10 @@ const publishedOnly = (draft: boolean): Where =>
 
 // Path helpers for localized blogs: English posts live at /blog/…,
 // translations under /<lang>/blog/… (mirrors the `*/blog/**` sync route).
-// blogRoot('//blog/x' → ''), parentPath('/de/blog/a/b' → '/de/blog/a'),
-// originalPostPath('/de/blog/a/b' → '/blog/a/b').
+// blogRoot('//blog/x' → ''), parentPath('/de/blog/a/b' → '/de/blog/a').
 export const blogRoot = (path: string) => path.slice(0, path.indexOf('/blog'))
 export const parentPath = (path: string) =>
   path.slice(0, path.lastIndexOf('/'))
-export const originalPostPath = (path: string) =>
-  path.replace(/^\/[^/]+(?=\/blog\/)/, '')
 
 // `like` is useless for prefixes — the drizzle adapter wraps the value in
 // %…% (substring match), so '/de/blog/…' matches `like '/blog/%'`. Use a
@@ -58,6 +74,7 @@ export async function getPostsPage({
   author,
   category,
   draft,
+  excludeCategories,
   page = 1,
   pathPrefix,
   tag,
@@ -65,11 +82,31 @@ export async function getPostsPage({
   author?: string
   category?: string
   draft: boolean
+  excludeCategories?: string[]
   page?: number
   pathPrefix?: string
   tag?: string
 }) {
   const payload = await getPayload({ config: await config })
+  // hide-if-any-inactive: a post carrying one of the excluded categories
+  // is dropped entirely. `categories: { not_in }` would match per joined
+  // row (any non-excluded category saves the post), so the exclusion is
+  // an id subquery instead; posts without categories always pass.
+  let hiddenIds: number[] = []
+  if (excludeCategories?.length) {
+    const { docs: hidden } = await payload.find({
+      collection: 'posts',
+      draft,
+      pagination: false,
+      select: { categories: true },
+      where: {
+        ...publishedOnly(draft),
+        ...(pathPrefix ? pathPrefixWhere(pathPrefix) : {}),
+        categories: { in: excludeCategories },
+      },
+    })
+    hiddenIds = (hidden as Post[]).map((doc) => doc.id)
+  }
   return payload.find({
     collection: 'posts',
     draft,
@@ -82,8 +119,30 @@ export async function getPostsPage({
       ...(category ? { categories: { contains: category } } : {}),
       ...(pathPrefix ? pathPrefixWhere(pathPrefix) : {}),
       ...(tag ? { tags: { contains: tag } } : {}),
+      ...(hiddenIds.length ? { id: { not_in: hiddenIds } } : {}),
     },
   })
+}
+
+// Distinct categories used by posts under pathPrefix — the index filter
+// list. Uncategorized posts are always shown, so they need no pill.
+export async function getCategories(pathPrefix: string, draft: boolean) {
+  const payload = await getPayload({ config: await config })
+  const { docs } = await payload.find({
+    collection: 'posts',
+    draft,
+    pagination: false,
+    select: { categories: true },
+    where: {
+      ...publishedOnly(draft),
+      ...pathPrefixWhere(pathPrefix),
+    },
+  })
+  return [
+    ...new Set(
+      (docs as Post[]).flatMap((doc) => doc.categories ?? []),
+    ),
+  ].sort()
 }
 
 // Optional intro/meta source for a blog index: a `pages` doc at the index

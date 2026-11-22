@@ -1,6 +1,12 @@
 import React from 'react'
 
-import { getAgentMap, getIntroPage, getPostsPage,
+import {
+  DEFAULT_EXCLUDED_CATEGORIES,
+  getAgentMap,
+  getCategories,
+  getIntroPage,
+  getPostsPage,
+  parseHideParam,
   parsePageParam,
 } from '@/lib/blog'
 import { getRequestDraft } from '@/lib/review'
@@ -9,7 +15,7 @@ import { blogAlternates } from '@/lib/seo'
 import { BlogIndexView } from './views'
 
 type Props = {
-  searchParams: Promise<{ page?: string }>
+  searchParams: Promise<{ hide?: string | string[]; page?: string }>
 }
 
 export async function generateMetadata() {
@@ -29,11 +35,18 @@ export async function generateMetadata() {
 
 export default async function BlogIndex({ searchParams }: Props) {
   const draft = await getRequestDraft()
-  const { page } = await searchParams
+  const { hide, page } = await searchParams
   const current = parsePageParam(page)
-  const [intro, result] = await Promise.all([
+  const inactive = parseHideParam(hide) ?? DEFAULT_EXCLUDED_CATEGORIES
+  const [categories, intro, result] = await Promise.all([
+    getCategories('/blog', draft),
     getIntroPage('/blog', draft),
-    getPostsPage({ draft: draft, page: current, pathPrefix: '/blog' }),
+    getPostsPage({
+      draft: draft,
+      excludeCategories: inactive,
+      page: current,
+      pathPrefix: '/blog',
+    }),
   ])
   const agents = await getAgentMap(
     result.docs.map((post) => post.author),
@@ -45,6 +58,7 @@ export default async function BlogIndex({ searchParams }: Props) {
       agents={agents}
       basePath="/blog"
       current={result.page ?? current}
+      filter={{ categories, inactive }}
       intro={intro}
       posts={result.docs}
       totalPages={result.totalPages}

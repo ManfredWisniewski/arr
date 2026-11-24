@@ -10,6 +10,8 @@ release.
 
 ## Unreleased
 
+## [0.17.0] - 2026-11-24
+
 ### Fixed
 
 - Missing migration for `theme.meta.lang` and `meta.noindex` on

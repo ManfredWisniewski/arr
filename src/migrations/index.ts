@@ -7,11 +7,11 @@ import * as migration_20261003_073413_add_theme_favicon from './20261003_073413_
 import * as migration_20261012_153224_add_posts from './20261012_153224_add_posts';
 import * as migration_20261013_192611_add_media_image_sizes from './20261013_192611_add_media_image_sizes';
 import * as migration_20261013_192901_extend_media_image_sizes from './20261013_192901_extend_media_image_sizes';
-import * as migration_20261013_211826_i18n from './20261013_211826_i18n';
 import * as migration_20261024_201751_add_media_source_repo from './20261024_201751_add_media_source_repo';
 import * as migration_20261030_090502_add_post_slides from './20261030_090502_add_post_slides';
 import * as migration_20261110_120000_add_theme_tracking from './20261110_120000_add_theme_tracking';
 import * as migration_20261110_121500_add_theme_consent from './20261110_121500_add_theme_consent';
+import * as migration_20261124_203038_add_theme_meta_lang_noindex from './20261124_203038_add_theme_meta_lang_noindex';
 
 export const migrations = [
   {
@@ -60,11 +60,6 @@ export const migrations = [
     name: '20261013_192901_extend_media_image_sizes',
   },
   {
-    up: migration_20261013_211826_i18n.up,
-    down: migration_20261013_211826_i18n.down,
-    name: '20261013_211826_i18n'
-  },
-  {
     up: migration_20261024_201751_add_media_source_repo.up,
     down: migration_20261024_201751_add_media_source_repo.down,
     name: '20261024_201751_add_media_source_repo',
@@ -72,16 +67,21 @@ export const migrations = [
   {
     up: migration_20261030_090502_add_post_slides.up,
     down: migration_20261030_090502_add_post_slides.down,
-    name: '20261030_090502_add_post_slides'
+    name: '20261030_090502_add_post_slides',
   },
   {
     up: migration_20261110_120000_add_theme_tracking.up,
     down: migration_20261110_120000_add_theme_tracking.down,
-    name: '20261110_120000_add_theme_tracking'
+    name: '20261110_120000_add_theme_tracking',
   },
   {
     up: migration_20261110_121500_add_theme_consent.up,
     down: migration_20261110_121500_add_theme_consent.down,
-    name: '20261110_121500_add_theme_consent'
+    name: '20261110_121500_add_theme_consent',
+  },
+  {
+    up: migration_20261124_203038_add_theme_meta_lang_noindex.up,
+    down: migration_20261124_203038_add_theme_meta_lang_noindex.down,
+    name: '20261124_203038_add_theme_meta_lang_noindex'
   },
 ];

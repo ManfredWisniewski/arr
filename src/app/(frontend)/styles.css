@@ -1,0 +1,416 @@
+/* Base frontend styles. Design values come from the `theme` global
+   (compiled wit-tokens CSS injected into <head>); var() fallbacks keep the
+   site readable before the first theme push. */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-family-sans, system-ui, sans-serif);
+  font-size: var(--font-size-base, 1rem);
+  line-height: var(--line-height-normal, 1.6);
+  color: var(--fg, #111);
+  background: var(--bg, #fff);
+}
+
+.page {
+  max-width: var(--content-width, 70ch);
+  margin: 0 auto;
+  padding: var(--space-lg, 2rem) var(--space-md, 1rem);
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-weight: var(--font-weight-bold, 700);
+  line-height: var(--line-height-tight, 1.25);
+}
+
+/* anchored headings ({#id} markdown anchors) keep clearance on fragment
+   jumps — covers a future sticky header too */
+:is(h1, h2, h3, h4, h5, h6)[id] {
+  scroll-margin-top: var(--space-lg, 2rem);
+}
+
+a {
+  color: var(--brand, inherit);
+
+  &:hover {
+    color: var(--brand-hover, currentColor);
+  }
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+figure {
+  margin: var(--space-md, 1rem) 0;
+}
+
+figcaption {
+  margin-top: var(--space-xs, 0.25rem);
+  color: var(--fg-muted, #666);
+  font-size: var(--font-size-sm, 0.875rem);
+}
+
+blockquote {
+  margin: var(--space-md, 1rem) 0;
+  padding-left: var(--space-md, 1rem);
+  border-left: 3px solid var(--brand, #888);
+  color: var(--fg-muted, #555);
+}
+
+code {
+  font-family: var(--font-family-mono, monospace);
+  font-size: var(--font-size-sm, 0.875em);
+  background: var(--bg-muted, #f0f0f0);
+  padding: 0.1em 0.3em;
+  border-radius: var(--radius-sm, 3px);
+}
+
+pre {
+  padding: var(--space-md, 1rem);
+  background: var(--bg-muted, #f0f0f0);
+  border-radius: var(--radius-md, 6px);
+  overflow-x: auto;
+
+  code {
+    background: none;
+    padding: 0;
+  }
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th,
+td {
+  border: 1px solid var(--border, #ddd);
+  padding: var(--space-xs, 0.4rem) var(--space-sm, 0.75rem);
+  text-align: left;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid var(--border, #ddd);
+  margin: var(--space-lg, 2rem) 0;
+}
+
+/* pressed (active) toggle pills in the blog index filter reuse the
+   link-hover fill from the .pill contract */
+.pill[aria-pressed='true'] {
+  background: var(--component-fill-component-fill-primary, #444);
+  color: var(--component-text-component-text-light-fixed, #fff);
+}
+
+/* embedded HedgeDoc/reveal.js decks (slide template) */
+.page[data-template='slide'] {
+  max-width: 90rem;
+}
+
+.slide-deck {
+  position: relative;
+  margin: var(--space-md, 1rem) 0;
+}
+
+/* :where() keeps this a zero-specificity fallback — the loaded reveal
+   theme css must always win over the stage background */
+:where(.slide-deck) .reveal-viewport {
+  background: var(--slide-stage, #191919);
+}
+
+.slide-deck .reveal {
+  height: 100%;
+  max-height: 100%;
+  visibility: hidden;
+}
+
+/* slide content taller than the canvas scrolls inside the slide instead
+   of clipping — --slide-height is the deck's current canvas height, set
+   by reveal on the viewport */
+.slide-deck .slides section {
+  max-height: var(--slide-height, 100%);
+  overflow-y: auto;
+}
+
+/* cap font weight at 600 — some reveal themes use heavier headings */
+.slide-deck .reveal :is(h1, h2, h3, h4, h5, h6, strong, b) {
+  font-weight: 600;
+}
+
+.slide-deck .reveal h1 {
+  font-size: calc(var(--r-heading1-size, 2.5em) * 0.7);
+}
+
+.slide-deck .reveal h2 {
+  font-size: calc(var(--r-heading2-size, 1.6em) * 0.9);
+}
+
+/* body text 10% below the (possibly fontScale-adjusted) base */
+.slide-deck .slides {
+  font-size: 0.9em;
+}
+
+/* images render at half size — markdown images come in oversized */
+.slide-deck .slides img {
+  zoom: 0.5;
+}
+
+.slide-deck[data-ready] .reveal {
+  visibility: visible;
+}
+
+/* slide markup sizes images via height attributes; the global
+   img{height:auto} above would wipe them out */
+.slide-deck img {
+  display: inline;
+  height: revert;
+  max-width: none;
+}
+
+.slide-deck pre.mermaid {
+  padding: 0;
+  background: none;
+}
+
+.slide-deck .slide-deck-overview {
+  position: absolute;
+  top: var(--space-xs, 0.5rem);
+  left: var(--space-xs, 0.5rem);
+  z-index: 30;
+}
+
+.slide-deck .slide-deck-fullscreen {
+  position: absolute;
+  top: var(--space-xs, 0.5rem);
+  right: var(--space-xs, 0.5rem);
+  z-index: 30;
+}
+
+.slide-deck:fullscreen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--slide-stage, #191919);
+}
+
+.slide-deck:fullscreen .reveal-viewport {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+}
+
+/* dev-only theme switcher widget */
+.theme-switcher {
+  position: fixed;
+  right: var(--space-md, 1rem);
+  bottom: var(--space-md, 1rem);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs, 0.4rem);
+  padding: var(--space-xs, 0.4rem) var(--space-sm, 0.75rem);
+  background: var(--bg, #fff);
+  color: var(--fg, #111);
+  border: 1px solid var(--border, #ddd);
+  border-radius: var(--radius-md, 6px);
+  font-size: var(--font-size-sm, 0.875rem);
+}
+
+/* draft-review banner — floats above content for editors on draft pages */
+.draft-banner {
+  position: fixed;
+  right: var(--space-md, 1rem);
+  bottom: var(--space-md, 1rem);
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm, 0.75rem);
+  padding: var(--space-sm, 0.75rem) var(--space-md, 1rem);
+  background: var(--bg-muted, #f0f0f0);
+  color: var(--fg, #111);
+  border: 1px solid var(--border, #ddd);
+  border-radius: var(--radius-md, 6px);
+  box-shadow: 0 2px 12px rgb(0 0 0 / 20%);
+  font-size: var(--font-size-sm, 0.875rem);
+}
+
+.draft-banner button {
+  padding: var(--space-xs, 0.4rem) var(--space-sm, 0.75rem);
+  background: var(--brand, #333);
+  color: var(--bg, #fff);
+  border: 0;
+  border-radius: var(--radius-sm, 3px);
+  font: inherit;
+  cursor: pointer;
+}
+
+/* /review pending index */
+.review-list {
+  list-style: none;
+  margin: var(--space-md, 1rem) 0 0;
+  padding: 0;
+}
+
+.review-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm, 0.75rem);
+  padding: var(--space-sm, 0.75rem) 0;
+  border-bottom: 1px solid var(--border, #ddd);
+}
+
+.review-item time {
+  margin-left: auto;
+  color: var(--fg-muted, #666);
+  font-size: var(--font-size-sm, 0.875rem);
+}
+
+.review-collection {
+  padding: var(--space-xs, 0.25rem) var(--space-xs, 0.5rem);
+  background: var(--bg-muted, #f0f0f0);
+  border: 1px solid var(--border, #ddd);
+  border-radius: var(--radius-sm, 3px);
+  font-size: var(--font-size-sm, 0.875rem);
+}
+
+.review-publish {
+  margin: 0;
+}
+
+.review-publish button {
+  padding: var(--space-xs, 0.4rem) var(--space-sm, 0.75rem);
+  background: var(--brand, #333);
+  color: var(--bg, #fff);
+  border: 0;
+  border-radius: var(--radius-sm, 3px);
+  font: inherit;
+  cursor: pointer;
+}
+/* visitor chat widget — rendered only when CHAT_WEBHOOK_URL is set */
+.chat-widget {
+  position: fixed;
+  right: var(--space-md, 1rem);
+  bottom: var(--space-md, 1rem);
+  z-index: 60;
+  font-size: var(--font-size-sm, 0.875rem);
+}
+
+.chat-widget-fab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  padding: 0;
+  color: var(--bg, #fff);
+  background: var(--brand, #333);
+  border: none;
+  border-radius: var(--radius-md, 50%);
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.25);
+}
+
+.chat-widget-panel {
+  display: flex;
+  flex-direction: column;
+  width: min(22rem, calc(100vw - 2rem));
+  height: min(30rem, calc(100vh - 2rem));
+  color: var(--fg, #111);
+  background: var(--bg, #fff);
+  border: 1px solid var(--border, #ddd);
+  border-radius: var(--radius-md, 6px);
+  box-shadow: 0 4px 16px rgb(0 0 0 / 0.2);
+  overflow: hidden;
+}
+
+.chat-widget-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-sm, 0.75rem) var(--space-md, 1rem);
+  border-bottom: 1px solid var(--border, #ddd);
+}
+
+.chat-widget-title {
+  margin: 0;
+  font-weight: var(--font-weight-bold, 700);
+}
+
+.chat-widget-close {
+  padding: 0 var(--space-xs, 0.4rem);
+  color: var(--fg-muted, #666);
+  background: none;
+  border: none;
+  font-size: var(--font-size-lg, 1.25rem);
+  line-height: 1;
+  cursor: pointer;
+}
+
+.chat-widget-messages {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm, 0.75rem);
+  padding: var(--space-md, 1rem);
+  overflow-y: auto;
+}
+
+.chat-widget-typing {
+  margin: 0;
+  color: var(--fg-muted, #666);
+  font-size: var(--font-size-xs, 0.75rem);
+}
+
+.chat-widget-error {
+  margin: 0;
+  padding: var(--space-xs, 0.4rem) var(--space-md, 1rem);
+  color: var(--fg-muted, #666);
+  border-top: 1px solid var(--border, #ddd);
+}
+
+.chat-widget-form {
+  display: flex;
+  gap: var(--space-xs, 0.4rem);
+  padding: var(--space-sm, 0.75rem) var(--space-md, 1rem);
+  border-top: 1px solid var(--border, #ddd);
+}
+
+.chat-widget-input {
+  flex: 1;
+  padding: var(--space-xs, 0.4rem) var(--space-sm, 0.75rem);
+  color: var(--fg, #111);
+  background: var(--bg, #fff);
+  border: 1px solid var(--border, #ddd);
+  border-radius: var(--radius-md, 6px);
+  font: inherit;
+}
+
+.chat-widget-send {
+  display: flex;
+  align-items: center;
+  padding: 0 var(--space-sm, 0.75rem);
+  color: var(--bg, #fff);
+  background: var(--brand, #333);
+  border: none;
+  border-radius: var(--radius-md, 6px);
+  cursor: pointer;
+}
+
+.chat-widget-send:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+

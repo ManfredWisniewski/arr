@@ -1,0 +1,246 @@
+import { notFound } from 'next/navigation.js'
+import React from 'react'
+
+import { DraftBanner } from '@/components/draft-banner'
+import {
+  DEFAULT_EXCLUDED_CATEGORIES,
+  getAgent,
+  getAgentMap,
+  getCategories,
+  getIntroPage,
+  getMediaUrl,
+  getPostByPath,
+  getPostsPage,
+  getTaxonomyTerm,
+  parseHideParam,
+  parsePageParam,
+} from '@/lib/blog'
+import { blogAlternates, docAlternates } from '@/lib/seo'
+
+import { TaxonomyArchive } from '../blog/taxonomy-archive'
+import {
+  AuthorArchiveView,
+  BlogIndexView,
+  PostArticle,
+} from '../blog/views'
+
+// Localized blog tree: /<lang>/blog/… mirrors the English /blog routes,
+// served through the catch-all (a wildcard [lang] segment can't coexist
+// with [[...path]]). Matches the `*/blog/**` posts-route in .arrcontent.yml.
+export const isLangBlogPath = (segments: string[]) =>
+  segments.length >= 2 && segments[1] === 'blog'
+
+const EMPTY_LABEL = 'Keine Beiträge gefunden.'
+const LINK_LABEL = 'Weiterlesen'
+
+export async function langBlogMetadata(segments: string[], draft: boolean) {
+  const base = `/${segments[0]}/blog`
+  const rest = segments.slice(2)
+
+  if (!rest.length) {
+    const [intro, alternates] = await Promise.all([
+      getIntroPage(base, draft),
+      blogAlternates(base, draft),
+    ])
+    return {
+      alternates,
+      description: intro?.meta?.description ?? undefined,
+      openGraph: { url: alternates.canonical },
+      robots: { index: false },
+      title: intro?.meta?.title ?? intro?.title ?? 'Blog',
+    }
+  }
+  if (
+    (rest[0] === 'kategorie' || rest[0] === 'tag') &&
+    rest.length === 2
+  ) {
+    const term = await getTaxonomyTerm(
+      rest[0] === 'kategorie' ? 'categories' : 'tags',
+      rest[1],
+      draft,
+    )
+    const label = rest[0] === 'kategorie' ? 'Kategorie' : 'Tag'
+    const alternates = await blogAlternates(
+      `${base}/${rest[0]}/${rest[1]}`,
+      draft,
+      {
+        [rest[0] === 'kategorie' ? 'categories' : 'tags']: {
+          contains: rest[1],
+        },
+      },
+    )
+    return {
+      alternates,
+      description: term?.description,
+      openGraph: { url: alternates.canonical },
+      robots: { index: false },
+      title: term?.label ?? `${label}: ${rest[1]}`,
+    }
+  }
+  if (rest.length === 1) {
+    const agent = await getAgent(rest[0], draft)
+    if (!agent) {
+      return {}
+    }
+    const alternates = await blogAlternates(`${base}/${rest[0]}`, draft, {
+      author: { equals: rest[0] },
+    })
+    return {
+      alternates,
+      description: agent.bio,
+      openGraph: { url: alternates.canonical },
+      robots: { index: false },
+      title: agent.name,
+    }
+  }
+  if (rest.length === 2) {
+    const doc = await getPostByPath(`${base}/${rest[0]}/${rest[1]}`, draft)
+    if (!doc) {
+      return {}
+    }
+    const alternates = await docAlternates('posts', doc.path, draft)
+    return {
+      alternates,
+      description: doc.meta?.description ?? doc.excerpt ?? undefined,
+      openGraph: { url: alternates.canonical },
+      ...(doc.meta?.noindex ? { robots: { index: false } } : {}),
+      title: doc.meta?.title ?? doc.title,
+    }
+  }
+  return {}
+}
+
+export async function LangBlog({
+  draft,
+  from,
+  hide,
+  page,
+  segments,
+}: {
+  draft: boolean
+  from?: string
+  hide?: string | string[]
+  page?: string
+  segments: string[]
+}) {
+  const base = `/${segments[0]}/blog`
+  const rest = segments.slice(2)
+  const current = parsePageParam(page)
+
+  if (!rest.length) {
+    const inactive = parseHideParam(hide) ?? DEFAULT_EXCLUDED_CATEGORIES
+    const [categories, intro, result] = await Promise.all([
+      getCategories(base, draft),
+      getIntroPage(base, draft),
+      getPostsPage({
+        draft,
+        excludeCategories: inactive,
+        page: current,
+        pathPrefix: base,
+      }),
+    ])
+    const agents = await getAgentMap(
+      result.docs.map((post) => post.author),
+      draft,
+    )
+    return (
+      <BlogIndexView
+        agents={agents}
+        basePath={base}
+        current={result.page ?? current}
+        emptyLabel={EMPTY_LABEL}
+        filter={{ categories, inactive }}
+        intro={intro}
+        linkLabel={LINK_LABEL}
+        posts={result.docs}
+        totalPages={result.totalPages}
+      />
+    )
+  }
+
+  if (rest[0] === 'kategorie' || rest[0] === 'tag') {
+    if (rest.length !== 2) {
+      notFound()
+    }
+    const slug = rest[1]
+    const isCategory = rest[0] === 'kategorie'
+    const [term, result] = await Promise.all([
+      getTaxonomyTerm(isCategory ? 'categories' : 'tags', slug, draft),
+      getPostsPage(
+        isCategory
+          ? { category: slug, draft, page: current, pathPrefix: base }
+          : { draft, page: current, pathPrefix: base, tag: slug },
+      ),
+    ])
+    const agents = await getAgentMap(
+      result.docs.map((post) => post.author),
+      draft,
+    )
+    if (!result.docs.length && !term && !draft) {
+      notFound()
+    }
+    return (
+      <TaxonomyArchive
+        agents={agents}
+        basePath={`${base}/${rest[0]}/${slug}`}
+        current={result.page ?? current}
+        description={term?.description}
+        heading={
+          term?.label ?? `${isCategory ? 'Kategorie' : 'Tag'}: ${slug}`
+        }
+        linkLabel={LINK_LABEL}
+        posts={result.docs}
+        totalPages={result.totalPages}
+      />
+    )
+  }
+
+  if (rest.length === 1) {
+    const agent = await getAgent(rest[0], draft)
+    if (!agent) {
+      notFound()
+    }
+    const [avatarUrl, result] = await Promise.all([
+      getMediaUrl(agent.avatar, draft),
+      getPostsPage({
+        author: agent.slug,
+        draft,
+        page: current,
+        pathPrefix: base,
+      }),
+    ])
+    return (
+      <AuthorArchiveView
+        agent={agent}
+        avatarUrl={avatarUrl}
+        basePath={`${base}/${agent.slug}`}
+        current={result.page ?? current}
+        emptyLabel={EMPTY_LABEL}
+        linkLabel={LINK_LABEL}
+        posts={result.docs}
+        totalPages={result.totalPages}
+      />
+    )
+  }
+
+  if (rest.length === 2) {
+    const doc = await getPostByPath(`${base}/${rest[0]}/${rest[1]}`, draft)
+    if (!doc) {
+      notFound()
+    }
+    const agent = doc.author ? await getAgent(doc.author, draft) : undefined
+    const avatarUrl = await getMediaUrl(agent?.avatar, draft)
+    return (
+      <>
+        <PostArticle
+          agent={agent}
+          avatarUrl={avatarUrl}
+          doc={doc}
+        />
+        <DraftBanner collection="posts" doc={doc} from={from} />
+      </>
+    )
+  }
+
+  notFound()
+}

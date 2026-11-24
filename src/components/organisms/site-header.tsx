@@ -1,4 +1,3 @@
-import { useTranslations } from 'next-intl'
 import React from 'react'
 
 import type { Media } from '@/payload-types'
@@ -24,7 +23,6 @@ export const SiteHeader = ({
   navItems: NavItem[]
   siteName: string
 }) => {
-  const t = useTranslations('nav')
   // Non-interactive brand copy for the submenu-band ghosts — same width as
   // .nav-brand so the band spacer can replicate the bar up to the parent
   // item and align the first band cell to its left edge and width.
@@ -49,7 +47,7 @@ export const SiteHeader = ({
           <SiteLogo logo={logo} siteName={siteName} />
         </div>
         {navItems.length ? (
-          <nav aria-label={t('primary')} className="site-nav">
+          <nav aria-label="Hauptnavigation" className="site-nav">
             <NavList brand={spacerBrand} items={navItems} primary />
           </nav>
         ) : null}
@@ -57,7 +55,7 @@ export const SiteHeader = ({
           {navItems.length ? (
             <details className="site-nav-toggle">
               <summary>
-                <Icon name="menu" /> {t('menu')}
+                <Icon name="menu" /> Menü
               </summary>
               <NavList items={navItems} />
             </details>

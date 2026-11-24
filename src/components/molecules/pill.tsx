@@ -6,13 +6,16 @@ import { Icon, type IconName } from '../atoms/icon'
 import { Link } from '../atoms/link'
 
 // Tag/category pill — rounded element for labels, filters, tag links.
-// .pill contract class; with `href` renders as a link pill.
+// .pill contract class; with `href` renders as a link pill. `active`
+// marks a toggle pill (aria-pressed); themes style the pressed state.
 export const Pill = ({
+  active,
   children,
   className,
   href,
   icon,
 }: {
+  active?: boolean
   children: React.ReactNode
   className?: string
   href?: string
@@ -26,7 +29,7 @@ export const Pill = ({
     </>
   )
   return href ? (
-    <Link className={cls} href={href}>
+    <Link aria-pressed={active} className={cls} href={href}>
       {inner}
     </Link>
   ) : (

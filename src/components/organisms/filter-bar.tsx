@@ -12,8 +12,9 @@ export type FilterSelect = {
   placeholder?: string
 }
 
-// Filter control row — SearchField + Selects + ButtonGroup + optional
-// pills slot (.filter-bar contract class). Wrap in a <form>.
+// Filter control row — optional SearchField (when searchPlaceholder is
+// given) + Selects + ButtonGroup + optional pills slot (.filter-bar
+// contract class). Wrap in a <form> when inputs should submit.
 export const FilterBar = ({
   buttons,
   children,
@@ -28,7 +29,9 @@ export const FilterBar = ({
   selects?: FilterSelect[]
 }) => (
   <div className={cx('filter-bar', className)}>
-    <SearchField placeholder={searchPlaceholder} />
+    {searchPlaceholder !== undefined ? (
+      <SearchField placeholder={searchPlaceholder} />
+    ) : null}
     {selects?.map((select) => (
       <Select defaultValue="" key={select.name} name={select.name}>
         {select.placeholder ? (

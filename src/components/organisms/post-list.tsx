@@ -1,10 +1,8 @@
-import { useTranslations } from 'next-intl'
 import React from 'react'
 
 import type { Post } from '@/payload-types'
 import type { AgentRef } from '@/lib/blog'
 import { formatDate, parentPath } from '@/lib/blog'
-import type { Locale } from '@/i18n/routing'
 import { mediaUrl } from '@/lib/media'
 
 import { Avatar } from '../atoms/avatar'
@@ -14,12 +12,10 @@ import { CardGrid, type CardItem } from './card'
 // Post -> card mapping; cover/date become media + badge, excerpt the body,
 // and the author becomes a header byline: avatar left, linked name as
 // subtitle — the link targets the agent's archive (/blog/<author>).
-// `path` hrefs are locale-prefixed by the Link atom.
 export const postToCardItem = (
   post: Post,
-  agents: Record<string, AgentRef> | undefined,
-  locale: Locale,
-  linkLabel?: string,
+  agents?: Record<string, AgentRef>,
+  linkLabel = 'Continue',
 ): CardItem => {
   const media =
     post.cover && typeof post.cover === 'object' ? post.cover : undefined
@@ -28,7 +24,7 @@ export const postToCardItem = (
   return {
     // front-matter `date`, falling back to the doc's creation time
     badge:
-      formatDate(post.publishedAt || post.createdAt, locale) ||
+      formatDate(post.publishedAt || post.createdAt, post.path) ||
       undefined,
     // slide decks and other excerpt-less posts show the meta description
     description: post.excerpt || post.meta?.description || undefined,
@@ -50,21 +46,16 @@ export const postToCardItem = (
 export const PostList = ({
   agents,
   className,
-  locale,
+  linkLabel,
   posts,
 }: {
   agents?: Record<string, AgentRef>
   className?: string
-  locale: Locale
+  linkLabel?: string
   posts: Post[]
-}) => {
-  const t = useTranslations('blog')
-  return (
-    <CardGrid
-      className={className ?? 'post-list'}
-      items={posts.map((post) =>
-        postToCardItem(post, agents, locale, t('readMore')),
-      )}
-    />
-  )
-}
+}) => (
+  <CardGrid
+    className={className ?? 'post-list'}
+    items={posts.map((post) => postToCardItem(post, agents, linkLabel))}
+  />
+)

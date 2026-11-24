@@ -10,6 +10,67 @@ release.
 
 ## Unreleased
 
+## [0.18.0] - 2026-11-24
+
+## [0.17.0] - 2026-11-24
+
+### Fixed
+
+- Missing migration for `theme.meta.lang` and `meta.noindex` on
+  `pages`/`posts` (fields added in `e206ca1` but never migrated — every
+  query on `pages`, `posts` and `theme` 500'd with
+  `column "meta_noindex" does not exist` / `"meta_lang" does not exist`
+  on all deployed sites). Generated
+  `20261124_203038_add_theme_meta_lang_noindex`; the entrypoint's
+  `payload migrate` applies it on the next deploy.
+
+## [0.16.0] - 2026-11-24
+
+## [0.15.0] - 2026-11-22
+
+## [0.14.0] - 2026-11-22
+
+## [0.13.0] - 2026-11-22
+
+### Added
+
+- Canonical `rel=canonical`, `og:url` and hreflang `languages`/`x-default`
+  on pages, posts and all blog archive routes — translation siblings are
+  resolved from the `/<lang>/<rest>` path convention and emitted only
+  when a published doc exists (`src/lib/seo.ts`).
+- `theme.meta.lang` (site.yml `lang:` → `payloadtools site`) selects the
+  default content-tree language; `<html lang>` uses it and a
+  `beforeInteractive` script corrects it on `/<lang>/` routes.
+- `meta.noindex` on `pages`/`posts` (front matter `noindex: true` →
+  `payloadtools` sync) serves `robots noindex` and drops the doc from
+  `sitemap.xml`; the `/blog` archive routes (index, author, taxonomy —
+  including `/<lang>/blog` mirrors) serve `robots noindex`
+  unconditionally and leave the sitemap entirely.
+
+- `/blog` and `/<lang>/blog` indexes render a `FilterBar` row of
+  category pills (`?hide=<slugs>`) — every category active by default
+  except `daily` and `wordpress`; posts carrying an inactive category
+  are excluded
+  server-side, and `Pill` gained an `active`/`aria-pressed` state.
+- `FilterBar` renders its `SearchField` only when `searchPlaceholder`
+  is given.
+
+### Removed
+
+- `TranslationNotice` on `/<lang>/blog/…` posts — the injected
+  machine-translation disclaimer hardcoded the English→German direction,
+  which is wrong on sites whose default content tree is not English.
+
+### Fixed
+
+- `/publish` redirects resolved against the container listen origin
+  (`http://0.0.0.0:3000/…`) — the Location base now uses the same
+  public-origin resolution as canonical output (`SITE_URL` /
+  `NEXT_PUBLIC_SERVER_URL`, then forwarded/host headers).
+- `getSiteUrl` prefers `NEXT_PUBLIC_SERVER_URL` over forwarded-host, so
+  sitemap/robots/feeds and canonicals emit the canonical host even when
+  a request arrives on an alias (e.g. `www.`) host.
+
 ## [0.12.0] - 2026-11-21
 
 ## [0.11.0] - 2026-11-20
@@ -52,34 +113,6 @@ release.
 
 ### Added
 
-- Internationalization, German (default) + English: Payload field-level
-  localization (`de`/`en`, `localized: true` on editorial fields of
-  `pages`, `posts`, `media` and `structures.data`;
-  ids/slugs/paths/dates stay shared), experimental per-locale publish
-  status (`experimental.localizeStatus` + `versions.drafts.localizeStatus`),
-  admin UI in German and English. Frontend routes moved under
-  `app/(frontend)/[lang]` with `next-intl` middleware — every public URL
-  carries an explicit `/de` or `/en` prefix (`/` redirects to `/de`) and
-  the route locale is passed to every Payload read. Public reads use
-  `fallbackLocale: false` (no mixed-language pages); draft previews fall
-  back to `de`. UI strings come from `messages/{de,en}.json`; internal
-  links are locale-prefixed by the `Link` atom. Per-locale feeds
-  (`/de/rss.xml`, `/en/rss.xml`, …) and `sitemap.xml` (per-locale URLs
-  with `hreflang` alternates + `x-default`), canonical/hreflang metadata
-  on every page. Migration `20261013_211826_i18n` copies existing rows
-  into the `de` locale tables before dropping the old columns. See
-  `knowledge/decisions.md` D13–D16.
-- Visitor chat widget: `ChatWidget` client component
-  (`app/(frontend)/[lang]/chat-widget.tsx`) rendered by the frontend
-  layout when `CHAT_WEBHOOK_URL` is set — fixed bubble → panel, AI
-  disclosure shown before first input, `sessionId` persisted in
-  `localStorage`. Posts to the new same-origin `POST /api/chat` route
-  (`app/(frontend)/api/chat/route.ts`), which validates input, rate-limits
-  per session+IP (20/h) and proxies to the n8n chat webhook with
-  `Authorization: Bearer ${CHAT_WEBHOOK_SECRET}` — webhook URL and secret
-  never reach the browser. Labels via `CHAT_TITLE`, `CHAT_GREETING`,
-  `CHAT_DISCLOSURE`. Plan:
-  `+wit/development/plans/chat/2026-10-13_plan-website-chat-claudia.md`.
 - Docs-as-code documentation site (spec `+wit/specs/arr/docusaurus/`): a
   Docusaurus project in `docs/` whose static export is built inside the
   image (`docs-builder` Dockerfile stage) into `public/docs/` and served
@@ -522,13 +555,6 @@ release.
 
 ### Changed
 
-- **Breaking URL scheme**: all public URLs are locale-prefixed —
-  `/blog/kategorie/<c>` became `/{de,en}/blog/category/<c>`, feeds live
-  at `/{de,en}/{rss.xml,feed,index.xml,atom.xml}`, and the Payload admin
-  preview links target `/<locale><path>` via the `/preview` handler.
-  Content writes must send `?locale=<de|en>` (`fallback-locale=none` for
-  strict reads) — `wit_pytools/payloadtools` needs a follow-up to emit
-  localized writes
 - `Button` atom: `ghost` variant, `size="sm|lg"`, `loading` (spinner +
   no interaction) and `disabled` per the catalog spec
 - `Modal` organism: `title` renders `.modal-header` (Heading + close),

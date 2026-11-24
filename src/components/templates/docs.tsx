@@ -1,9 +1,7 @@
 import { getPayload } from 'payload'
-import { getTranslations } from 'next-intl/server'
 import React from 'react'
 
 import config from '@/payload.config'
-import type { Locale } from '@/i18n/routing'
 import { getRequestDraft } from '@/lib/review'
 
 import { Breadcrumb } from '../molecules/breadcrumb'
@@ -14,16 +12,14 @@ import { TextBlock } from '../molecules/text-block'
 import { Sidebar } from '../organisms/sidebar'
 import type { TemplateProps } from './default'
 
-async function getNavigation(locale: Locale): Promise<NavItem[]> {
+async function getNavigation(): Promise<NavItem[]> {
   try {
     const draft = await getRequestDraft()
     const payload = await getPayload({ config: await config })
     const { docs } = await payload.find({
       collection: 'structures',
-      draft,
-      fallbackLocale: false,
+      draft: draft,
       limit: 1,
-      locale,
       where: {
         name: { equals: 'navigation' },
         ...(draft ? {} : { _status: { equals: 'published' } }),
@@ -40,18 +36,11 @@ async function getNavigation(locale: Locale): Promise<NavItem[]> {
 // Docs layout — Breadcrumb from the page path + sidebar nav (from the
 // `navigation` structure) beside the markdown body, with tabbed
 // sections and bottom pagination. Demo template.
-export const DocsTemplate = async ({
-  locale,
-  page,
-  renderBody,
-}: TemplateProps) => {
-  const [navItems, t] = await Promise.all([
-    getNavigation(locale),
-    getTranslations({ locale, namespace: 'docs' }),
-  ])
+export const DocsTemplate = async ({ page, renderBody }: TemplateProps) => {
+  const navItems = await getNavigation()
   const segments = (page.path ?? '').split('/').filter(Boolean)
   const crumbs = [
-    { label: t('home'), path: '/' },
+    { label: 'Start', path: '/' },
     ...segments.map((segment, index) => ({
       label: segment.charAt(0).toUpperCase() + segment.slice(1),
       path: `/${segments.slice(0, index + 1).join('/')}`,
@@ -62,7 +51,7 @@ export const DocsTemplate = async ({
       <Breadcrumb items={crumbs} />
       <div className="layout-sidebar">
         <Sidebar
-          sections={[{ items: navItems, title: t('sidebarTitle') }]}
+          sections={[{ items: navItems, title: 'Dokumentation' }]}
         />
         <div>
           <TextBlock
@@ -75,12 +64,17 @@ export const DocsTemplate = async ({
                 content: (
                   <div className="page-body">{renderBody(page.content)}</div>
                 ),
-                label: t('contentTab'),
+                label: 'Inhalt',
               },
               {
-                content: <p>{t('notesBody')}</p>,
+                content: (
+                  <p>
+                    Hinweise-Tab — ergänzende Informationen zum gleichen
+                    Dokument ohne eigenen Seitenwechsel.
+                  </p>
+                ),
                 icon: 'info',
-                label: t('notesTab'),
+                label: 'Hinweise',
               },
             ]}
           />

@@ -19,13 +19,11 @@ export const Media: CollectionConfig = {
     {
       name: 'alt',
       type: 'text',
-      localized: true,
       required: true,
     },
     {
       name: 'caption',
       type: 'text',
-      localized: true,
     },
     {
       // sha256 of the uploaded file, set by the sync tool for dedup

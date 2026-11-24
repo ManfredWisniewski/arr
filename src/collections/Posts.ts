@@ -23,13 +23,10 @@ export const Posts: CollectionConfig = {
     useAsTitle: 'title',
     defaultColumns: ['title', 'author', 'publishedAt', 'updatedAt'],
     preview: (doc, { req }) =>
-      `${req.origin}/preview?secret=${process.env.PREVIEW_SECRET}&path=${encodeURIComponent(`/${req.locale ?? 'de'}${doc.path ?? ''}`)}`,
+      `${req.origin}/preview?secret=${process.env.PREVIEW_SECRET}&path=${encodeURIComponent(String(doc.path ?? ''))}`,
   },
   versions: {
-    drafts: {
-      // D10: de/en publish independently
-      localizeStatus: true,
-    },
+    drafts: true,
   },
   access: {
     read: publishedOrAuthenticated,
@@ -48,7 +45,6 @@ export const Posts: CollectionConfig = {
     {
       name: 'title',
       type: 'text',
-      localized: true,
       required: true,
     },
     {
@@ -70,19 +66,16 @@ export const Posts: CollectionConfig = {
     {
       name: 'excerpt',
       type: 'textarea',
-      localized: true,
     },
     {
       // markdown as pushed by the sync tool; converted to `content` on write
       name: 'markdownRaw',
       type: 'textarea',
-      localized: true,
     },
     {
       name: 'content',
       type: 'richText',
       editor: pagesEditor,
-      localized: true,
     },
     {
       // front-matter `date`; drives archive ordering
@@ -162,7 +155,6 @@ export const Posts: CollectionConfig = {
     {
       name: 'meta',
       type: 'group',
-      localized: true,
       fields: [
         {
           name: 'title',
@@ -171,6 +163,11 @@ export const Posts: CollectionConfig = {
         {
           name: 'description',
           type: 'textarea',
+        },
+        {
+          // front matter `noindex: true` -> robots noindex + sitemap drop
+          name: 'noindex',
+          type: 'checkbox',
         },
       ],
     },

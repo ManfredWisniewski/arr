@@ -1,6 +1,5 @@
 'use client'
 
-import { useTranslations } from 'next-intl'
 import { useEffect, useRef } from 'react'
 
 const THEME_KEY = 'arr.theme'
@@ -23,7 +22,6 @@ const applyTheme = (pref: string) => {
 // prefers-color-scheme, including live changes. The matching pre-paint
 // script lives in the root layout <head>.
 export function ThemeToggle() {
-  const t = useTranslations('theme')
   const selectRef = useRef<HTMLSelectElement>(null)
 
   useEffect(() => {
@@ -44,7 +42,7 @@ export function ThemeToggle() {
 
   return (
     <select
-      aria-label={t('label')}
+      aria-label="Farbschema"
       className="theme-toggle"
       defaultValue="light"
       onChange={(event) => {
@@ -59,9 +57,9 @@ export function ThemeToggle() {
       }}
       ref={selectRef}
     >
-      <option value="system">{t('system')}</option>
-      <option value="light">{t('light')}</option>
-      <option value="dark">{t('dark')}</option>
+      <option value="system">System</option>
+      <option value="light">Hell</option>
+      <option value="dark">Dunkel</option>
     </select>
   )
 }

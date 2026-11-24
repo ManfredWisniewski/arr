@@ -92,14 +92,14 @@ export interface Config {
   db: {
     defaultIDType: number;
   };
-  fallbackLocale: ('false' | 'none' | 'null') | false | null | ('de' | 'en') | ('de' | 'en')[];
+  fallbackLocale: null;
   globals: {
     theme: Theme;
   };
   globalsSelect: {
     theme: ThemeSelect<false> | ThemeSelect<true>;
   };
-  locale: 'de' | 'en';
+  locale: null;
   widgets: {
     collections: CollectionsWidget;
   };
@@ -263,6 +263,7 @@ export interface Page {
   meta?: {
     title?: string | null;
     description?: string | null;
+    noindex?: boolean | null;
   };
   updatedAt: string;
   createdAt: string;
@@ -314,6 +315,7 @@ export interface Post {
   meta?: {
     title?: string | null;
     description?: string | null;
+    noindex?: boolean | null;
   };
   updatedAt: string;
   createdAt: string;
@@ -550,6 +552,7 @@ export interface PagesSelect<T extends boolean = true> {
     | {
         title?: T;
         description?: T;
+        noindex?: T;
       };
   updatedAt?: T;
   createdAt?: T;
@@ -580,6 +583,7 @@ export interface PostsSelect<T extends boolean = true> {
     | {
         title?: T;
         description?: T;
+        noindex?: T;
       };
   updatedAt?: T;
   createdAt?: T;
@@ -656,6 +660,7 @@ export interface Theme {
   cssDark?: string | null;
   meta?: {
     siteName?: string | null;
+    lang?: string | null;
     fontFamily?: string | null;
   };
   updatedAt?: string | null;
@@ -684,6 +689,7 @@ export interface ThemeSelect<T extends boolean = true> {
     | T
     | {
         siteName?: T;
+        lang?: T;
         fontFamily?: T;
       };
   updatedAt?: T;

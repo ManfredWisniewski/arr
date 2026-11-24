@@ -1,6 +1,6 @@
 {
   "name": "arr",
-  "version": "0.12.0",
+  "version": "0.18.0",
   "description": "Payload CMS application image for witconsult.de, deployed via wit.docker_apps",
   "license": "MIT",
   "type": "module",
@@ -30,7 +30,6 @@
     "graphql": "^16.8.1",
     "mermaid": "^12.2.0",
     "next": "16.3.3",
-    "next-intl": "^4.14.9",
     "payload": "3.90.2",
     "react": "19.2.6",
     "react-dom": "19.2.6",

@@ -1,16 +1,38 @@
 import { getPayload, type Where } from 'payload'
 
-import type { Media, Post } from '@/payload-types'
+import type { Media, Page, Post } from '@/payload-types'
 import config from '@/payload.config'
-import type { Locale } from '@/i18n/routing'
 
 // Shared queries for the /blog routes. Taxonomy is data: agent profiles
 // live in the `structures` doc "agents", optional term labels in
 // "taxonomies" — both pushed from <site>/+structure/*.yml.
-// Every reader takes the route locale: public reads never fall back
-// (D11), draft previews fall back to the default locale so editors see
-// partially translated pages.
 export const POSTS_PER_PAGE = 12
+
+// ?page= parser shared by all blog routes — Number() alone would pass
+// Infinity and fractions through to the Postgres OFFSET.
+export const parsePageParam = (page: string | undefined): number => {
+  const n = Number(page)
+  return Number.isFinite(n) && n >= 1 ? Math.floor(n) : 1
+}
+
+// Categories inactive on the blog index filter until a ?hide= parameter
+// overrides the default.
+export const DEFAULT_EXCLUDED_CATEGORIES = ['daily', 'wordpress']
+
+// `?hide=a,b` lists the inactive categories on the blog index filter.
+// Absent param -> undefined ("use the default"); an empty value means
+// "hide nothing" — every category is active.
+export const parseHideParam = (value?: string | string[]) =>
+  value === undefined
+    ? undefined
+    : [
+        ...new Set(
+          (Array.isArray(value) ? value.join(',') : value)
+            .split(',')
+            .map((v) => v.trim())
+            .filter(Boolean),
+        ),
+      ]
 
 export type AgentProfile = {
   // media sourcePath, resolved to a URL via getMediaUrl()
@@ -30,36 +52,64 @@ export type TaxonomyTerm = {
 const publishedOnly = (draft: boolean): Where =>
   draft ? {} : { _status: { equals: 'published' } }
 
-// parentPath('/blog/a/b' → '/blog/a') — the Link atom adds the locale
-// prefix, so stored paths stay locale-free (D14).
+// Path helpers for localized blogs: English posts live at /blog/…,
+// translations under /<lang>/blog/… (mirrors the `*/blog/**` sync route).
+// blogRoot('//blog/x' → ''), parentPath('/de/blog/a/b' → '/de/blog/a').
+export const blogRoot = (path: string) => path.slice(0, path.indexOf('/blog'))
 export const parentPath = (path: string) =>
   path.slice(0, path.lastIndexOf('/'))
 
-const localizedRead = (draft: boolean, locale: Locale) => ({
-  draft,
-  fallbackLocale: (draft ? 'de' : false) as 'de' | false,
-  locale,
+// `like` is useless for prefixes — the drizzle adapter wraps the value in
+// %…% (substring match), so '/de/blog/…' matches `like '/blog/%'`. Use a
+// half-open range instead: '/' sorts just below '0', so
+// [pathPrefix + '/', pathPrefix + '0') covers exactly pathPrefix/… .
+export const pathPrefixWhere = (prefix: string): Where => ({
+  and: [
+    { path: { greater_than_equal: `${prefix}/` } },
+    { path: { less_than: `${prefix}0` } },
+  ],
 })
 
 export async function getPostsPage({
   author,
   category,
   draft,
-  locale,
+  excludeCategories,
   page = 1,
+  pathPrefix,
   tag,
 }: {
   author?: string
   category?: string
   draft: boolean
-  locale: Locale
+  excludeCategories?: string[]
   page?: number
+  pathPrefix?: string
   tag?: string
 }) {
   const payload = await getPayload({ config: await config })
+  // hide-if-any-inactive: a post carrying one of the excluded categories
+  // is dropped entirely. `categories: { not_in }` would match per joined
+  // row (any non-excluded category saves the post), so the exclusion is
+  // an id subquery instead; posts without categories always pass.
+  let hiddenIds: number[] = []
+  if (excludeCategories?.length) {
+    const { docs: hidden } = await payload.find({
+      collection: 'posts',
+      draft,
+      pagination: false,
+      select: { categories: true },
+      where: {
+        ...publishedOnly(draft),
+        ...(pathPrefix ? pathPrefixWhere(pathPrefix) : {}),
+        categories: { in: excludeCategories },
+      },
+    })
+    hiddenIds = (hidden as Post[]).map((doc) => doc.id)
+  }
   return payload.find({
     collection: 'posts',
-    ...localizedRead(draft, locale),
+    draft,
     limit: POSTS_PER_PAGE,
     page,
     sort: '-publishedAt',
@@ -67,20 +117,55 @@ export async function getPostsPage({
       ...publishedOnly(draft),
       ...(author ? { author: { equals: author } } : {}),
       ...(category ? { categories: { contains: category } } : {}),
+      ...(pathPrefix ? pathPrefixWhere(pathPrefix) : {}),
       ...(tag ? { tags: { contains: tag } } : {}),
+      ...(hiddenIds.length ? { id: { not_in: hiddenIds } } : {}),
     },
   })
 }
 
-export async function getPostByPath(
-  path: string,
-  draft: boolean,
-  locale: Locale,
-) {
+// Distinct categories used by posts under pathPrefix — the index filter
+// list. Uncategorized posts are always shown, so they need no pill.
+export async function getCategories(pathPrefix: string, draft: boolean) {
   const payload = await getPayload({ config: await config })
   const { docs } = await payload.find({
     collection: 'posts',
-    ...localizedRead(draft, locale),
+    draft,
+    pagination: false,
+    select: { categories: true },
+    where: {
+      ...publishedOnly(draft),
+      ...pathPrefixWhere(pathPrefix),
+    },
+  })
+  return [
+    ...new Set(
+      (docs as Post[]).flatMap((doc) => doc.categories ?? []),
+    ),
+  ].sort()
+}
+
+// Optional intro/meta source for a blog index: a `pages` doc at the index
+// path (e.g. /blog or /de/blog) supplies copy above the post list.
+export async function getIntroPage(path: string, draft: boolean) {
+  const payload = await getPayload({ config: await config })
+  const { docs } = await payload.find({
+    collection: 'pages',
+    draft,
+    limit: 1,
+    where: {
+      ...publishedOnly(draft),
+      path: { equals: path },
+    },
+  })
+  return docs[0] as Page | undefined
+}
+
+export async function getPostByPath(path: string, draft: boolean) {
+  const payload = await getPayload({ config: await config })
+  const { docs } = await payload.find({
+    collection: 'posts',
+    draft,
     limit: 1,
     where: {
       ...publishedOnly(draft),
@@ -90,12 +175,12 @@ export async function getPostByPath(
   return docs[0] as Post | undefined
 }
 
-async function findStructure(name: string, draft: boolean, locale: Locale) {
+async function findStructure(name: string, draft: boolean) {
   try {
     const payload = await getPayload({ config: await config })
     const { docs } = await payload.find({
       collection: 'structures',
-      ...localizedRead(draft, locale),
+      draft,
       limit: 1,
       where: {
         name: { equals: name },
@@ -108,11 +193,8 @@ async function findStructure(name: string, draft: boolean, locale: Locale) {
   }
 }
 
-export async function getAgents(
-  draft: boolean,
-  locale: Locale,
-): Promise<AgentProfile[]> {
-  const data = (await findStructure('agents', draft, locale)) as
+export async function getAgents(draft: boolean): Promise<AgentProfile[]> {
+  const data = (await findStructure('agents', draft)) as
     | { agents?: unknown }
     | unknown[]
     | undefined
@@ -140,12 +222,8 @@ export async function getAgents(
   })
 }
 
-export async function getAgent(
-  slug: string,
-  draft: boolean,
-  locale: Locale,
-) {
-  return (await getAgents(draft, locale)).find((agent) => agent.slug === slug)
+export async function getAgent(slug: string, draft: boolean) {
+  return (await getAgents(draft)).find((agent) => agent.slug === slug)
 }
 
 export type AgentRef = { avatarUrl?: string; name: string; slug: string }
@@ -155,13 +233,12 @@ export type AgentRef = { avatarUrl?: string; name: string; slug: string }
 export async function getAgentMap(
   slugs: (null | string | undefined)[],
   draft: boolean,
-  locale: Locale,
 ): Promise<Record<string, AgentRef>> {
   const wanted = new Set(slugs.filter((slug): slug is string => !!slug))
   if (!wanted.size) {
     return {}
   }
-  const agents = await getAgents(draft, locale)
+  const agents = await getAgents(draft)
   const entries = await Promise.all(
     agents
       .filter((agent) => wanted.has(agent.slug))
@@ -170,7 +247,7 @@ export async function getAgentMap(
           [
             agent.slug,
             {
-              avatarUrl: await getMediaUrl(agent.avatar, draft, 'avatar', locale),
+              avatarUrl: await getMediaUrl(agent.avatar, draft, 'avatar'),
               name: agent.name,
               slug: agent.slug,
             },
@@ -184,9 +261,8 @@ export async function getTaxonomyTerm(
   kind: 'categories' | 'tags',
   slug: string,
   draft: boolean,
-  locale: Locale,
 ): Promise<TaxonomyTerm | undefined> {
-  const data = (await findStructure('taxonomies', draft, locale)) as
+  const data = (await findStructure('taxonomies', draft)) as
     | Record<string, unknown>
     | undefined
   const raw = data?.[kind]
@@ -212,7 +288,6 @@ export async function getMediaUrl(
   sourcePath: string | undefined,
   draft: boolean,
   size?: 'avatar' | 'card',
-  locale?: Locale,
 ) {
   if (!sourcePath) {
     return undefined
@@ -221,7 +296,7 @@ export async function getMediaUrl(
     const payload = await getPayload({ config: await config })
     const { docs } = await payload.find({
       collection: 'media',
-      ...localizedRead(draft, locale ?? 'de'),
+      draft,
       limit: 1,
       where: { sourcePath: { equals: sourcePath } },
     })
@@ -232,10 +307,7 @@ export async function getMediaUrl(
   }
 }
 
-export function formatDate(
-  value?: null | string,
-  locale: Locale = 'de',
-) {
+export function formatDate(value?: null | string, path?: string) {
   if (!value) {
     return ''
   }
@@ -243,9 +315,12 @@ export function formatDate(
   if (Number.isNaN(date.getTime())) {
     return ''
   }
-  return new Intl.DateTimeFormat(locale === 'de' ? 'de-DE' : 'en-GB', {
+  // post paths carry the lang prefix (/<lang>/blog/…); the default tree
+  // is German, /en keeps the previous en-GB rendering
+  const lang = path ? blogRoot(path).slice(1) : ''
+  return date.toLocaleDateString(lang === 'en' ? 'en-GB' : lang || 'de', {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
-  }).format(date)
+  })
 }

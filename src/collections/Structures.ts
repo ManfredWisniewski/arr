@@ -17,10 +17,7 @@ export const Structures: CollectionConfig = {
     useAsTitle: 'name',
   },
   versions: {
-    drafts: {
-      // D10: de/en publish independently
-      localizeStatus: true,
-    },
+    drafts: true,
   },
   access: {
     read: publishedOrAuthenticated,
@@ -43,7 +40,6 @@ export const Structures: CollectionConfig = {
     {
       name: 'data',
       type: 'json',
-      localized: true,
       required: true,
     },
     {

@@ -39,6 +39,20 @@ COPY --from=docs-builder /app/docs/build ./public/docs
 # Learn more here: https://nextjs.org/telemetry
 ENV NEXT_TELEMETRY_DISABLED 1
 
+# Fail the build when the Payload schema drifted from the registered
+# migrations — a missing migration only surfaces at runtime (e.g.
+# "column meta_noindex does not exist"). migrate:create diffs schema vs.
+# the last snapshot offline; a probe file in src/migrations means drift.
+RUN \
+  PAYLOAD_SECRET=drift-check DATABASE_URI=postgresql://localhost:1/ci \
+  npx payload migrate:create schema_drift_probe </dev/null; \
+  status=$$?; \
+  if [ $$status -ne 0 ]; then exit $$status; fi; \
+  if ls src/migrations/*schema_drift_probe* >/dev/null 2>&1; then \
+    echo "ERROR: Payload schema changed without a migration — run 'npx payload migrate:create <name>' and commit the result." >&2; \
+    exit 1; \
+  fi
+
 RUN \
   if [ -f yarn.lock ]; then yarn run build; \
   elif [ -f package-lock.json ]; then npm run build; \

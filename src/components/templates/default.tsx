@@ -1,11 +1,8 @@
 import React from 'react'
 
 import type { Page } from '@/payload-types'
-import type { Locale } from '@/i18n/routing'
 
 export type TemplateProps = {
-  // active route locale — for structure queries (localized `data`)
-  locale: Locale
   page: Page
   // renders the Lexical content (upload/figure converters applied)
   renderBody: (data: Page['content']) => React.ReactNode

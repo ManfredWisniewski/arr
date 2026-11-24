@@ -2,7 +2,6 @@ import { getPayload } from 'payload'
 import React from 'react'
 
 import config from '@/payload.config'
-import type { Locale } from '@/i18n/routing'
 import { getRequestDraft } from '@/lib/review'
 
 import { CardGrid, type CardItem } from '../organisms/card'
@@ -17,16 +16,14 @@ type FeatureItem = {
   title?: string
 }
 
-async function getFeatures(locale: Locale): Promise<CardItem[]> {
+async function getFeatures(): Promise<CardItem[]> {
   try {
     const draft = await getRequestDraft()
     const payload = await getPayload({ config: await config })
     const { docs } = await payload.find({
       collection: 'structures',
-      draft,
-      fallbackLocale: false,
+      draft: draft,
       limit: 1,
-      locale,
       where: {
         name: { equals: 'features' },
         ...(draft ? {} : { _status: { equals: 'published' } }),
@@ -52,11 +49,10 @@ async function getFeatures(locale: Locale): Promise<CardItem[]> {
 // CardGrid fed by the `features` structure doc + markdown body.
 // Convention mirrors `navigation`: structure name `features`.
 export const FeaturesTemplate = async ({
-  locale,
   page,
   renderBody,
 }: TemplateProps) => {
-  const items = await getFeatures(locale)
+  const items = await getFeatures()
   return (
     <article className="page" data-template="features">
       <LeadSection

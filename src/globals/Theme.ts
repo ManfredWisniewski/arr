@@ -92,6 +92,13 @@ export const Theme: GlobalConfig = {
           type: 'text',
         },
         {
+          // ISO code of the unprefixed default content tree (de/en);
+          // translations live under /<lang>/… — drives <html lang> and
+          // hreflang output; pushed from site.yml `lang:`
+          name: 'lang',
+          type: 'text',
+        },
+        {
           name: 'fontFamily',
           type: 'text',
         },

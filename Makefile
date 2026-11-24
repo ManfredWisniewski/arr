@@ -49,7 +49,7 @@ FONT_VARS_wit := \
 
 FONT_ARGS := $(FONT_ARGS_$(THEME)) $(FONT_VARS_$(THEME))
 
-.PHONY: publish publish-site publish-local dev tokens theme site sync biti-ports biti-port
+.PHONY: publish publish-site publish-local dev preflight tokens theme site sync biti-ports biti-port
 
 publish:
 ifeq ($(SITE),)
@@ -60,11 +60,14 @@ else
 	@$(MAKE) --no-print-directory publish-site SITE=$(SITE)
 endif
 
-publish-site: tokens biti-ports theme site sync
+publish-site: preflight tokens biti-ports theme site sync
 	$(info NOTE [$(SITE)]: pages and structures are pushed as drafts - publish them in the Payload admin to go live.)
 ifneq ($(IMAGE_DIRTY),)
 	$(info NOTE: image files changed ($(IMAGE_PATHS)) - rebuild and redeploy the image; push does not ship code changes. See CHANGELOG.md.)
 endif
+
+preflight:
+	$(PT) preflight --repo $(CONTENT_REPO)
 
 tokens:
 	npm --prefix $(BITI_DIR)/tokens run preview

@@ -10,6 +10,16 @@ release.
 
 ## Unreleased
 
+### Fixed
+
+- Missing migration for `theme.meta.lang` and `meta.noindex` on
+  `pages`/`posts` (fields added in `e206ca1` but never migrated — every
+  query on `pages`, `posts` and `theme` 500'd with
+  `column "meta_noindex" does not exist` / `"meta_lang" does not exist`
+  on all deployed sites). Generated
+  `20261124_203038_add_theme_meta_lang_noindex`; the entrypoint's
+  `payload migrate` applies it on the next deploy.
+
 ## [0.16.0] - 2026-11-24
 
 ## [0.15.0] - 2026-11-22

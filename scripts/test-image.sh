@@ -57,4 +57,56 @@ for run in 1 2; do
     payload node seed-admin.js
 done
 
+# Schema-drift regression: a column added to the schema without a
+# migration makes every query on that table 500 ("column x does not
+# exist") — while /api/health still answers 200 because it never
+# touches the DB. Exercise a real query per collection/global, plus
+# draft reads (version tables) via the seeded admin.
+echo "Checking collection queries catch missing-migration columns..."
+for endpoint in \
+  "api/pages?limit=1" \
+  "api/posts?limit=1" \
+  "api/media?limit=1" \
+  "api/structures?limit=1" \
+  "api/globals/theme"; do
+  code=$(curl --silent --output /dev/null --write-out '%{http_code}' \
+    "$BASE_URL/$endpoint")
+  if [ "$code" != "200" ]; then
+    echo "GET /$endpoint returned $code (want 200)" >&2
+    docker compose -p "$PROJECT_NAME" -f "$COMPOSE_FILE" logs payload
+    exit 1
+  fi
+done
+
+# Frontend render exercises theme global + page lookup end to end; an
+# empty DB 404s, so only a 5xx means a query/schema crash.
+code=$(curl --silent --output /dev/null --write-out '%{http_code}' "$BASE_URL/")
+if [ "$code" -ge 500 ]; then
+  echo "GET / returned $code — frontend render crashed" >&2
+  docker compose -p "$PROJECT_NAME" -f "$COMPOSE_FILE" logs payload
+  exit 1
+fi
+
+echo "Checking draft queries against the version tables..."
+COOKIE_JAR=$(mktemp)
+trap 'rm -f "$COOKIE_JAR"; cleanup' EXIT
+code=$(curl --silent --output /dev/null --write-out '%{http_code}' \
+  --cookie-jar "$COOKIE_JAR" -X POST "$BASE_URL/api/users/login" \
+  -H 'Content-Type: application/json' \
+  -d "{\"email\":\"$SEED_EMAIL\",\"password\":\"$SEED_PASSWORD\"}")
+if [ "$code" != "200" ]; then
+  echo "POST /api/users/login returned $code (want 200)" >&2
+  docker compose -p "$PROJECT_NAME" -f "$COMPOSE_FILE" logs payload
+  exit 1
+fi
+for endpoint in "api/pages?draft=true&limit=1" "api/posts?draft=true&limit=1"; do
+  code=$(curl --silent --output /dev/null --write-out '%{http_code}' \
+    --cookie "$COOKIE_JAR" "$BASE_URL/$endpoint")
+  if [ "$code" != "200" ]; then
+    echo "GET /$endpoint returned $code (want 200)" >&2
+    docker compose -p "$PROJECT_NAME" -f "$COMPOSE_FILE" logs payload
+    exit 1
+  fi
+done
+
 echo "Docker image tests passed."

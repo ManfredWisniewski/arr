@@ -10,6 +10,8 @@ release.
 
 ## Unreleased
 
+## [0.22.0] - 2026-11-25
+
 ### Changed
 
 - Blog index filter lists tags instead of categories: the top 8 tags by

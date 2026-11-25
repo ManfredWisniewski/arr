@@ -152,7 +152,6 @@ export async function LangBlog({
         filter={{ inactive, tags }}
         intro={intro}
         linkLabel={LINK_LABEL}
-        moreLabel="Mehr"
         posts={result.docs}
         totalPages={result.totalPages}
       />

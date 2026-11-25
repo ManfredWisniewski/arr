@@ -10,6 +10,13 @@ release.
 
 ## Unreleased
 
+### Changed
+
+- Blog index filter lists tags instead of categories: the top 8 tags by
+  post count are shown as pills, a "More"/"Mehr" pill expands the full
+  tag list, and `?hide=`/`DEFAULT_EXCLUDED_TAGS` now hide posts by tag
+  (default: `daily`, `diary`, `update`).
+
 ## [0.21.0] - 2026-11-24
 
 ## [0.20.0] - 2026-11-24

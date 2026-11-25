@@ -115,6 +115,29 @@ hr {
   color: var(--component-text-component-text-light-fixed, #fff);
 }
 
+/* "more" pill in the blog index filter — a <details> whose summary is
+   styled like a pill; opening it reveals the remaining tag pills inline */
+.filter-more {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: calc(var(--padding-padding-8px, 8) * 1px);
+}
+
+.filter-more > summary {
+  cursor: pointer;
+  list-style: none;
+}
+
+.filter-more > summary::-webkit-details-marker {
+  display: none;
+}
+
+.filter-more > summary.pill:hover {
+  background: var(--component-fill-component-fill-primary, #444);
+  color: var(--component-text-component-text-light-fixed, #fff);
+}
+
 /* embedded HedgeDoc/reveal.js decks (slide template) */
 .page[data-template='slide'] {
   max-width: 90rem;

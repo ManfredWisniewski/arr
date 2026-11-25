@@ -1,11 +1,11 @@
 import React from 'react'
 
 import {
-  DEFAULT_EXCLUDED_CATEGORIES,
+  DEFAULT_EXCLUDED_TAGS,
   getAgentMap,
-  getCategories,
   getIntroPage,
   getPostsPage,
+  getTags,
   parseHideParam,
   parsePageParam,
 } from '@/lib/blog'
@@ -37,13 +37,13 @@ export default async function BlogIndex({ searchParams }: Props) {
   const draft = await getRequestDraft()
   const { hide, page } = await searchParams
   const current = parsePageParam(page)
-  const inactive = parseHideParam(hide) ?? DEFAULT_EXCLUDED_CATEGORIES
-  const [categories, intro, result] = await Promise.all([
-    getCategories('/blog', draft),
+  const inactive = parseHideParam(hide) ?? DEFAULT_EXCLUDED_TAGS
+  const [tags, intro, result] = await Promise.all([
+    getTags('/blog', draft, inactive),
     getIntroPage('/blog', draft),
     getPostsPage({
       draft: draft,
-      excludeCategories: inactive,
+      excludeTags: inactive,
       page: current,
       pathPrefix: '/blog',
     }),
@@ -58,7 +58,7 @@ export default async function BlogIndex({ searchParams }: Props) {
       agents={agents}
       basePath="/blog"
       current={result.page ?? current}
-      filter={{ categories, inactive }}
+      filter={{ inactive, tags }}
       intro={intro}
       posts={result.docs}
       totalPages={result.totalPages}

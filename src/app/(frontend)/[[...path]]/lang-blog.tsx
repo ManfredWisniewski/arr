@@ -130,7 +130,7 @@ export async function LangBlog({
   if (!rest.length) {
     const inactive = parseHideParam(hide) ?? DEFAULT_EXCLUDED_TAGS
     const [tags, intro, result] = await Promise.all([
-      getTags(base, draft, inactive),
+      getTags(base, draft),
       getIntroPage(base, draft),
       getPostsPage({
         draft,

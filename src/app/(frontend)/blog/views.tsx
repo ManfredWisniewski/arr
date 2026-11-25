@@ -83,16 +83,11 @@ export const BlogIndexView = ({
       </Pill>
     )
   }
-  // top 8 pills skip the hidden tags; "more" expands to every
-  // filterable tag — overflow active ones first, inactive last
-  const visible = filter
-    ? filter.tags
-        .filter((tag) => !filter.inactive.includes(tag))
-        .slice(0, TOP_TAGS)
-    : []
-  const more = filter
-    ? filter.tags.filter((tag) => !visible.includes(tag))
-    : []
+  // fixed tag order (ranked by post count): the top 8 sit in the first
+  // row, "+" expands the rest — toggling only flips a pill's active
+  // state in place, positions never change
+  const visible = filter?.tags.slice(0, TOP_TAGS) ?? []
+  const more = filter?.tags.slice(TOP_TAGS) ?? []
   return (
     <article className="page blog-index">
       {intro?.content ? (

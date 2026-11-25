@@ -39,7 +39,7 @@ export default async function BlogIndex({ searchParams }: Props) {
   const current = parsePageParam(page)
   const inactive = parseHideParam(hide) ?? DEFAULT_EXCLUDED_TAGS
   const [tags, intro, result] = await Promise.all([
-    getTags('/blog', draft, inactive),
+    getTags('/blog', draft),
     getIntroPage('/blog', draft),
     getPostsPage({
       draft: draft,

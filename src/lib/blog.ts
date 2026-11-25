@@ -137,21 +137,12 @@ export async function getPostsPage({
   })
 }
 
-// Tag pills for the blog index filter, ranked by post count among the
-// posts surviving `exclude` — hidden tags get count 0 and sink to the
-// end, so a top-N slice never surfaces them. Untagged posts are always
-// shown, so they need no pill.
-export async function getTags(
-  pathPrefix: string,
-  draft: boolean,
-  exclude: string[] = [],
-) {
+// Tag pills for the blog index filter, ranked by post count over all
+// published posts under pathPrefix — the order is independent of ?hide,
+// so a toggled pill only flips its active state in place and never
+// moves. Untagged posts are always shown, so they need no pill.
+export async function getTags(pathPrefix: string, draft: boolean) {
   const payload = await getPayload({ config: await config })
-  const hiddenIds = await hiddenPostIds({
-    draft,
-    excludeTags: exclude,
-    pathPrefix,
-  })
   const { docs } = await payload.find({
     collection: 'posts',
     draft,
@@ -160,7 +151,6 @@ export async function getTags(
     where: {
       ...publishedOnly(draft),
       ...pathPrefixWhere(pathPrefix),
-      ...(hiddenIds.length ? { id: { not_in: hiddenIds } } : {}),
     },
   })
   const counts = new Map<string, number>()
@@ -168,9 +158,6 @@ export async function getTags(
     for (const tag of doc.tags ?? []) {
       counts.set(tag, (counts.get(tag) ?? 0) + 1)
     }
-  }
-  for (const tag of exclude) {
-    counts.set(tag, counts.get(tag) ?? 0)
   }
   return [...counts.keys()].sort(
     (a, b) =>

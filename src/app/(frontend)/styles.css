@@ -117,23 +117,36 @@ hr {
 
 /* "more" pill in the blog index filter — the <details> only carries the
    +/− summary pill so it never reflows; the expanded list is a sibling
-   toggled via :has([open]) and flattened with display:contents, so its
-   pills share the filter-bar flex layout (spacing and wrap) exactly */
+   toggled via :has([open]) */
 .filter-more {
+  align-items: center;
   display: inline-flex;
 }
 
+/* expanded pills wrap onto their own row right after the +/− pill */
 .filter-more-list {
-  display: contents;
+  align-items: center;
+  display: flex;
+  flex-basis: 100%;
+  flex-wrap: wrap;
+  gap: calc(var(--padding-padding-8px, 8) * 1px);
 }
 
 .blog-filter:not(:has(.filter-more[open])) .filter-more-list {
   display: none;
 }
 
+/* the +/− summary renders as a full circle */
 .filter-more > summary {
+  align-items: center;
+  border-radius: 50%;
   cursor: pointer;
+  display: inline-flex;
+  height: 1.75em;
+  justify-content: center;
   list-style: none;
+  padding: 0;
+  width: 1.75em;
 }
 
 .filter-more > summary::-webkit-details-marker {

@@ -15,11 +15,11 @@ export const parsePageParam = (page: string | undefined): number => {
   return Number.isFinite(n) && n >= 1 ? Math.floor(n) : 1
 }
 
-// Categories inactive on the blog index filter until a ?hide= parameter
+// Tags inactive on the blog index filter until a ?hide= parameter
 // overrides the default.
-export const DEFAULT_EXCLUDED_CATEGORIES = ['daily', 'wordpress']
+export const DEFAULT_EXCLUDED_TAGS = ['daily', 'diary', 'update']
 
-// `?hide=a,b` lists the inactive categories on the blog index filter.
+// `?hide=a,b` lists the inactive tags on the blog index filter.
 // Absent param -> undefined ("use the default"); an empty value means
 // "hide nothing" — every category is active.
 export const parseHideParam = (value?: string | string[]) =>
@@ -70,11 +70,42 @@ export const pathPrefixWhere = (prefix: string): Where => ({
   ],
 })
 
+// hide-if-any-inactive: a post carrying one of the excluded tags is
+// dropped entirely. `tags: { not_in }` would match per joined row (any
+// non-excluded tag saves the post), so the exclusion is an id subquery
+// instead; posts without tags always pass.
+async function hiddenPostIds({
+  draft,
+  excludeTags,
+  pathPrefix,
+}: {
+  draft: boolean
+  excludeTags?: string[]
+  pathPrefix?: string
+}) {
+  if (!excludeTags?.length) {
+    return []
+  }
+  const payload = await getPayload({ config: await config })
+  const { docs: hidden } = await payload.find({
+    collection: 'posts',
+    draft,
+    pagination: false,
+    select: { tags: true },
+    where: {
+      ...publishedOnly(draft),
+      ...(pathPrefix ? pathPrefixWhere(pathPrefix) : {}),
+      tags: { in: excludeTags },
+    },
+  })
+  return (hidden as Post[]).map((doc) => doc.id)
+}
+
 export async function getPostsPage({
   author,
   category,
   draft,
-  excludeCategories,
+  excludeTags,
   page = 1,
   pathPrefix,
   tag,
@@ -82,31 +113,13 @@ export async function getPostsPage({
   author?: string
   category?: string
   draft: boolean
-  excludeCategories?: string[]
+  excludeTags?: string[]
   page?: number
   pathPrefix?: string
   tag?: string
 }) {
   const payload = await getPayload({ config: await config })
-  // hide-if-any-inactive: a post carrying one of the excluded categories
-  // is dropped entirely. `categories: { not_in }` would match per joined
-  // row (any non-excluded category saves the post), so the exclusion is
-  // an id subquery instead; posts without categories always pass.
-  let hiddenIds: number[] = []
-  if (excludeCategories?.length) {
-    const { docs: hidden } = await payload.find({
-      collection: 'posts',
-      draft,
-      pagination: false,
-      select: { categories: true },
-      where: {
-        ...publishedOnly(draft),
-        ...(pathPrefix ? pathPrefixWhere(pathPrefix) : {}),
-        categories: { in: excludeCategories },
-      },
-    })
-    hiddenIds = (hidden as Post[]).map((doc) => doc.id)
-  }
+  const hiddenIds = await hiddenPostIds({ draft, excludeTags, pathPrefix })
   return payload.find({
     collection: 'posts',
     draft,
@@ -124,25 +137,45 @@ export async function getPostsPage({
   })
 }
 
-// Distinct categories used by posts under pathPrefix — the index filter
-// list. Uncategorized posts are always shown, so they need no pill.
-export async function getCategories(pathPrefix: string, draft: boolean) {
+// Tag pills for the blog index filter, ranked by post count among the
+// posts surviving `exclude` — hidden tags get count 0 and sink to the
+// end, so a top-N slice never surfaces them. Untagged posts are always
+// shown, so they need no pill.
+export async function getTags(
+  pathPrefix: string,
+  draft: boolean,
+  exclude: string[] = [],
+) {
   const payload = await getPayload({ config: await config })
+  const hiddenIds = await hiddenPostIds({
+    draft,
+    excludeTags: exclude,
+    pathPrefix,
+  })
   const { docs } = await payload.find({
     collection: 'posts',
     draft,
     pagination: false,
-    select: { categories: true },
+    select: { tags: true },
     where: {
       ...publishedOnly(draft),
       ...pathPrefixWhere(pathPrefix),
+      ...(hiddenIds.length ? { id: { not_in: hiddenIds } } : {}),
     },
   })
-  return [
-    ...new Set(
-      (docs as Post[]).flatMap((doc) => doc.categories ?? []),
-    ),
-  ].sort()
+  const counts = new Map<string, number>()
+  for (const doc of docs as Post[]) {
+    for (const tag of doc.tags ?? []) {
+      counts.set(tag, (counts.get(tag) ?? 0) + 1)
+    }
+  }
+  for (const tag of exclude) {
+    counts.set(tag, counts.get(tag) ?? 0)
+  }
+  return [...counts.keys()].sort(
+    (a, b) =>
+      (counts.get(b) ?? 0) - (counts.get(a) ?? 0) || a.localeCompare(b),
+  )
 }
 
 // Optional intro/meta source for a blog index: a `pages` doc at the index

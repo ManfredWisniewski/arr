@@ -3,14 +3,14 @@ import React from 'react'
 
 import { DraftBanner } from '@/components/draft-banner'
 import {
-  DEFAULT_EXCLUDED_CATEGORIES,
+  DEFAULT_EXCLUDED_TAGS,
   getAgent,
   getAgentMap,
-  getCategories,
   getIntroPage,
   getMediaUrl,
   getPostByPath,
   getPostsPage,
+  getTags,
   getTaxonomyTerm,
   parseHideParam,
   parsePageParam,
@@ -128,13 +128,13 @@ export async function LangBlog({
   const current = parsePageParam(page)
 
   if (!rest.length) {
-    const inactive = parseHideParam(hide) ?? DEFAULT_EXCLUDED_CATEGORIES
-    const [categories, intro, result] = await Promise.all([
-      getCategories(base, draft),
+    const inactive = parseHideParam(hide) ?? DEFAULT_EXCLUDED_TAGS
+    const [tags, intro, result] = await Promise.all([
+      getTags(base, draft, inactive),
       getIntroPage(base, draft),
       getPostsPage({
         draft,
-        excludeCategories: inactive,
+        excludeTags: inactive,
         page: current,
         pathPrefix: base,
       }),
@@ -149,9 +149,10 @@ export async function LangBlog({
         basePath={base}
         current={result.page ?? current}
         emptyLabel={EMPTY_LABEL}
-        filter={{ categories, inactive }}
+        filter={{ inactive, tags }}
         intro={intro}
         linkLabel={LINK_LABEL}
+        moreLabel="Mehr"
         posts={result.docs}
         totalPages={result.totalPages}
       />

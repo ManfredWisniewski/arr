@@ -25,12 +25,14 @@ import { SlideDeck } from '@/components/organisms/slide-deck'
 // localized trees served through [[...path]] (/<lang>/blog/…) render the
 // same markup with a different basePath/emptyLabel.
 
-// Category filter state for the index: `categories` lists every
-// category in the tree, `inactive` the hidden ones (?hide=…).
+// Tag filter state for the index: `tags` lists every tag in the tree
+// ranked by post count, `inactive` the hidden ones (?hide=…).
 export type BlogFilter = {
-  categories: string[]
+  tags: string[]
   inactive: string[]
 }
+
+const TOP_TAGS = 8
 
 export const BlogIndexView = ({
   agents,
@@ -40,6 +42,7 @@ export const BlogIndexView = ({
   filter,
   intro,
   linkLabel,
+  moreLabel = 'More',
   posts,
   totalPages,
 }: {
@@ -50,6 +53,7 @@ export const BlogIndexView = ({
   filter?: BlogFilter
   intro?: Page
   linkLabel?: string
+  moreLabel?: string
   posts: Post[]
   totalPages: number
 }) => {
@@ -66,28 +70,45 @@ export const BlogIndexView = ({
     const qs = params.toString()
     return qs ? `${basePath}?${qs}` : basePath
   }
+  const tagPill = (tag: string) => {
+    const active = !filter?.inactive.includes(tag)
+    const inactive = active
+      ? [...(filter?.inactive ?? []), tag]
+      : (filter?.inactive ?? []).filter((t) => t !== tag)
+    return (
+      <Pill
+        active={active}
+        href={`${basePath}?hide=${inactive.join(',')}`}
+        key={tag}
+      >
+        {tag}
+      </Pill>
+    )
+  }
+  // top 8 pills skip the hidden tags; "more" expands to every
+  // filterable tag — overflow active ones first, inactive last
+  const visible = filter
+    ? filter.tags
+        .filter((tag) => !filter.inactive.includes(tag))
+        .slice(0, TOP_TAGS)
+    : []
+  const more = filter
+    ? filter.tags.filter((tag) => !visible.includes(tag))
+    : []
   return (
     <article className="page blog-index">
       {intro?.content ? (
         <RichText converters={jsxConverters} data={intro.content} />
       ) : null}
-      {filter?.categories.length ? (
+      {filter?.tags.length ? (
         <FilterBar className="blog-filter">
-          {filter.categories.map((category) => {
-            const active = !filter.inactive.includes(category)
-            const inactive = active
-              ? [...filter.inactive, category]
-              : filter.inactive.filter((c) => c !== category)
-            return (
-              <Pill
-                active={active}
-                href={`${basePath}?hide=${inactive.join(',')}`}
-                key={category}
-              >
-                {category}
-              </Pill>
-            )
-          })}
+          {visible.map(tagPill)}
+          {more.length ? (
+            <details className="filter-more">
+              <summary className="pill">{moreLabel}</summary>
+              {more.map(tagPill)}
+            </details>
+          ) : null}
         </FilterBar>
       ) : null}
       {posts.length ? (

@@ -2,23 +2,30 @@
 //
 //   ## Title {#some-id}              → heading anchor id
 //   [text](url){target="_blank"}     → link target override
+//   [text](url){preview}             → hover preview fetched from the
+//                                      linked doc (fragment → its heading
+//                                      section, else meta description)
+//   [text](url){preview="Kurztext"}  → hover preview with literal text
 //
 // Heading anchors exist so internal links like /faq/glossar#headless-cms
 // stay stable regardless of heading text; link targets let authors
 // override the default policy (absolute http(s) URLs open in a new tab,
-// everything else in the same tab — decision D08).
+// everything else in the same tab — decision D08). Link previews render
+// the link inside a RichTooltip on the frontend (jsx-converters link).
 //
 // Lexical nodes carry neither attribute natively, so extractHeadingAnchors
 // strips `{#id}` before conversion (it must not leak into the visible
 // text) and returns the ids in document order; applyHeadingAnchors stamps
 // them onto the serialized heading nodes as an extra `id` key.
-// applyLinkTargets runs after conversion and works at the node level: a
-// `{target="…"}` attribute survives markdown import as an unformatted
-// text node directly following its link node — it is stripped from the
-// text and stamped onto the link's `fields.target`. This needs no
-// fence/code tracking: inside code there are no link nodes, and
+// applyLinkAttributes runs after conversion and works at the node level: a
+// `{target="…"}`/`{preview…}` attribute survives markdown import as an
+// unformatted text node directly following its link node — it is stripped
+// from the text and stamped onto the link's `fields` (`target`/`preview`).
+// Several attributes may chain (`{preview}{target="_blank"}`). This needs
+// no fence/code tracking: inside code there are no link nodes, and
 // inline-code text carries format != 0. The frontend JSX converters
-// render `id` / `target` as the matching element attributes.
+// render `id` / `target` as the matching element attributes and `preview`
+// as a RichTooltip.
 //
 // Heading ids are matched positionally — the Nth ATX heading in the
 // markdown maps to the Nth heading node in the Lexical tree. ATX_HEADING
@@ -33,10 +40,12 @@ const FENCE = /^[ \t]*(`{3,}|~{3,})/
 const LINK_TARGETS = new Set(['_blank', '_self', '_parent', '_top'])
 const LINK_TARGET_ATTR =
   /^\{:?target=(?:"([^"]+)"|'([^']+)'|([A-Za-z_][A-Za-z0-9_-]*))\}/
-// `](url)` immediately followed by the attribute — used by
+const LINK_PREVIEW_ATTR =
+  /^\{:?preview(?:=(?:"([^"]*)"|'([^']*)'|([A-Za-z_][A-Za-z0-9_-]*)))?\}/
+// `](url)` immediately followed by attributes — used by
 // stripMarkdownAttributes for non-Lexical render paths (slide decks).
-const LINK_TARGET_INLINE =
-  /(\]\([^()\n]*\))\{:?target=(?:"[^"]+"|'[^']+'|[A-Za-z_][A-Za-z0-9_-]*)\}/g
+const LINK_ATTRS_INLINE =
+  /(\]\([^()\n]*\))(?:\{:?(?:target=(?:"[^"]+"|'[^']+'|[A-Za-z_][A-Za-z0-9_-]*)|preview(?:=(?:"[^"]*"|'[^']*'|[A-Za-z_][A-Za-z0-9_-]*))?)\})+/g
 
 export const extractHeadingAnchors = (
   markdown: string,
@@ -96,11 +105,12 @@ export const applyHeadingAnchors = (
   walk(editorState.root?.children)
 }
 
-// Stamps `fields.target` on link/autolink nodes followed by an
-// unformatted `{target="…"}` text node and removes the attribute from the
-// text. Only the four browsing-context keywords are consumed — anything
+// Stamps link/autolink `fields` from unformatted attribute text nodes
+// directly following the node and removes the consumed markup.
+// `{target="…"}` only accepts the four browsing-context keywords;
+// `{preview}` stamps `true`, `{preview="…"}` the literal text — anything
 // else stays literal so a typo is visible in the draft preview.
-export const applyLinkTargets = (editorState: {
+export const applyLinkAttributes = (editorState: {
   root?: { children?: SerializedNode[] }
 }): void => {
   const walk = (nodes: SerializedNode[] | undefined) => {
@@ -108,21 +118,42 @@ export const applyLinkTargets = (editorState: {
       const node = nodes![i]!
       if (node.type === 'link' || node.type === 'autolink') {
         const next = nodes![i + 1]
-        const text = typeof next?.text === 'string' ? next.text : ''
-        const match =
-          next?.type === 'text' && next.format === 0
-            ? LINK_TARGET_ATTR.exec(text)
-            : null
-        const target = match?.[1] ?? match?.[2] ?? match?.[3]
-        if (match && target && LINK_TARGETS.has(target)) {
-          ;(next as { text: string }).text = text.slice(match[0].length)
-          if (next.text === '') {
+        if (next?.type !== 'text' || next.format !== 0) {
+          walk(node.children)
+          continue
+        }
+        let text = typeof next.text === 'string' ? next.text : ''
+        const fields = {
+          ...(node.fields as Record<string, unknown> | undefined),
+        }
+        let consumed = false
+        for (;;) {
+          const targetMatch = LINK_TARGET_ATTR.exec(text)
+          const target =
+            targetMatch?.[1] ?? targetMatch?.[2] ?? targetMatch?.[3]
+          if (targetMatch && target && LINK_TARGETS.has(target)) {
+            fields.target = target
+            text = text.slice(targetMatch[0].length)
+            consumed = true
+            continue
+          }
+          const previewMatch = LINK_PREVIEW_ATTR.exec(text)
+          if (previewMatch) {
+            fields.preview =
+              (previewMatch[1] ?? previewMatch[2] ?? previewMatch[3]) ||
+              true
+            text = text.slice(previewMatch[0].length)
+            consumed = true
+            continue
+          }
+          break
+        }
+        if (consumed) {
+          ;(next as { text: string }).text = text
+          if (text === '') {
             nodes!.splice(i + 1, 1)
           }
-          node.fields = {
-            ...(node.fields as Record<string, unknown> | undefined),
-            target,
-          }
+          node.fields = fields
         }
       }
       walk(node.children)
@@ -147,7 +178,7 @@ export const stripMarkdownAttributes = (markdown: string): string => {
       continue
     }
     if (!fence) {
-      lines[i] = line.replace(LINK_TARGET_INLINE, '$1')
+      lines[i] = line.replace(LINK_ATTRS_INLINE, '$1')
     }
   }
   return lines.join('\n')

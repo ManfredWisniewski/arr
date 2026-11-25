@@ -40,6 +40,10 @@ media placeholders only — never Lexical JSON.
 - `## Title {#some-id}` → heading node with `id` (stable fragment links).
 - `[text](url){target="_blank"}` → explicit link target, overriding the
   URL-based rule (D08).
+- `[text](path){preview}` → `fields.preview` on the link node; the
+  frontend wraps the link in a `RichTooltip` and resolves the preview
+  server-side (`#fragment` → the `{#anchor}` heading's section, else the
+  doc's meta description/post excerpt). `{preview="…"}` sets literal text.
 - `![media:<docId>]()` → Lexical upload node referencing a media document.
 
 ## Frontend

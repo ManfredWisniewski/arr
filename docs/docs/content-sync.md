@@ -20,6 +20,9 @@ model — re-syncs are idempotent and the DB can always be rebuilt.
   none (explicit ids only — no slugger fallback).
 - `[t](u){target="_blank|_self|_parent|_top"}` stamps `fields.target` on
   the link node and strips the markup; invalid values stay literal.
+- `[t](u){preview}` / `{preview="…"}` stamps `fields.preview` (`true` or
+  the literal text) for the frontend hover card; `{preview=}` and other
+  malformed values stay literal.
 
 ## Media
 

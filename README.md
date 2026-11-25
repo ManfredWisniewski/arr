@@ -47,7 +47,10 @@ work.
   to override the link-target policy (decision D08): absolute `http(s)`
   URLs open in a new tab, everything else in the same tab. Allowed
   values: `_blank`, `_self`, `_parent`, `_top`; invalid values stay
-  visible as literal text so typos surface in the draft preview.
+  visible as literal text so typos surface in the draft preview. A link
+  may also carry a hover preview — `[text](path){preview}` fetches the
+  linked doc's section (`#fragment`) or meta description into a
+  `RichTooltip`; `{preview="…"}` shows literal text instead.
 - D04 review gate: only `editor` may set `_status: 'published'`; the
   `content-bot` can create/update drafts but cannot publish or delete.
 - Frontend: a site shell (header with `theme.meta.siteName` + `navigation`

@@ -10,6 +10,19 @@ release.
 
 ## Unreleased
 
+## [0.24.0] - 2026-11-25
+
+### Added
+
+- Link preview tooltips (D09 attribute syntax): `[text](path){preview}`
+  renders the link inside a `RichTooltip` hover card — a `#fragment`
+  href previews the section under the heading carrying that `{#anchor}`
+  id, a plain path the linked page's meta description (posts: excerpt).
+  `{preview="…"}` shows literal text instead. Stamped as `fields.preview`
+  on link nodes (`applyLinkAttributes`), resolved server-side via
+  `getLinkPreview`; misses and invalid values degrade to a plain link /
+  literal text.
+
 ## [0.23.0] - 2026-11-25
 
 ## [0.22.0] - 2026-11-25

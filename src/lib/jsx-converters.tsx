@@ -17,8 +17,10 @@ import { getRequestDraft } from '@/lib/review'
 import type { Media } from '@/payload-types'
 import { Link } from '@/components/atoms/link'
 import { Figure } from '@/components/molecules/figure'
+import { RichTooltip } from '@/components/organisms/rich-tooltip'
 import { WitSpace, type WitSpaceAuthor } from '@/components/organisms/wit-space'
 import { getAgents, getMediaUrl } from '@/lib/blog'
+import { getLinkPreview } from '@/lib/linkPreview'
 
 // Heading nodes may carry an explicit anchor id (markdown `{#some-id}`,
 // stamped by the markdownToContent hook — see lib/markdownAttributes.ts);
@@ -110,8 +112,10 @@ const WitSpaceScene = async ({
 // policy (D08): absolute http(s) URLs open in a new tab, everything else
 // in the same tab. `fields.target` (markdown `{target="…"}` override —
 // lib/markdownAttributes.ts) beats both the atom's URL rule and the
-// editor's newTab flag.
-const link = ({
+// editor's newTab flag. `fields.preview` (markdown `{preview}` /
+// `{preview="…"}`) wraps the link in a RichTooltip — `true` fetches the
+// preview from the linked doc, a string is shown verbatim.
+const link = async ({
   node,
   nodesToJSX,
 }: JSXConverterArgs<SerializedAutoLinkNode | SerializedLinkNode>) => {
@@ -136,11 +140,26 @@ const link = ({
       : node.fields.newTab
         ? { rel: 'noopener noreferrer', target: '_blank' }
         : {}
-  return (
+  const anchor = (
     <Link href={href} {...targetProps}>
       {children}
     </Link>
   )
+  const preview = (node.fields as { preview?: unknown }).preview
+  if (typeof preview === 'string' && preview) {
+    return <RichTooltip content={preview}>{anchor}</RichTooltip>
+  }
+  if (preview === true) {
+    const found = await getLinkPreview(href, await getRequestDraft())
+    if (found) {
+      return (
+        <RichTooltip content={found.text} headline={found.headline}>
+          {anchor}
+        </RichTooltip>
+      )
+    }
+  }
+  return anchor
 }
 
 export const jsxConverters: JSXConvertersFunction<DefaultNodeTypes> = ({

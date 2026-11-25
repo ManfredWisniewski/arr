@@ -28,6 +28,11 @@ types:  npx payload generate:types && npx tsc
 - `[t](u){target="_blank|_self|_parent|_top"}` stamps `fields.target` on
   the link node and strips the markup; the frontend uses it over the
   URL-based target rule (D08). Invalid values stay literal.
+- `[t](u){preview}` stamps `fields.preview: true` and `{preview="…"}` the
+  literal string; the frontend renders the link inside a `RichTooltip`,
+  resolving `true` server-side from the linked page/post (`#fragment` →
+  the `{#anchor}` heading's section, else meta description/excerpt).
+  Malformed values (`{preview=}`) stay literal.
 - Re-sync of an unchanged `sourcePath` is a no-op; `sourcePath` is unique.
 - `POST /api/media` deduplicates on `sourceHash`; `![media:<id>]()` in markdown
   becomes a Lexical upload node.

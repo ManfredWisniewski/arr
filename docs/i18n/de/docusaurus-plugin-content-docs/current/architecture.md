@@ -44,6 +44,11 @@ senden nur Markdown und Medien-Platzhalter — niemals Lexical-JSON.
   Fragment-Links).
 - `[text](url){target="_blank"}` → explizites Link-Target, überstimmt
   die URL-Regel (D08).
+- `[text](pfad){preview}` → `fields.preview` am Link-Node; das Frontend
+  hüllt den Link in ein `RichTooltip` und löst die Vorschau serverseitig
+  auf (`#fragment` → die Sektion der `{#anchor}`-Überschrift, sonst die
+  Meta-Description bzw. der Post-Excerpt). `{preview="…"}` setzt einen
+  literalen Text.
 - `![media:<docId>]()` → Lexical-Upload-Node mit Verweis auf ein
   Medien-Dokument.
 

@@ -132,6 +132,50 @@ describe('Pages', () => {
     expect(serialized).toContain('{target="banana"}')
   })
 
+  it('applies {preview} link attributes and strips the markup', async () => {
+    const page = await payload.create({
+      collection: 'pages',
+      data: {
+        title: 'Link previews',
+        slug: 'link-previews',
+        path: '/link-previews',
+        markdownRaw:
+          '[term](/faq/glossar#x){preview} and ' +
+          '[lit](/y){preview="Custom text"} and ' +
+          '[both](/z){preview}{target="_blank"} and ' +
+          '[bad](/w){preview=} stays.\n',
+        sourcePath: 'link-previews_webtext.md',
+      },
+    })
+    createdIds.push(page.id)
+
+    const children = page.content?.root?.children ?? []
+    const paragraph = children[0] as
+      | {
+          children?: {
+            fields?: { preview?: boolean | string; target?: string }
+            type?: string
+          }[]
+        }
+      | undefined
+    const links = (paragraph?.children ?? []).filter(
+      (n) => n.type === 'link',
+    )
+
+    expect(links).toHaveLength(4)
+    expect(links[0]?.fields?.preview).toBe(true)
+    expect(links[1]?.fields?.preview).toBe('Custom text')
+    expect(links[2]?.fields?.preview).toBe(true)
+    expect(links[2]?.fields?.target).toBe('_blank')
+    expect(links[3]?.fields?.preview).toBeUndefined()
+
+    const serialized = JSON.stringify(children)
+    // consumed attributes are gone; the invalid value stays literal
+    expect(serialized).not.toContain('{preview}')
+    expect(serialized).not.toContain('{preview="Custom text"}')
+    expect(serialized).toContain('{preview=}')
+  })
+
   it('regenerates content when markdownRaw changes', async () => {
     const page = await payload.create({
       collection: 'pages',

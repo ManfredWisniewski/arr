@@ -140,7 +140,9 @@ export async function getPostsPage({
 // Tag pills for the blog index filter, ranked by post count over all
 // published posts under pathPrefix — the order is independent of ?hide,
 // so a toggled pill only flips its active state in place and never
-// moves. Untagged posts are always shown, so they need no pill.
+// moves. DEFAULT_EXCLUDED_TAGS rank last regardless of count: they are
+// the hidden-by-default floods (e.g. diary), not the top tags. Untagged
+// posts are always shown, so they need no pill.
 export async function getTags(pathPrefix: string, draft: boolean) {
   const payload = await getPayload({ config: await config })
   const { docs } = await payload.find({
@@ -159,10 +161,14 @@ export async function getTags(pathPrefix: string, draft: boolean) {
       counts.set(tag, (counts.get(tag) ?? 0) + 1)
     }
   }
-  return [...counts.keys()].sort(
-    (a, b) =>
-      (counts.get(b) ?? 0) - (counts.get(a) ?? 0) || a.localeCompare(b),
-  )
+  const rank = (a: string, b: string) =>
+    (counts.get(b) ?? 0) - (counts.get(a) ?? 0) || a.localeCompare(b)
+  const demoted = new Set(DEFAULT_EXCLUDED_TAGS)
+  const all = [...counts.keys()]
+  return [
+    ...all.filter((tag) => !demoted.has(tag)).sort(rank),
+    ...all.filter((tag) => demoted.has(tag)).sort(rank),
+  ]
 }
 
 // Optional intro/meta source for a blog index: a `pages` doc at the index

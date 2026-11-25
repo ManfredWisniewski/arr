@@ -9,7 +9,7 @@ import {
 
 import {
   applyHeadingAnchors,
-  applyLinkTargets,
+  applyLinkAttributes,
   extractHeadingAnchors,
 } from '../lib/markdownAttributes'
 
@@ -50,7 +50,7 @@ export const markdownToContent: CollectionBeforeValidateHook = ({
     markdown: stripped,
   })
   applyHeadingAnchors(content, anchors)
-  applyLinkTargets(content)
+  applyLinkAttributes(content)
   ;(data as { content?: unknown }).content = content
   return data
 }

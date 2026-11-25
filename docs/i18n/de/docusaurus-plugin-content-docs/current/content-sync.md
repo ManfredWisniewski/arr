@@ -23,6 +23,9 @@ konvertiert.
 - `[t](u){target="_blank|_self|_parent|_top"}` setzt `fields.target` am
   Link-Node und entfernt das Markup; ungültige Werte bleiben literal
   stehen.
+- `[t](u){preview}` / `{preview="…"}` setzt `fields.preview` (`true` oder
+  den literalen Text) für die Hover-Vorschau; `{preview=}` und andere
+  fehlerhafte Werte bleiben literal stehen.
 
 ## Medien
 

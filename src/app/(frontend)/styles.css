@@ -115,13 +115,20 @@ hr {
   color: var(--component-text-component-text-light-fixed, #fff);
 }
 
-/* "more" pill in the blog index filter — a <details> whose summary is
-   styled like a pill; opening it reveals the remaining tag pills inline */
+/* "more" pill in the blog index filter — the <details> only carries the
+   +/− summary pill so it never reflows; the expanded list is a sibling
+   toggled via :has([open]) and flattened with display:contents, so its
+   pills share the filter-bar flex layout (spacing and wrap) exactly */
 .filter-more {
   display: inline-flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: calc(var(--padding-padding-8px, 8) * 1px);
+}
+
+.filter-more-list {
+  display: contents;
+}
+
+.blog-filter:not(:has(.filter-more[open])) .filter-more-list {
+  display: none;
 }
 
 .filter-more > summary {
@@ -131,6 +138,18 @@ hr {
 
 .filter-more > summary::-webkit-details-marker {
   display: none;
+}
+
+.filter-more > summary::after {
+  content: '+';
+}
+
+.filter-more[open] > summary::after {
+  content: '-';
+}
+
+.filter-more-sep {
+  color: var(--component-text-component-text-muted, #888);
 }
 
 .filter-more > summary.pill:hover {

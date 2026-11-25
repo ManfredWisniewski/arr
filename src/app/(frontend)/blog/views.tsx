@@ -42,7 +42,6 @@ export const BlogIndexView = ({
   filter,
   intro,
   linkLabel,
-  moreLabel = 'More',
   posts,
   totalPages,
 }: {
@@ -53,7 +52,6 @@ export const BlogIndexView = ({
   filter?: BlogFilter
   intro?: Page
   linkLabel?: string
-  moreLabel?: string
   posts: Post[]
   totalPages: number
 }) => {
@@ -104,10 +102,18 @@ export const BlogIndexView = ({
         <FilterBar className="blog-filter">
           {visible.map(tagPill)}
           {more.length ? (
-            <details className="filter-more">
-              <summary className="pill">{moreLabel}</summary>
-              {more.map(tagPill)}
-            </details>
+            <>
+              <details className="filter-more">
+                <summary className="pill" />
+              </details>
+              <span className="filter-more-list">
+                {more.map(tagPill)}
+                <span aria-hidden="true" className="filter-more-sep">
+                  •
+                </span>
+                <Pill href={basePath}>reset</Pill>
+              </span>
+            </>
           ) : null}
         </FilterBar>
       ) : null}

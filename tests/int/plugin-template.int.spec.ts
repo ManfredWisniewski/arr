@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { getPayload, Payload } from 'payload'
 import type { Config } from 'payload'
 import config from '@/payload.config'
@@ -72,6 +73,8 @@ describe('plugin-template wiring', () => {
       [
         'media',
         'pages',
+        'payload-kv',
+        'payload-locked-documents',
         'payload-migrations',
         'payload-preferences',
         'posts',

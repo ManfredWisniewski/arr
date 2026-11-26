@@ -10,6 +10,7 @@ import { Pages } from './collections/Pages'
 import { Posts } from './collections/Posts'
 import { Structures } from './collections/Structures'
 import { Theme } from './globals/Theme'
+import { pluginTemplate } from './plugins/plugin-template'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -55,6 +56,6 @@ export default buildConfig({
         process.env.DATABASE_URI || process.env.DATABASE_URL || '',
     },
   }),
-  plugins: [],
+  plugins: [pluginTemplate({ enabled: true })],
   sharp,
 })

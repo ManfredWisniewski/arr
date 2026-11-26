@@ -138,6 +138,35 @@ types:  npx payload generate:types && npx tsc
 - The docs theme renders biti token branding in light and dark mode — no
   unbranded default values.
 
+### A17 Plugin builds and boots (spec `+wit/specs/arr/plugin-template/`)
+
+- `npm run build` succeeds with `pluginTemplate` registered in
+  `plugins[]`; a booted instance answers `/api/health` and serves existing
+  routes unchanged.
+
+### A18 Plugin enabled flag (spec `+wit/specs/arr/plugin-template/`)
+
+- With `enabled: false` the factory returns the incoming config
+  unmodified; with `enabled: true` every incoming config key is preserved
+  and a pre-existing `onInit` is invoked before the plugin's init code.
+
+### A19 Plugin schema no-diff (spec `+wit/specs/arr/plugin-template/`)
+
+- `payload generate:types` output and the collection schema are identical
+  to the pre-plugin baseline — no additional collections, globals, fields,
+  endpoints or migrations.
+
+### A20 Plugin skeleton completeness (spec `+wit/specs/arr/plugin-template/`)
+
+- The module under `src/plugins/plugin-template/` demonstrates all
+  documented extension points (options typing, collection/global/hook
+  extension, `onInit` chaining) such that copying it into a second plugin
+  requires only renaming and registering.
+
+### A21 Plugin changelog entry (spec `+wit/specs/arr/plugin-template/`)
+
+- The merged change includes an `Unreleased` entry in `CHANGELOG.md`.
+
 ## Not tested
 
 - REST-level publish denial by the bot key — covered by the `beforeChange`

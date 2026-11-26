@@ -10,7 +10,17 @@ release.
 
 ## Unreleased
 
+## [0.26.0] - 2026-11-26
+
 ## [0.25.0] - 2026-11-25
+
+### Added
+
+- `src/plugins/plugin-template/` — inert Payload plugin skeleton
+  (options type + `enabled` flag, spread-safe config extension, chained
+  `onInit`, `slug` for cross-plugin discovery) registered in
+  `payload.config.ts`; the vetted boilerplate for future arr plugins
+  (spec `+wit/specs/arr/plugin-template/`).
 
 ## [0.24.0] - 2026-11-25
 

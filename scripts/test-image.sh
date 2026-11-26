@@ -33,8 +33,11 @@ else
   docker compose -p "$PROJECT_NAME" -f "$COMPOSE_FILE" up --build --detach
 fi
 
+# exec (not run) — the entrypoint runs migrate.js first, so a run container
+# would execute a second migration concurrently with the server container's
+# and lose the CREATE TABLE race ("relation already exists").
 echo "Checking the runtime user and bundled seed script..."
-docker compose -p "$PROJECT_NAME" -f "$COMPOSE_FILE" run --rm --no-deps payload \
+docker compose -p "$PROJECT_NAME" -f "$COMPOSE_FILE" exec -T payload \
   sh -c '[ "$(id -u)" = "1000" ] && test -f /app/seed-admin.js'
 
 echo "Waiting for the health endpoint..."

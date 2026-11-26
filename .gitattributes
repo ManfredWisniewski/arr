@@ -7,3 +7,7 @@
 # append-only - add rows, never edit or reorder another persona's rows
 # (convention: +wit/common/conventions/coordination.md).
 +team/+coordination/*.md merge=union
+
+# Shell scripts must keep LF endings — a CRLF checkout breaks the shebang
+# inside the Docker image (exec ...: no such file or directory).
+*.sh text eol=lf

@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { getPayload, Payload } from 'payload'
 import config from '@/payload.config'
 
@@ -126,10 +127,10 @@ describe('Pages', () => {
 
     const serialized = JSON.stringify(children)
     // consumed attributes are gone; inline-code and invalid values stay
-    expect(serialized).not.toContain('{target="_self"}')
+    expect(serialized).not.toContain('{target=\\"_self\\"}')
     expect(serialized).not.toContain('and [rel')
-    expect(serialized).toContain('code {target="_blank"}')
-    expect(serialized).toContain('{target="banana"}')
+    expect(serialized).toContain('code {target=\\"_blank\\"}')
+    expect(serialized).toContain('{target=\\"banana\\"}')
   })
 
   it('applies {preview} link attributes and strips the markup', async () => {
@@ -172,7 +173,7 @@ describe('Pages', () => {
     const serialized = JSON.stringify(children)
     // consumed attributes are gone; the invalid value stays literal
     expect(serialized).not.toContain('{preview}')
-    expect(serialized).not.toContain('{preview="Custom text"}')
+    expect(serialized).not.toContain('{preview=\\"Custom text\\"}')
     expect(serialized).toContain('{preview=}')
   })
 

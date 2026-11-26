@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { getPayload, type Payload } from 'payload'
 import config from '@/payload.config'
 
@@ -129,7 +130,9 @@ describe('preview-confirm', () => {
     )
     expect(structureEntry?.viewPath).toBe('/')
     expect(
-      pending.find((doc) => doc.id === draftPage.id)?.viewPath,
+      pending.find(
+        (doc) => doc.collection === 'pages' && doc.id === draftPage.id,
+      )?.viewPath,
     ).toBe('/review-draft')
   })
 

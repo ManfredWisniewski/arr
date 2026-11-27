@@ -8,6 +8,7 @@ import { DashboardTemplate } from './dashboard'
 import { DefaultTemplate, type TemplateProps } from './default'
 import { DocsTemplate } from './docs'
 import { FeaturesTemplate } from './features'
+import { JobsListTemplate } from './jobs-list'
 import { JourneyTemplate } from './journey'
 import { LandingTemplate } from './landing'
 import { PricingTemplate } from './pricing'
@@ -23,6 +24,7 @@ const registry: Record<string, React.ComponentType<TemplateProps>> = {
   dashboard: DashboardTemplate,
   docs: DocsTemplate,
   features: FeaturesTemplate,
+  'jobs-list': JobsListTemplate,
   journey: JourneyTemplate,
   landing: LandingTemplate,
   pricing: PricingTemplate,
@@ -38,4 +40,10 @@ export const resolveTemplate = (name?: null | string) =>
 export const renderTemplate = (
   page: Page,
   renderBody: TemplateProps['renderBody'],
-) => createElement(resolveTemplate(page.template), { page, renderBody })
+  searchParams?: TemplateProps['searchParams'],
+) =>
+  createElement(resolveTemplate(page.template), {
+    page,
+    renderBody,
+    searchParams,
+  })

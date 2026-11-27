@@ -1,0 +1,8 @@
+# Site configuration pushed to the Payload `theme` global.
+# Paths are relative to this file. Images are hotlinked to w1t.org —
+# no media files are duplicated in this repository.
+site_name: arr Demo
+logo: https://w1t.org/media/wit_logo.svg
+logo_alt: arr Demo
+favicon: https://w1t.org/media/wit_logo.svg
+lang: en

@@ -15,7 +15,7 @@ const escapeXml = (value: string) =>
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&apos;')
 
-// Published pages + posts. Drafts, meta.noindex docs and the /blog
+// Published pages + posts + jobs. Drafts, meta.noindex docs and the /blog
 // archive routes (navigation, not search inventory — noindexed) are
 // never listed; a failing DB yields just the static entries instead
 // of a 500 (same fail-open pattern as layout.tsx).
@@ -25,7 +25,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
     const payload = await getPayload({ config: await config })
     const published = { _status: { equals: 'published' } }
-    const [pages, posts] = await Promise.all([
+    const [pages, posts, jobs] = await Promise.all([
       payload.find({
         collection: 'pages',
         pagination: false,
@@ -35,6 +35,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         collection: 'posts',
         pagination: false,
         sort: '-publishedAt',
+        where: published,
+      }),
+      payload.find({
+        collection: 'jobs',
+        pagination: false,
+        sort: '-datePosted',
         where: published,
       }),
     ])
@@ -50,6 +56,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         .filter((doc) => !doc.meta?.noindex)
         .map((doc) => ({
           lastModified: doc.publishedAt ?? doc.updatedAt,
+          url: `${base}${escapeXml(doc.path)}`,
+        })),
+      ...jobs.docs
+        .filter((doc) => !doc.meta?.noindex)
+        .map((doc) => ({
+          lastModified: doc.datePosted ?? doc.updatedAt,
           url: `${base}${escapeXml(doc.path)}`,
         })),
     ]

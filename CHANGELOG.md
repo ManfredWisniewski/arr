@@ -12,6 +12,25 @@ release.
 
 ## [0.27.0] - 2026-11-26
 
+### Added
+
+- `src/plugins/jobs/` — Payload mirror of the WP *Job Postings* plugin
+  (spec `+wit/specs/arr/jobs/`): synced `jobs` collection with the
+  schema.org field set, public list/detail routes (`/karriere` default,
+  `path`-driven like posts), `JobPosting` JSON-LD, and an apply form
+  (`POST /jobs-apply`) storing `job-applications` + private
+  `job-attachments` uploads with honeypot, file allowlist and
+  `payload.email` notification. Jobs join the review/publish flow and
+  the sitemap.
+- `jobs-list` page template renders the filtered job list wherever the
+  content repo places it.
+
+### Changed
+
+- Color mode defaults to the system setting (`prefers-color-scheme`)
+  when no preference is stored; choosing "System" removes the stored
+  `arr.theme` value instead of saving it.
+
 ## [0.26.0] - 2026-11-26
 
 ## [0.25.0] - 2026-11-25

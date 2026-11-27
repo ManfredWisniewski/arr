@@ -1,0 +1,7 @@
+collection: pages
+collections:
+  "blog/**/*.md": posts
+  "*/blog/**/*.md": posts
+media_collection: media
+include_glob: "**/webtext.md"
+source_repo: arr-demo

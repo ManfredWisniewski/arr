@@ -71,6 +71,9 @@ describe('plugin-template wiring', () => {
   it('boots with an unchanged collection set', () => {
     expect(Object.keys(payload.collections).sort()).toEqual(
       [
+        'job-applications',
+        'job-attachments',
+        'jobs',
         'media',
         'pages',
         'payload-kv',

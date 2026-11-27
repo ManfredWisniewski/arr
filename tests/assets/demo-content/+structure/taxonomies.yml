@@ -1,0 +1,27 @@
+# Labels and descriptions for blog archives (/blog/kategorie/<slug>,
+# /blog/tag/<slug>). Slugs come from post front matter; entries here are
+# optional — without a match the slug is displayed.
+categories:
+  technik:
+    label: Technology
+    description: Implementation, infrastructure and debugging.
+  design:
+    label: Design
+    description: The biti design system — tokens, themes and components.
+  daily:
+    label: Daily
+    description: Work diary entries — what happened, in one sitting.
+tags:
+  agents: {label: Agents}
+  api: {label: API}
+  ci: {label: CI}
+  css: {label: CSS}
+  docker: {label: Docker}
+  git: {label: Git}
+  json-ld: {label: JSON-LD}
+  markdown: {label: Markdown}
+  nextjs: {label: Next.js}
+  payload: {label: Payload CMS}
+  seo: {label: SEO}
+  testing: {label: Testing}
+  wordpress: {label: WordPress}

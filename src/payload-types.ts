@@ -72,6 +72,9 @@ export interface Config {
     pages: Page;
     posts: Post;
     structures: Structure;
+    jobs: Job;
+    'job-applications': JobApplication;
+    'job-attachments': JobAttachment;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -84,6 +87,9 @@ export interface Config {
     pages: PagesSelect<false> | PagesSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
     structures: StructuresSelect<false> | StructuresSelect<true>;
+    jobs: JobsSelect<false> | JobsSelect<true>;
+    'job-applications': JobApplicationsSelect<false> | JobApplicationsSelect<true>;
+    'job-attachments': JobAttachmentsSelect<false> | JobAttachmentsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -345,6 +351,169 @@ export interface Structure {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "jobs".
+ */
+export interface Job {
+  id: number;
+  title: string;
+  slug: string;
+  path: string;
+  employmentType?:
+    ('FULL_TIME' | 'PART_TIME' | 'CONTRACTOR' | 'TEMPORARY' | 'INTERN' | 'VOLUNTEER' | 'PER_DIEM' | 'OTHER')[] | null;
+  employmentBeginning?: string | null;
+  employmentDuration?: string | null;
+  industry?: string | null;
+  jobLocation?: {
+    streetAddress?: string | null;
+    addressLocality?: string | null;
+    addressRegion?: string | null;
+    postalCode?: string | null;
+    addressCountry?: string | null;
+  };
+  descriptionRaw?: string | null;
+  description?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  responsibilitiesRaw?: string | null;
+  responsibilities?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  qualificationsRaw?: string | null;
+  qualifications?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  benefitsRaw?: string | null;
+  benefits?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  contactsRaw?: string | null;
+  contacts?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  workHours?: string | null;
+  baseSalary?: {
+    currency?: string | null;
+    value?: number | null;
+    minValue?: number | null;
+    maxValue?: number | null;
+    unitType?: ('HOUR' | 'DAY' | 'WEEK' | 'MONTH' | 'YEAR') | null;
+  };
+  datePosted?: string | null;
+  validThrough?: string | null;
+  hiringOrganization?: {
+    name?: string | null;
+    url?: string | null;
+    logo?: (number | null) | Media;
+  };
+  applicationEmail?: string | null;
+  categories?: string[] | null;
+  sourcePath?: string | null;
+  sourceRepo?: string | null;
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    noindex?: boolean | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "job-applications".
+ */
+export interface JobApplication {
+  id: number;
+  job: number | Job;
+  name: string;
+  email: string;
+  phone?: string | null;
+  message?: string | null;
+  cv?: (number | null) | JobAttachment;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "job-attachments".
+ */
+export interface JobAttachment {
+  id: number;
+  kind?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -386,6 +555,18 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'structures';
         value: number | Structure;
+      } | null)
+    | ({
+        relationTo: 'jobs';
+        value: number | Job;
+      } | null)
+    | ({
+        relationTo: 'job-applications';
+        value: number | JobApplication;
+      } | null)
+    | ({
+        relationTo: 'job-attachments';
+        value: number | JobAttachment;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -601,6 +782,103 @@ export interface StructuresSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "jobs_select".
+ */
+export interface JobsSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  path?: T;
+  employmentType?: T;
+  employmentBeginning?: T;
+  employmentDuration?: T;
+  industry?: T;
+  jobLocation?:
+    | T
+    | {
+        streetAddress?: T;
+        addressLocality?: T;
+        addressRegion?: T;
+        postalCode?: T;
+        addressCountry?: T;
+      };
+  descriptionRaw?: T;
+  description?: T;
+  responsibilitiesRaw?: T;
+  responsibilities?: T;
+  qualificationsRaw?: T;
+  qualifications?: T;
+  benefitsRaw?: T;
+  benefits?: T;
+  contactsRaw?: T;
+  contacts?: T;
+  workHours?: T;
+  baseSalary?:
+    | T
+    | {
+        currency?: T;
+        value?: T;
+        minValue?: T;
+        maxValue?: T;
+        unitType?: T;
+      };
+  datePosted?: T;
+  validThrough?: T;
+  hiringOrganization?:
+    | T
+    | {
+        name?: T;
+        url?: T;
+        logo?: T;
+      };
+  applicationEmail?: T;
+  categories?: T;
+  sourcePath?: T;
+  sourceRepo?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        noindex?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "job-applications_select".
+ */
+export interface JobApplicationsSelect<T extends boolean = true> {
+  job?: T;
+  name?: T;
+  email?: T;
+  phone?: T;
+  message?: T;
+  cv?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "job-attachments_select".
+ */
+export interface JobAttachmentsSelect<T extends boolean = true> {
+  kind?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

@@ -1,13 +1,18 @@
 import { draftMode, headers } from 'next/headers'
 import { getPayload, type TypedUser, type Where } from 'payload'
 
-import type { Page, Post, Structure } from '@/payload-types'
+import type { Job, Page, Post, Structure } from '@/payload-types'
 import config from '@/payload.config'
 
 // Shared queries for the preview-confirm flow (spec
 // +wit/specs/arr/preview-confirm/): session detection, draft-context
 // resolution and the pending-review set.
-export const REVIEW_COLLECTIONS = ['pages', 'posts', 'structures'] as const
+export const REVIEW_COLLECTIONS = [
+  'pages',
+  'posts',
+  'structures',
+  'jobs',
+] as const
 export type ReviewCollection = (typeof REVIEW_COLLECTIONS)[number]
 
 const getReviewPayload = async () => getPayload({ config: await config })
@@ -54,7 +59,7 @@ export type PendingDoc = {
 // (navigation/footer), so the representative draft view is the home page.
 export const docViewPath = (
   collection: ReviewCollection,
-  doc: Page | Post | Structure,
+  doc: Job | Page | Post | Structure,
 ): string =>
   collection !== 'structures' && 'path' in doc && doc.path
     ? doc.path
@@ -73,7 +78,7 @@ export async function getPendingDocs(): Promise<PendingDoc[]> {
       limit: 0,
       where,
     })
-    for (const doc of docs as (Page | Post | Structure)[]) {
+    for (const doc of docs as (Job | Page | Post | Structure)[]) {
       pending.push({
         collection,
         id: doc.id,

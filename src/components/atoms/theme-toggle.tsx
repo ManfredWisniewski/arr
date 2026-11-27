@@ -17,15 +17,14 @@ const applyTheme = (pref: string) => {
 }
 
 // Light/dark choice per +wit/design design-tokens.md: stored preference key
-// `arr.theme`, options system/light/dark; no stored value defaults to
-// "light" on all sites, "system" is an explicit stored choice that follows
-// prefers-color-scheme, including live changes. The matching pre-paint
+// `arr.theme`, options system/light/dark; "system" removes the stored value
+// and follows prefers-color-scheme, including live changes. The matching pre-paint
 // script lives in the root layout <head>.
 export function ThemeToggle() {
   const selectRef = useRef<HTMLSelectElement>(null)
 
   useEffect(() => {
-    const pref = localStorage.getItem(THEME_KEY) ?? 'light'
+    const pref = localStorage.getItem(THEME_KEY) ?? 'system'
     if (selectRef.current) {
       selectRef.current.value = pref
     }
@@ -33,7 +32,7 @@ export function ThemeToggle() {
     const media = window.matchMedia('(prefers-color-scheme: dark)')
     const onChange = () => {
       if (!localStorage.getItem(THEME_KEY)) {
-        applyTheme('light')
+        applyTheme('system')
       }
     }
     media.addEventListener('change', onChange)
@@ -44,10 +43,14 @@ export function ThemeToggle() {
     <select
       aria-label="Farbschema"
       className="theme-toggle"
-      defaultValue="light"
+      defaultValue="system"
       onChange={(event) => {
         const pref = event.target.value
-        localStorage.setItem(THEME_KEY, pref)
+        if (pref === 'system') {
+          localStorage.removeItem(THEME_KEY)
+        } else {
+          localStorage.setItem(THEME_KEY, pref)
+        }
         // a mode choice wins over a dev variant — clear it so the
         // pushed theme applies, and reset the dev switcher's select
         localStorage.removeItem('theme-variant')

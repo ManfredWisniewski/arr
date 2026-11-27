@@ -11,6 +11,7 @@ import { Posts } from './collections/Posts'
 import { Structures } from './collections/Structures'
 import { Theme } from './globals/Theme'
 import { pluginTemplate } from './plugins/plugin-template'
+import { jobs } from './plugins/jobs'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -56,6 +57,12 @@ export default buildConfig({
         process.env.DATABASE_URI || process.env.DATABASE_URL || '',
     },
   }),
-  plugins: [pluginTemplate({ enabled: true })],
+  plugins: [
+    pluginTemplate({ enabled: true }),
+    jobs({
+      enabled: true,
+      defaultApplicationEmail: process.env.JOBS_APPLICATION_EMAIL,
+    }),
+  ],
   sharp,
 })

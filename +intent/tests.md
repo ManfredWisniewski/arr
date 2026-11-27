@@ -167,6 +167,47 @@ types:  npx payload generate:types && npx tsc
 
 - The merged change includes an `Unreleased` entry in `CHANGELOG.md`.
 
+### A22 Job push contract (spec `+wit/specs/arr/jobs/`)
+
+- A job pushed to `/api/jobs` is stored with `sourcePath` as upsert key and
+  a unique `path`; a second push with the same `sourcePath` updates the
+  same document; drafts are invisible to anonymous reads and appear after
+  publish. (SC-001, SC-006)
+
+### A23 Job list and filters (spec `+wit/specs/arr/jobs/`)
+
+- The list route renders every published job with title, employment type,
+  location and date; `q` plus the `category`/`employmentType`/`location`
+  filters each narrow the result set; an empty result renders a defined
+  empty state. (SC-002)
+
+### A24 Job detail and JSON-LD (spec `+wit/specs/arr/jobs/`)
+
+- A published job resolves at its `path` and renders every populated
+  section; a draft route answers 404 anonymously; the page embeds
+  schema.org `JobPosting` JSON-LD containing all populated fields and no
+  empty keys. (SC-003)
+
+### A25 Apply endpoint (spec `+wit/specs/arr/jobs/`)
+
+- A valid multipart submission stores one application linked to the job,
+  one attachment, and triggers one `payload.email` call to the job
+  recipient; a filled honeypot stores nothing and returns success; missing
+  fields or disallowed file types are rejected; a missing email adapter
+  does not fail the request. (SC-004)
+
+### A26 Repository verification (spec `+wit/specs/arr/jobs/`)
+
+- `npm run build`, `npm run lint`, `generate:types` and the full
+  `test:int` suite pass; `./scripts/test-vhost.sh` including the image
+  smoke test is green. (SC-005)
+
+### A27 Jobs lifecycle parity (spec `+wit/specs/arr/jobs/`)
+
+- `jobs` behaves like posts for the pipeline: upsert on `sourcePath`,
+  draft→publish lifecycle, sitemap-resubmit and preview hooks wired.
+  (SC-006)
+
 ## Not tested
 
 - REST-level publish denial by the bot key — covered by the `beforeChange`

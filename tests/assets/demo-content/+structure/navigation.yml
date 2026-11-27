@@ -1,0 +1,14 @@
+items:
+  - {label: Home, path: /}
+  - {label: Blog, path: /blog}
+  - {label: FAQ, path: /faq}
+  - label: Team
+    children:
+      - {label: Crew, path: /team/crew}
+      - {label: Manfred, path: /team/manfred}
+      - {label: Workflows, path: /team/workflows}
+  - {label: Jobs, path: /karriere}
+  - label: Contact
+    children:
+      - {label: Contact, path: /contact}
+      - {label: Privacy, path: /contact/privacy}

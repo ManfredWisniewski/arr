@@ -12,6 +12,7 @@ import * as migration_20261030_090502_add_post_slides from './20261030_090502_ad
 import * as migration_20261110_120000_add_theme_tracking from './20261110_120000_add_theme_tracking';
 import * as migration_20261110_121500_add_theme_consent from './20261110_121500_add_theme_consent';
 import * as migration_20261124_203038_add_theme_meta_lang_noindex from './20261124_203038_add_theme_meta_lang_noindex';
+import * as migration_20261126_212949_add_jobs from './20261126_212949_add_jobs';
 
 export const migrations = [
   {
@@ -82,6 +83,11 @@ export const migrations = [
   {
     up: migration_20261124_203038_add_theme_meta_lang_noindex.up,
     down: migration_20261124_203038_add_theme_meta_lang_noindex.down,
-    name: '20261124_203038_add_theme_meta_lang_noindex'
+    name: '20261124_203038_add_theme_meta_lang_noindex',
+  },
+  {
+    up: migration_20261126_212949_add_jobs.up,
+    down: migration_20261126_212949_add_jobs.down,
+    name: '20261126_212949_add_jobs'
   },
 ];

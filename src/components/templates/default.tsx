@@ -6,6 +6,8 @@ export type TemplateProps = {
   page: Page
   // renders the Lexical content (upload/figure converters applied)
   renderBody: (data: Page['content']) => React.ReactNode
+  // raw query params — templates with filters (jobs-list) read these
+  searchParams?: Record<string, string | string[] | undefined>
 }
 
 // Default article render — semantic classes only, styled by the pushed

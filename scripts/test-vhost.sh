@@ -74,4 +74,22 @@ $SSH "$VHOST" "cd '$REMOTE_DIR' && docker compose run --rm payload npm run test:
 step "Running production image smoke test (builds the image)"
 $SSH "$VHOST" "cd '$REMOTE_DIR' && ./scripts/test-image.sh"
 
+step "(Re)starting the dev site on the LAN (0.0.0.0:3000)"
+# `compose run -p` instead of `up`: the base file's 127.0.0.1:3000 binding
+# would merge with an override and collide — run applies only -p.
+$SSH "$VHOST" "cd '$REMOTE_DIR' \
+  && docker rm -f arr-payload-dev >/dev/null 2>&1 || true \
+  && docker compose run -d -p 0.0.0.0:3000:3000 --name arr-payload-dev payload >/dev/null \
+  && for i in \$(seq 1 90); do \
+       curl -sf -o /dev/null http://127.0.0.1:3000/api/health && break; \
+       sleep 5; \
+     done \
+  && curl -sf http://127.0.0.1:3000/api/health >/dev/null"
+
+step "Building biti arr theme tokens"
+$SSH "$VHOST" "docker exec -w /app arr-payload-dev sh -c 'npm --prefix biti/tokens ci && npm --prefix biti/tokens run preview'"
+
+step "Pushing demo content and the compiled theme (published)"
+$SSH "$VHOST" "docker exec -w /app arr-payload-dev npx tsx scripts/push-demo-content.ts"
+
 step "All vhost checks passed"

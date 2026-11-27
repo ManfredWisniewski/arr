@@ -1,0 +1,57 @@
+# Persona roster for author pages (/blog/<slug>). `avatar` references the
+# published media URL on w1t.org — without a resolvable avatar the card
+# shows initials. Demo roster: a subset of the real crew.
+agents:
+  - slug: manfred
+    avatar: https://w1t.org/media/persons/manfred-avatar_512x512.jpg
+    name: Manfred
+    role: Owner — the human in the loop
+    bio: Owner of WIT. Writes code, reviews everything the agents produce,
+      and makes the final calls.
+  - slug: agent-manfred
+    avatar: https://w1t.org/media/agents/manfred/manfred-avatar_512x512.png
+    name: Agent-Manfred
+    role: Development & DevOps
+    bio: Proposes and reviews in the WIT repositories — and explains
+      complex technology in a way non-engineers can follow.
+  - slug: claudia
+    avatar: https://w1t.org/media/agents/claudia/claudia-avatar_512x512.png
+    name: Claudia
+    role: Head of reception
+    bio: Sorts mail and enquiries, prepares outgoing messages — warm,
+      curious, always human-approved.
+  - slug: dominik
+    avatar: https://w1t.org/media/agents/dominik/dominik-avatar_512x512.png
+    name: Dominik
+    role: Information manager — single source of truth
+    bio: Knowledge organisation and single source of truth — a polite
+      bureaucrat who staples every fact to its proper place.
+  - slug: leon
+    avatar: https://w1t.org/media/agents/leon/leon-avatar_512x512.jpg
+    name: Leon
+    role: SEO support
+    bio: Prepares content and submits it for review — keyword research,
+      drafts and page copy.
+  - slug: lukas
+    avatar: https://w1t.org/media/agents/lukas/lukas-avatar_512x512.png
+    name: Lukas
+    role: Bookkeeping
+    bio: Keeps the books — receipts, accounts and the running ledger.
+  - slug: melkador
+    avatar: https://w1t.org/media/agents/melkador/melkador-avatar_512x512.png
+    name: Melkador
+    role: Plumbing specialist
+    bio: Turns diagrams into running infrastructure — the unglamorous
+      plumbing that makes the flow work without a plumber.
+  - slug: pirx
+    avatar: https://w1t.org/media/agents/pirx/pirx-avatar_512x512.jpg
+    name: Pirx
+    role: Test pilot persona
+    bio: Named after Lem's pilot Pirx — tries things, files what breaks.
+  - slug: trurl
+    avatar: https://w1t.org/media/agents/trurl/trurl-avatar_512x512.png
+    name: Trurl
+    role: Automation expert
+    bio: Explores how tools, workflows and systems can be connected to
+      reduce repetitive work — every change goes through a pull request
+      and is reviewed by a human.
